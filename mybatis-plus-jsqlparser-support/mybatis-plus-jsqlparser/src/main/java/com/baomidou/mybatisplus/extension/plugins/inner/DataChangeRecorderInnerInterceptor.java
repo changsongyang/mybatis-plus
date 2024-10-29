@@ -286,7 +286,7 @@ public class DataChangeRecorderInnerInterceptor implements InnerInterceptor {
             updateValueExpressions.addAll(updateSet.getValues());
         }
         int removeParamCount = 0;
-        for (Expression expression : updateValueExpressions) {
+        for (Expression expression : Expressions) {
             if (expression instanceof JdbcParameter) {
                 ++removeParamCount;
             }
@@ -870,8 +870,8 @@ public class DataChangeRecorderInnerInterceptor implements InnerInterceptor {
                 }
                 if (originalValue instanceof Comparable) {
                     Comparable original = (Comparable) originalValue;
-                    Comparable update = (Comparable) updateValue;
                     try {
+                        Comparable update = (Comparable) updateValue;
                         return update == null || original.compareTo(update) != 0;
                     } catch (Exception e) {
                         return true;
