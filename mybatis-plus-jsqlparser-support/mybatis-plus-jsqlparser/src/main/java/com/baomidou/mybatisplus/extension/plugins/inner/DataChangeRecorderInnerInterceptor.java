@@ -286,7 +286,7 @@ public class DataChangeRecorderInnerInterceptor implements InnerInterceptor {
             updateValueExpressions.addAll(updateSet.getValues());
         }
         int removeParamCount = 0;
-        for (Expression expression : Expressions) {
+        for (Expression expression : updateValueExpressions) {
             if (expression instanceof JdbcParameter) {
                 ++removeParamCount;
             }
