@@ -44,6 +44,12 @@ class GeneratePomTest {
             Dependency extension = dependenciesMap.get("mybatis-plus-spring");
             Assertions.assertEquals("compile", extension.getScope());
             Assertions.assertFalse(extension.isOptional());
+            Dependency mybatisSpring = dependenciesMap.get("mybatis-spring");
+            Assertions.assertEquals("compile", mybatisSpring.getScope());
+            Assertions.assertTrue(mybatisSpring.isOptional());
+            Dependency kotlinStdlib = dependenciesMap.get("kotlin-stdlib-jdk8");
+            Assertions.assertEquals("compile", kotlinStdlib.getScope());
+            Assertions.assertTrue(kotlinStdlib.isOptional());
         }
     }
 

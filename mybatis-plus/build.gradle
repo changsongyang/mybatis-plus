@@ -1,3 +1,15 @@
+apply plugin: 'kotlin'
+
+compileKotlin{
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+compileTestKotlin {
+    kotlinOptions {
+        freeCompilerArgs = ['-Xjvm-default=all']
+    }
+}
+
 dependencies {
     api project(":mybatis-plus-core")
     api project(":mybatis-plus-annotation")
@@ -6,6 +18,7 @@ dependencies {
     api "${lib.mybatis}"
 
     implementation "${lib."mybatis-spring"}"
+    implementation "${lib."kotlin-stdlib-jdk8"}"
 
     testImplementation "${lib.'spring-web'}"
 

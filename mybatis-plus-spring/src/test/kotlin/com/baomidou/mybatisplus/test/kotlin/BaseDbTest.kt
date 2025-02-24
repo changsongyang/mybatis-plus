@@ -36,7 +36,6 @@ abstract class BaseDbTest<T> : TypeReference<T>() {
     protected var jdbcTemplate: JdbcTemplate
 
     init {
-        SqlRunner.DEFAULT.close()
         val ds = dataSource()
         val tableSql = tableSql()
         val tableDataSql = tableDataSql()
