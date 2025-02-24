@@ -1,12 +1,13 @@
 package ${package.Mapper};
 
-import ${package.Entity}.${entity};
-import ${superMapperClassPackage};
-<% for(pkg in importPackages){ %>
+<% for(pkg in importMapperFrameworkPackages){ %>
 import ${pkg};
 <% } %>
-<% if(mapperAnnotationClass!=null){ %>
-import ${mapperAnnotationClass.name};
+<% if(isNotEmpty(importMapperJavaPackages)){ %>
+
+<% for(pkg in importMapperJavaPackages){ %>
+import ${pkg};
+<% } %>
 <% } %>
 
 /**

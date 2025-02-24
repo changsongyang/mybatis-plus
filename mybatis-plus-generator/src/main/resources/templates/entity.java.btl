@@ -1,6 +1,10 @@
 package ${package.Entity};
 
-<% for(pkg in importEntityPackages){ %>
+<% for(pkg in importEntityFrameworkPackages){ %>
+import ${pkg};
+<% } %>
+
+<% for(pkg in importEntityJavaPackages){ %>
 import ${pkg};
 <% } %>
 

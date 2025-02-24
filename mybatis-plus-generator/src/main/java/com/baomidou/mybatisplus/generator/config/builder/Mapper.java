@@ -15,8 +15,11 @@
  */
 package com.baomidou.mybatisplus.generator.config.builder;
 
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.generator.ITemplate;
 import com.baomidou.mybatisplus.generator.config.ConstVal;
+import com.baomidou.mybatisplus.generator.config.PackageConfig;
 import com.baomidou.mybatisplus.generator.config.StrategyConfig;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import com.baomidou.mybatisplus.generator.function.ConverterFileName;
@@ -33,9 +36,12 @@ import org.slf4j.LoggerFactory;
 import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 控制器属性配置
@@ -172,6 +178,14 @@ public class Mapper implements ITemplate {
      */
     private IGenerateMapperMethodHandler generateMapperMethodHandler;
 
+    /**
+     * 导包处理方法
+     *
+     * @since 3.5.11
+     */
+    private Function<Set<String>, List<String>> importPackageFunction;
+
+
     @Override
     @NotNull
     public Map<String, Object> renderData(@NotNull TableInfo tableInfo) {
@@ -192,12 +206,25 @@ public class Mapper implements ITemplate {
         data.put("generateMapperXml", this.generateMapperXml);
         data.put("generateMapper", this.generateMapper);
         List<MapperMethod> methodList = null;
-        Set<String> importPackages = null;
+        Set<String> importPackages = new HashSet<>();
         if (generateMapperMethodHandler != null) {
             methodList = generateMapperMethodHandler.getMethodList(tableInfo);
-            importPackages = generateMapperMethodHandler.getImportPackages(tableInfo);
+            importPackages.addAll(generateMapperMethodHandler.getImportPackages(tableInfo));
         }
-        data.put("importPackages", importPackages == null ? Collections.emptySet() : importPackages);
+        if(StringUtils.isNotBlank(superClass)){
+            importPackages.add(superClass);
+        }
+        if (mapperAnnotationClass != null) {
+            importPackages.add(mapperAnnotationClass.getName());
+        }
+        PackageConfig packageConfig = tableInfo.getPackageConfig();
+        String entityPackage = packageConfig.getPackageInfo(null, ConstVal.ENTITY) + StringPool.DOT + tableInfo.getEntityName();
+        importPackages.add(entityPackage);
+        Set<String> javaPackages = importPackages.stream().filter(pkg -> pkg.startsWith("java")).collect(Collectors.toSet());
+        Set<String> frameworkPackages = importPackages.stream().filter(pkg -> !pkg.startsWith("java")).collect(Collectors.toSet());
+        data.put("importPackages", importPackageFunction != null ? importPackageFunction.apply(importPackages) : importPackages.stream().sorted().collect(Collectors.toList()));
+        data.put("importMapperFrameworkPackages", importPackageFunction != null ? importPackageFunction.apply(frameworkPackages) : frameworkPackages.stream().sorted().collect(Collectors.toList()));
+        data.put("importMapperJavaPackages", importPackageFunction != null ? importPackageFunction.apply(javaPackages) : javaPackages.stream().sorted().collect(Collectors.toList()));
         data.put("mapperMethodList", methodList == null ? Collections.emptyList() : methodList);
         return data;
     }
@@ -427,6 +454,20 @@ public class Mapper implements ITemplate {
             this.mapper.generateMapperMethodHandler = generateMapperMethodHandler;
             return this;
         }
+
+
+        /**
+         * 导包处理方法
+         *
+         * @param importPackageFunction 导包处理
+         * @return this
+         * @since 3.5.11
+         */
+        public Builder importPackageFunction(Function<Set<String>, List<String>> importPackageFunction) {
+            this.mapper.importPackageFunction = importPackageFunction;
+            return this;
+        }
+
 
         @NotNull
         public Mapper get() {

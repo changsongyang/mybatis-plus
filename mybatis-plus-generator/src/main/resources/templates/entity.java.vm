@@ -1,6 +1,10 @@
 package ${package.Entity};
 
-#foreach($pkg in ${importEntityPackages})
+#foreach($pkg in ${importEntityFrameworkPackages})
+import ${pkg};
+#end
+
+#foreach($pkg in ${importEntityJavaPackages})
 import ${pkg};
 #end
 

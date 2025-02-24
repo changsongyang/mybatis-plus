@@ -1,13 +1,13 @@
 package #(package.Mapper);
 
-import #(package.Entity).#(entity);
-import #(superMapperClassPackage);
-
-#for(pkg : importPackages)
+#for(pkg : importMapperFrameworkPackages)
 import #(pkg);
 #end
-#if(mapperAnnotationClass)
-import #(mapperAnnotationClass.name);
+#if(!importMapperJavaPackages.isEmpty())
+
+#for(pkg : importMapperJavaPackages)
+import #(pkg);
+#end
 #end
 
 /**

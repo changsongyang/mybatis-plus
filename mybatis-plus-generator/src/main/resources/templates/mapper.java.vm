@@ -1,14 +1,13 @@
 package ${package.Mapper};
 
-import ${package.Entity}.${entity};
-import ${superMapperClassPackage};
-
-#foreach($pkg in ${importPackages})
+#foreach($pkg in ${importMapperFrameworkPackages})
 import ${pkg};
 #end
+#if($importMapperJavaPackages.size()>0)
 
-#if(${mapperAnnotationClass})
-import ${mapperAnnotationClass.name};
+#foreach($pkg in ${importMapperJavaPackages})
+import ${pkg};
+#end
 #end
 
 /**

@@ -1,6 +1,10 @@
 package ${package.Entity}
 
-<#list importEntityPackages as pkg>
+<#list importEntityFrameworkPackages as pkg>
+import ${pkg}
+</#list>
+
+<#list importEntityJavaPackages as pkg>
 import ${pkg}
 </#list>
 

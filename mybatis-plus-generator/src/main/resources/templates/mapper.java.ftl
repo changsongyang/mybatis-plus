@@ -1,13 +1,13 @@
 package ${package.Mapper};
 
-import ${package.Entity}.${entity};
-import ${superMapperClassPackage};
-
-<#list importPackages as pkg>
+<#list importMapperFrameworkPackages as pkg>
 import ${pkg};
 </#list>
-<#if mapperAnnotationClass??>
-import ${mapperAnnotationClass.name};
+<#if importMapperJavaPackages?size !=0>
+
+  <#list importMapperJavaPackages as pkg>
+import ${pkg};
+   </#list>
 </#if>
 
 /**

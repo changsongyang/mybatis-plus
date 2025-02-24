@@ -453,6 +453,12 @@ public class Entity implements ITemplate {
             classAnnotationAttributes.stream().sorted(Comparator.comparingInt(s -> s.getDisplayName().length())).collect(Collectors.toList()));
         data.put("importEntityPackages", importPackageFunction != null ? importPackageFunction.apply(importPackages) :
             importPackages.stream().sorted().collect(Collectors.toList()));
+        Set<String> javaPackages = importPackages.stream().filter(pkg -> pkg.startsWith("java")).collect(Collectors.toSet());
+        data.put("importEntityJavaPackages", importPackageFunction != null ? importPackageFunction.apply(javaPackages) :
+            javaPackages.stream().sorted().collect(Collectors.toList()));
+        Set<String> frameworkPackages = importPackages.stream().filter(pkg -> !pkg.startsWith("java")).collect(Collectors.toSet());
+        data.put("importEntityFrameworkPackages", importPackageFunction != null ? importPackageFunction.apply(frameworkPackages) :
+            frameworkPackages.stream().sorted().collect(Collectors.toList()));
         data.put("entityToString", this.toString);
         return data;
     }

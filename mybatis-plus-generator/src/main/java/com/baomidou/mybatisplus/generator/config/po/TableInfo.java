@@ -18,6 +18,7 @@ package com.baomidou.mybatisplus.generator.config.po;
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.generator.config.GlobalConfig;
+import com.baomidou.mybatisplus.generator.config.PackageConfig;
 import com.baomidou.mybatisplus.generator.config.StrategyConfig;
 import com.baomidou.mybatisplus.generator.config.builder.ConfigBuilder;
 import com.baomidou.mybatisplus.generator.config.builder.Entity;
@@ -163,6 +164,12 @@ public class TableInfo {
     private String schemaName;
 
     /**
+     * @since 3.5.11
+     */
+    @Getter
+    private PackageConfig packageConfig;
+
+    /**
      * 构造方法
      *
      * @param configBuilder 配置构建
@@ -173,6 +180,7 @@ public class TableInfo {
         this.strategyConfig = configBuilder.getStrategyConfig();
         this.globalConfig = configBuilder.getGlobalConfig();
         this.entity = configBuilder.getStrategyConfig().entity();
+        this.packageConfig = configBuilder.getPackageConfig();
         this.name = name;
     }
 
