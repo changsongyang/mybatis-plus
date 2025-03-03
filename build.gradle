@@ -189,6 +189,16 @@ subprojects {
                 name = "Local"
                 url = layout.buildDirectory.dir('repos/bundles')
             }
+            maven {
+                def userName = System.getProperty("un")
+                def passWord = System.getProperty("ps")
+                name = "snapshots"
+                url = "https://central.sonatype.com/repository/maven-snapshots/"
+                credentials {
+                    username userName
+                    password passWord
+                }
+            }
         }
 
         // use example : ./gradlew clean build publish publishToMavenCentralPortal -DauthToken='xxxxxx' -x test
