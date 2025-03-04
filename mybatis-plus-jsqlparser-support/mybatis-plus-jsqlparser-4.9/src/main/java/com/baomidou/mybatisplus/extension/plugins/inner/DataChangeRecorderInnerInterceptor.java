@@ -863,26 +863,24 @@ public class DataChangeRecorderInnerInterceptor implements InnerInterceptor {
         private Object originalValue;
         private Object updateValue;
 
-        @SuppressWarnings("rawtypes")
+        @SuppressWarnings({"rawtypes", "unchecked"})
         public boolean isDataChanged(Object updateValue) {
-            if (!Objects.equals(originalValue, updateValue)) {
-                if (originalValue instanceof Clob) {
-                    String originalStr = convertClob((Clob) originalValue);
-                    setOriginalValue(originalStr);
-                    return !originalStr.equals(updateValue);
-                }
-                if (originalValue instanceof Comparable) {
-                    Comparable original = (Comparable) originalValue;
-                    Comparable update = (Comparable) updateValue;
-                    try {
-                        return update == null || original.compareTo(update) != 0;
-                    } catch (Exception e) {
-                        return true;
-                    }
-                }
-                return true;
+            if (Objects.equals(originalValue, updateValue)) {
+                return false;
             }
-            return false;
+            if (originalValue instanceof Clob) {
+                String originalStr = convertClob((Clob) originalValue);
+                setOriginalValue(originalStr);
+                return !originalStr.equals(updateValue);
+            }
+            if (originalValue instanceof Comparable) {
+                Comparable original = (Comparable) originalValue;
+                if (original.getClass().isInstance(updateValue)) {
+                    Comparable update = (Comparable) updateValue;
+                    return original.compareTo(update) != 0;
+                }
+            }
+            return true;
         }
 
         public static String convertClob(Clob clobObj) {

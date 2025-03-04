@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -60,4 +61,33 @@ class DataChangeRecorderInnerInterceptorTest {
         Assertions.assertFalse(operationResult.isRecordStatus());
         Assertions.assertNull(operationResult.getChangedData());
     }
+
+    @Test
+    void isDataChangedTest() {
+        var columnChangeResult = new DataChangeRecorderInnerInterceptor.DataColumnChangeResult();
+        Assertions.assertFalse(columnChangeResult.isDataChanged(null));
+        Assertions.assertTrue(columnChangeResult.isDataChanged(BigDecimal.ZERO));
+
+        columnChangeResult = new DataChangeRecorderInnerInterceptor.DataColumnChangeResult();
+        columnChangeResult.setOriginalValue(new Object());
+        Assertions.assertTrue(columnChangeResult.isDataChanged(null));
+        Assertions.assertTrue(columnChangeResult.isDataChanged(BigDecimal.ZERO));
+
+        columnChangeResult = new DataChangeRecorderInnerInterceptor.DataColumnChangeResult();
+        columnChangeResult.setOriginalValue(new BigDecimal("0"));
+        Assertions.assertFalse(columnChangeResult.isDataChanged(BigDecimal.ZERO));
+
+        columnChangeResult = new DataChangeRecorderInnerInterceptor.DataColumnChangeResult();
+        columnChangeResult.setOriginalValue(BigDecimal.ZERO);
+        Assertions.assertFalse(columnChangeResult.isDataChanged(BigDecimal.ZERO));
+
+        columnChangeResult = new DataChangeRecorderInnerInterceptor.DataColumnChangeResult();
+        columnChangeResult.setOriginalValue(BigDecimal.ZERO);
+        Assertions.assertTrue(columnChangeResult.isDataChanged("0"));
+        Assertions.assertTrue(columnChangeResult.isDataChanged(0));
+
+        Assertions.assertFalse(columnChangeResult.isDataChanged(new BigDecimal("0") {}));
+        Assertions.assertTrue(columnChangeResult.isDataChanged(new BigDecimal("1") {}));
+    }
+
 }
