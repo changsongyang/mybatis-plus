@@ -1,15 +1,16 @@
-package com.baomidou.mybatisplus.test.h2.entity
+package com.baomidou.mybatisplus.test.h2.kotlin.entity
 
-import com.baomidou.mybatisplus.annotation.TableField
-import com.baomidou.mybatisplus.annotation.TableLogic
-import com.baomidou.mybatisplus.annotation.TableName
-import com.baomidou.mybatisplus.annotation.Version
+import com.baomidou.mybatisplus.annotation.*
 import com.baomidou.mybatisplus.test.h2.enums.AgeEnum
 import java.math.BigDecimal
+import java.time.LocalDateTime
 import java.util.*
 
 @TableName("h2user")
 class KtH2User {
+
+    @TableId
+    var testId: Long? = null
 
     var name: String? = null
 
@@ -30,5 +31,11 @@ class KtH2User {
 
     @TableLogic
     val deleted: Int? = null
+
+    @TableField(fill = FieldFill.INSERT)
+    var createdDt: LocalDateTime? = null
+
+    @TableField(fill = FieldFill.UPDATE)
+    var lastUpdatedDt: LocalDateTime? = null
 
 }

@@ -1,8 +1,9 @@
-package com.baomidou.mybatisplus.test.h2
+package com.baomidou.mybatisplus.test.h2.kotlin
 
-import com.baomidou.mybatisplus.test.h2.entity.KtH2User
+import com.baomidou.mybatisplus.test.h2.KtTestConfig
+import com.baomidou.mybatisplus.test.h2.kotlin.entity.KtH2User
 import com.baomidou.mybatisplus.test.h2.enums.AgeEnum
-import com.baomidou.mybatisplus.test.h2.service.KtH2UserService
+import com.baomidou.mybatisplus.test.h2.kotlin.service.KtH2UserService
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -17,10 +18,42 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
  * @since 2020/10/18
  */
 @ExtendWith(SpringExtension::class)
-@ContextConfiguration(locations = ["classpath:h2/spring-test-h2.xml"])
+@ContextConfiguration(classes = [KtTestConfig::class])
 class KtH2UserTest {
+
     @Autowired
     private lateinit var userService: KtH2UserService
+
+
+    @Test
+    fun testSave() {
+        val user = KtH2User()
+        user.age = AgeEnum.ONE
+        user.name = "Demo"
+        userService.save(user)
+        Assertions.assertNotNull(user.createdDt)
+    }
+
+    @Test
+    fun testUpdate() {
+        val user = KtH2User()
+        user.age = AgeEnum.ONE
+        user.name = "Demo"
+        userService.save(user)
+        user.name = "Update"
+        userService.updateById(user)
+        Assertions.assertNotNull(user.lastUpdatedDt)
+    }
+
+    @Test
+    fun testDelete() {
+        val user = KtH2User()
+        user.age = AgeEnum.ONE
+        user.name = "Delete"
+        userService.save(user)
+        userService.removeById(user)
+        Assertions.assertNull(userService.getById(user.testId))
+    }
 
 
     @Test
