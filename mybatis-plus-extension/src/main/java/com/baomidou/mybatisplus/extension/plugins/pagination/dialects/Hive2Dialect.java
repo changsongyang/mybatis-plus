@@ -18,27 +18,23 @@ package com.baomidou.mybatisplus.extension.plugins.pagination.dialects;
 import com.baomidou.mybatisplus.extension.plugins.pagination.DialectModel;
 
 /**
- * DB2 数据库分页方言
+ * Hive2分页方言
  *
- * @author hubin
- * @since 2016-11-10
+ * @author dongwei
+ * @since 3.5.11
  */
 public class Hive2Dialect implements IDialect {
 
     @Override
     public DialectModel buildPaginationSql(String originalSql, long offset, long limit) {
         long firstParam = offset + 1;
-        long secondParam = limit;
-        /**
-         * select * from ( select t.*,ROW_NUMBER() OVER(ORDER BY INNER_NO) AS row_num FROM ("
-         * +sqlcmd+") t ) a offset "+startNo+" rows fetch next "+fetchCount+" rows only
-         */
         String sql = "SELECT a.* FROM (SELECT TMP_PAGE.*,ROW_NUMBER() OVER() AS ROW_ID FROM ( "
             + originalSql +
             " ) TMP_PAGE) a OFFSET "
             + firstParam
             + " ROWS FETCH NEXT "
-            + secondParam + " ROWS ONLY";
+            + limit + " ROWS ONLY";
         return new DialectModel(sql);
     }
+
 }
