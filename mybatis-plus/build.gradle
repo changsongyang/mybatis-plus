@@ -10,6 +10,10 @@ compileTestKotlin {
     }
 }
 
+configurations {
+    testImplementation.exclude module: 'mybatis-plus-jsqlparser-4.9'
+}
+
 dependencies {
     api project(":mybatis-plus-core")
     api project(":mybatis-plus-annotation")
@@ -19,6 +23,7 @@ dependencies {
 
     implementation "${lib."mybatis-spring"}"
     implementation "${lib."kotlin-stdlib-jdk8"}"
+    implementation project(":mybatis-plus-jsqlparser-support:mybatis-plus-jsqlparser-4.9")
 
     testImplementation "${lib.'spring-web'}"
 

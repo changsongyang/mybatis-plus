@@ -50,6 +50,10 @@ class GeneratePomTest {
             Dependency kotlinStdlib = dependenciesMap.get("kotlin-stdlib-jdk8");
             Assertions.assertEquals("compile", kotlinStdlib.getScope());
             Assertions.assertTrue(kotlinStdlib.isOptional());
+            Dependency jsqlparserLib = dependenciesMap.get("mybatis-plus-jsqlparser-4.9");
+            Assertions.assertEquals("compile", jsqlparserLib.getScope());
+            Assertions.assertTrue(jsqlparserLib.isOptional());
+
         }
     }
 
