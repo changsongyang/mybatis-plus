@@ -17,7 +17,6 @@ package com.baomidou.mybatisplus.extension.ddl;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
-import com.baomidou.mybatisplus.extension.spi.CompatibleHelper;
 import com.baomidou.mybatisplus.extension.ddl.history.*;
 import com.baomidou.mybatisplus.extension.toolkit.JdbcUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -122,7 +121,7 @@ public class DdlHelper {
     }
 
     public static InputStream getInputStream(String path) throws Exception {
-        return CompatibleHelper.getCompatibleSet().getInputStream(path);
+        return Resources.getResourceAsStream(path);
     }
 
     protected static String getNowTime() {
