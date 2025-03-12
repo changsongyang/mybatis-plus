@@ -41,8 +41,8 @@
 
 ## What is MyBatis-Plus?
 
-MyBatis-Plus is a powerful and enhanced toolkit of MyBatis for simplifying development. This toolkit provides some efficient,
-useful, and out-of-the-box features for MyBatis. Using it can effectively save your development time.
+MyBatis-Plus is a powerful and enhanced toolkit of MyBatis for simplifying development.
+It provides efficient, and out-of-the-box features (such as code generation, conditional query builders, pagination plugins...), effectively saving development time
 
 ## Links
 
