@@ -28,7 +28,6 @@ import org.apache.ibatis.logging.LogFactory;
 
 import javax.sql.DataSource;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -166,7 +165,6 @@ public class DdlHelper {
 
     public static ScriptRunner getScriptRunner(Connection connection, boolean autoCommit) {
         ScriptRunner scriptRunner = new ScriptRunner(connection);
-        Resources.setCharset(StandardCharsets.UTF_8);
         scriptRunner.setAutoCommit(autoCommit);
         scriptRunner.setEscapeProcessing(false);
         scriptRunner.setRemoveCRs(true);
