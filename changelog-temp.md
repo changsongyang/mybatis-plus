@@ -10,10 +10,14 @@
 - feat: 支持崖山数据库
 - feat: 支持`Hive2`分页
 - feat: 升级`Gradle`至8.10
+- feat: 支持`DdlHelper`执行自定义异常处理
+- opt: 调整`DdlScript`类方法实现(分离DDL版本记录,优化执行方法)
 - opt: 调整`DbType#GAUSS`数据库名为gauss
 - opt: 调整`JsqlParser`解析线程池指定
 - opt: 移除过时的`FieldStrategy.IGNORED`
 - opt: 移除过时的`GlobalConfig.DbConfig#selectStrategy`
 - opt: 移除过时的`MybatisSqlSessionFactoryBean#typeEnumsPackage`
+- opt: 优化`DdlHelper`资源加载(不再依赖spring或者其他实现)
+- opt: 去除`DdlHelper`中getScriptRunner方法指定的字符集编码
 - doc: 修正`DdlHelper`中注释错误
 -
