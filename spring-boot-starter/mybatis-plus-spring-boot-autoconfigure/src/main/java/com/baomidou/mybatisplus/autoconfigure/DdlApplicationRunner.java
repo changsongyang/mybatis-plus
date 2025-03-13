@@ -22,10 +22,10 @@ import com.baomidou.mybatisplus.extension.ddl.IDdl;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.jdbc.ScriptRunner;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -38,6 +38,9 @@ import java.util.function.Consumer;
 @Slf4j
 public class DdlApplicationRunner implements ApplicationRunner {
 
+    /**
+     * 处理器列表
+     */
     private final List<IDdl> ddlList;
 
     /**
@@ -49,7 +52,7 @@ public class DdlApplicationRunner implements ApplicationRunner {
     private boolean autoCommit = true;
 
     /**
-     * 错误处理器 (默认打印错误日志继续执行)
+     * 执行脚本错误处理器 (默认打印错误日志继续执行下一个文件)
      *
      * @since 3.5.11
      */
@@ -64,6 +67,17 @@ public class DdlApplicationRunner implements ApplicationRunner {
     @Setter
     private Consumer<ScriptRunner> scriptRunnerConsumer;
 
+    /**
+     * 是否抛出异常
+     * <p>注意这里是控制{@link #ddlList}循环处理时是否抛出异常</p>
+     * <p>当设置为false时,会遍历处理完所有处理器</p>
+     * <p>当设置为true时,在遍历处理时遇到异常会抛出异常中断下一个处理器处理</p>
+     *
+     * @since 3.5.11 保持兼容性,默认不抛出
+     */
+    @Setter
+    private boolean throwException = false;
+
     public DdlApplicationRunner(List<IDdl> ddlList) {
         this.ddlList = ddlList;
     }
@@ -73,11 +87,20 @@ public class DdlApplicationRunner implements ApplicationRunner {
         if (CollectionUtils.isNotEmpty(ddlList)) {
             log.debug("  ...  DDL start create  ...  ");
             ddlList.forEach(ddl -> ddl.runScript(dataSource -> {
+                String ddlClassName = AopUtils.getTargetClass(ddl).getName();
+                if (CollectionUtils.isEmpty(ddl.getSqlFiles())) {
+                    log.warn("{}, sql files is empty", ddlClassName);
+                    return;
+                }
+                log.info("{}, run sql files {}", ddlClassName, ddl.getSqlFiles());
                 try {
                     DdlHelper.runScript(ddl.getDdlGenerator(),
                         dataSource, ddl.getSqlFiles(), this.scriptRunnerConsumer, this.autoCommit, this.ddlScriptErrorHandler);
-                } catch (SQLException e) {
-                    log.error("Run script error: ", e);
+                } catch (Exception e) {
+                    log.error("{}, run sql file error: ", ddlClassName, e);
+                    if (throwException) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }));
             log.debug("  ...  DDL end create  ...  ");
