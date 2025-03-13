@@ -17,6 +17,7 @@ package com.baomidou.mybatisplus.extension.plugins.inner;
 
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.parser.JsqlParserSupport;
+import com.baomidou.mybatisplus.jsqlparser.enums.ExpressionAppendMode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -49,9 +50,11 @@ import java.util.stream.Collectors;
 public abstract class BaseMultiTableInnerInterceptor extends JsqlParserSupport implements InnerInterceptor {
 
     /**
-     * 条件表达式追加模式：true表示是后面追加（条件放最后），false表示插入到第一个位置（条件放第一个）
+     * 条件表达式追加模式 (默认放置最后,仅作用于update,delete,select)
+     *
+     * @since 3.5.11
      */
-    private boolean expressionAppendMode = true;
+    private ExpressionAppendMode expressionAppendMode = ExpressionAppendMode.LAST;
 
     protected void processSelectBody(Select selectBody, final String whereSegment) {
         if (selectBody == null) {
@@ -420,9 +423,10 @@ public abstract class BaseMultiTableInnerInterceptor extends JsqlParserSupport i
      * @param currentExpression 原sql的条件表达式
      * @param injectExpression  注入的表达式
      * @return 追加了条件的完整表达式(where条件 / on条件)
+     * @since 3.5.11
      */
     protected Expression appendExpression(Expression currentExpression, Expression injectExpression) {
-        if (expressionAppendMode) {
+        if (ExpressionAppendMode.LAST == expressionAppendMode || expressionAppendMode == null) {
             return new AndExpression(currentExpression, injectExpression);
         } else {
             return new AndExpression(injectExpression, currentExpression);
