@@ -4,6 +4,9 @@
 - fix: 修复`AbstractCaffeineJsqlParseCache`异步产生的错误
 - fix: 修复动态SQL解析包含SQL注释(--或#)导致的合并错误
 - fix: 修复`DataChangeRecorderInnerInterceptor`数据比较出现强转异常
+- feat: 支持`DDL`自定义脚本运行器参数
+- feat: 支持`DdlApplicationRunner`参数配置(脚本错误处理,自定义ScriptRunner,多处理器执行异常是否中断)
+- feat: 支持`BaseMultiTableInnerInterceptor`指定追加条件模式 (默认条件追加至末尾,仅作用于select,delete,update)
 - feat: 支持生成器`Entity`指定`serialVersionUID`添加`@Serial`注解
 - feat: 支持生成器`Entity`注解(字段,类注解)自定义处理
 - feat: 支持生成器`Entity`导包自定义处理
