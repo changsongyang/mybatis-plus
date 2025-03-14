@@ -16,12 +16,10 @@
 package com.baomidou.mybatisplus.extension.plugins.inner;
 
 import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
-import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
 import com.baomidou.mybatisplus.core.toolkit.PluginUtils;
 import com.baomidou.mybatisplus.core.toolkit.TableNameParser;
 import com.baomidou.mybatisplus.extension.plugins.handler.TableNameHandler;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.executor.statement.StatementHandler;
@@ -44,14 +42,28 @@ import java.util.List;
  */
 @Getter
 @Setter
-@NoArgsConstructor
 @SuppressWarnings({"rawtypes"})
 public class DynamicTableNameInnerInterceptor implements InnerInterceptor {
-    private Runnable hook;
+
     /**
-     * 表名处理器，是否处理表名的情况都在该处理器中自行判断
+     * 回调处理
      */
-    private TableNameHandler tableNameHandler;
+    private Runnable hook;
+
+    /**
+     * 表名处理器，是否 处理表名的情况都在该处理器中自行判断
+     */
+    private TableNameHandler tableNameHandler = (sql, tableName) -> sql;
+
+    /**
+     * 默认构建
+     *
+     * @see #DynamicTableNameInnerInterceptor(TableNameHandler)
+     * @deprecated 3.5.11
+     */
+    @Deprecated
+    public DynamicTableNameInnerInterceptor() {
+    }
 
     public DynamicTableNameInnerInterceptor(TableNameHandler tableNameHandler) {
         this.tableNameHandler = tableNameHandler;
@@ -79,7 +91,23 @@ public class DynamicTableNameInnerInterceptor implements InnerInterceptor {
     }
 
     public String changeTable(String sql) {
-        ExceptionUtils.throwMpe(null == tableNameHandler, "Please implement TableNameHandler processing logic");
+        try {
+            return processTableName(sql);
+        } finally {
+            if (hook != null) {
+                hook.run();
+            }
+        }
+    }
+
+    /**
+     * 处理表名解析替换
+     *
+     * @param sql 原始sql
+     * @return 处理完的sql
+     * @since 3.5.11
+     */
+    protected String processTableName(String sql) {
         TableNameParser parser = new TableNameParser(sql);
         List<TableNameParser.SqlToken> names = new ArrayList<>();
         parser.accept(names::add);
@@ -96,9 +124,7 @@ public class DynamicTableNameInnerInterceptor implements InnerInterceptor {
         if (last != sql.length()) {
             builder.append(sql.substring(last));
         }
-        if (hook != null) {
-            hook.run();
-        }
         return builder.toString();
     }
+
 }
