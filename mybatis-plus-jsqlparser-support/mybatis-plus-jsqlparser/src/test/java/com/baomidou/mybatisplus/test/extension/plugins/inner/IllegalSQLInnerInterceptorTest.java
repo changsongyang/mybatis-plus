@@ -78,8 +78,8 @@ class IllegalSQLInnerInterceptorTest {
         Assertions.assertDoesNotThrow(() -> interceptor.parserSingle("SELECT * FROM `T_DEMO` a INNER JOIN `T_TEST` b ON a.a = b.a WHERE a.a = 1", dataSource.getConnection()));
         Assertions.assertThrows(MybatisPlusException.class, () -> interceptor.parserSingle("SELECT * FROM `T_DEMO` a INNER JOIN `test` b ON a.a = b.a WHERE a.b = 1", dataSource.getConnection()));
 
-        Assertions.assertDoesNotThrow(() -> interceptor.parserSingle("SELECT * FROM test.`T_DEMO` a INNER JOIN test.`T_TEST` b ON a.a = b.a WHERE a.a = 1", dataSource.getConnection()));
-        Assertions.assertThrows(MybatisPlusException.class, () -> interceptor.parserSingle("SELECT * FROM test.`T_DEMO` a INNER JOIN test.`T_TEST` b ON a.a = b.a WHERE a.b = 1", dataSource.getConnection()));
+        Assertions.assertDoesNotThrow(() -> interceptor.parserSingle("SELECT * FROM PUBLIC.`T_DEMO` a INNER JOIN `T_TEST` b ON a.a = b.a WHERE a.a = 1", dataSource.getConnection()));
+        Assertions.assertThrows(MybatisPlusException.class, () -> interceptor.parserSingle("SELECT * FROM PUBLIC.`T_DEMO` a INNER JOIN `T_TEST` b ON a.a = b.a WHERE a.b = 1", dataSource.getConnection()));
 
         Assertions.assertDoesNotThrow(() -> interceptor.parserSingle("SELECT * FROM T_DEMO a INNER JOIN `T_TEST` b ON a.a = b.a WHERE a.a = 1", dataSource.getConnection()));
         Assertions.assertThrows(MybatisPlusException.class, () -> interceptor.parserSingle("SELECT * FROM T_DEMO a INNER JOIN `T_TEST` b ON a.a = b.a WHERE a.b = 1", dataSource.getConnection()));
@@ -118,6 +118,15 @@ class IllegalSQLInnerInterceptorTest {
         Assertions.assertDoesNotThrow(() -> interceptor.parserSingle("select count(*) from (select count(*) from (select * from T_DEMO where a = 1 and `b` = 2) a) c", dataSource.getConnection()));
         Assertions.assertThrows(MybatisPlusException.class, () -> interceptor.parserSingle("select count(*) from (select * from `T_DEMO`) a ", dataSource.getConnection()));
         Assertions.assertThrows(MybatisPlusException.class, () -> interceptor.parserSingle("select count(*) from (select * from `T_DEMO` where b = (SELECT b FROM T_TEST limit 1)) a ", dataSource.getConnection()));
+    }
+
+    @Test
+    void testCatalogAndSchemaName() {
+        Assertions.assertDoesNotThrow(() -> interceptor.parserSingle("select count(*) from TEST.PUBLIC.T_DEMO where a = 1 and `b` = 2", dataSource.getConnection()));
+        Assertions.assertDoesNotThrow(() -> interceptor.parserSingle("select count(*) from PUBLIC.T_DEMO where a = 1 and `b` = 2", dataSource.getConnection()));
+        // 非同一模式,读不到索引的情况
+        Assertions.assertThrows(MybatisPlusException.class, () -> interceptor.parserSingle("select count(*) from DB.T_DEMO where a = 1 and `b` = 2", dataSource.getConnection()));
+        Assertions.assertThrows(MybatisPlusException.class, () -> interceptor.parserSingle("select count(*) from PUBLIC.DB.T_DEMO where a = 1 and `b` = 2", dataSource.getConnection()));
     }
 
 }
