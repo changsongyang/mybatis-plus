@@ -492,6 +492,34 @@ public class TableNameParserTest {
         assertThat(new TableNameParser(sql).tables()).isEqualTo(asSet("student"));
     }
 
+    @Test
+    void testCreateTableIfNotExists() {
+        var sql = """
+            CREATE TABLE IF NOT EXISTS `user_info` (
+                `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                `username` VARCHAR(50) NOT NULL UNIQUE,
+                `email` VARCHAR(100) NOT NULL UNIQUE,
+                `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+            """;
+        assertThat(new TableNameParser(sql).tables()).isEqualTo(asSet("`user_info`"));
+    }
+
+    @Test
+    void testCreateUniqueIndex() {
+        var sql = "CREATE UNIQUE INDEX index_name ON table1 (a, b)";
+        assertThat(new TableNameParser(sql).tables()).isEqualTo(asSet("table1"));
+        sql = "ALTER TABLE table1 ADD UNIQUE INDEX `a`(`a`)";
+        assertThat(new TableNameParser(sql).tables()).isEqualTo(asSet("table1"));
+    }
+
+    @Test
+    void testCreateFullTextIndex(){
+        var sql = "CREATE FULLTEXT INDEX index_name ON table1 (a, b)";
+        assertThat(new TableNameParser(sql).tables()).isEqualTo(asSet("table1"));
+        sql = "ALTER TABLE table1 ADD FULLTEXT INDEX `a`(`a`)";
+        assertThat(new TableNameParser(sql).tables()).isEqualTo(asSet("table1"));
+    }
 
 
     private static Collection<String> asSet(String... a) {
