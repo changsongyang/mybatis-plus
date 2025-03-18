@@ -4,6 +4,10 @@
 - fix: 修复`AbstractCaffeineJsqlParseCache`异步产生的错误
 - fix: 修复动态SQL解析包含SQL注释(--或#)导致的合并错误
 - fix: 修复`DataChangeRecorderInnerInterceptor`数据比较出现强转异常
+- fix: 修复非法SQL拦截插件索引检测问题
+- fix: 修复动态表解析`create table if not exists` 获取表名错误
+- fix: 修复动态表解析`create [type] index` 获取表名错误
+- feat: 新增`DynamicTableNameJsqlParserInnerInterceptor` 基于`JsqlParser`动态表处理
 - feat: 支持`DDL`自定义脚本运行器参数
 - feat: 支持`DdlApplicationRunner`参数配置(脚本错误处理,自定义ScriptRunner,多处理器执行异常是否中断)
 - feat: 支持`BaseMultiTableInnerInterceptor`指定追加条件模式 (默认条件追加至末尾,仅作用于select,delete,update)
@@ -14,6 +18,7 @@
 - feat: 支持`Hive2`分页
 - feat: 升级`Gradle`至8.10
 - feat: 支持`DdlHelper`执行自定义异常处理
+- opt: 调整`DynamicTableNameInnerInterceptor`表处理逻辑并保证`hook`运行
 - opt: 调整`DdlScript`类方法实现(分离DDL版本记录,优化执行方法)
 - opt: 调整`DbType#GAUSS`数据库名为gauss
 - opt: 调整`JsqlParser`解析线程池指定
