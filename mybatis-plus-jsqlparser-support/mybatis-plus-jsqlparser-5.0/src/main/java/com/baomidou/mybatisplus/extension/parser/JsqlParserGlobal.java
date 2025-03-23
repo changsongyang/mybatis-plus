@@ -46,8 +46,10 @@ public class JsqlParserGlobal {
      * <p>注意: 由于项目情况,机器配置等不一样因素,请自行根据情况创建指定线程池.</p>
      *
      * @see java.util.concurrent.ThreadPoolExecutor
+     * @see #setExecutorService(ExecutorService)
+     * @see #setExecutorService(ExecutorService, boolean)
      * @since 3.5.6
-     * @deprecated 3.5.11 后面不再公开此属性,请使用{@link #setExecutorService(ExecutorService)}} 或 {@link #setExecutorService(ExecutorService, boolean)}
+     * @deprecated 3.5.11 后面不再公开此属性
      */
     @Deprecated
     public static ExecutorService executorService;
