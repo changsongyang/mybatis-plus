@@ -201,7 +201,7 @@ subprojects {
             }
         }
 
-        // use example : ./gradlew clean build publish publishToMavenCentralPortal -DauthToken='xxxxxx' -x test
+        // use example : ./gradlew clean build publishMavenJavaPublicationToLocalRepository publishToMavenCentralPortal -DauthToken='xxxxxx' -x test
         mavenCentral {
             repoDir = layout.buildDirectory.dir('repos/bundles')
             // Base64 encoded of "username:password"
