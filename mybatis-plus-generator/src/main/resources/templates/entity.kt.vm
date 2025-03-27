@@ -1,11 +1,11 @@
 package ${package.Entity};
 
 #foreach($pkg in ${importEntityFrameworkPackages})
-import ${pkg};
+import ${pkg}
 #end
 
 #foreach($pkg in ${importEntityJavaPackages})
-import ${pkg};
+import ${pkg}
 #end
 
 /**

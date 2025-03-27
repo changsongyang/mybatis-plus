@@ -1,11 +1,11 @@
 package #(package.Entity);
 
 #for(pkg : importEntityFrameworkPackages)
-import #(pkg);
+import #(pkg)
 #end
 
 #for(pkg : importEntityJavaPackages)
-import #(pkg);
+import #(pkg)
 #end
 
 /**

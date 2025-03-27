@@ -107,13 +107,13 @@ public class ${entity} {
     public String toString() {
         return "${entity}{" +
     <% for(field in table.fields){ %>
-       <% if(fieldLP.index==0){ %>
-        "${field.propertyName} = " + ${field.propertyName} +
+       <% if(fieldLP.dataIndex==0){ %>
+            "${field.propertyName} = " + ${field.propertyName} +
        <% }else{ %>
-        ", ${field.propertyName} = " + ${field.propertyName} +
+            ", ${field.propertyName} = " + ${field.propertyName} +
        <% } %>
     <% } %>
-        "}";
+            "}";
     }
 <% } %>
 }

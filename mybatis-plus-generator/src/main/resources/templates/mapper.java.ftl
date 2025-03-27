@@ -38,4 +38,3 @@ public interface ${table.mapperName} extends ${superMapperClass}<${entity}> {
     ${m.method}
 </#list>
 }
-

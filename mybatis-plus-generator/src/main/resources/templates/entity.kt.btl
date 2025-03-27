@@ -1,11 +1,11 @@
 package ${package.Entity}
 
 <% for(pkg in importEntityFrameworkPackages){ %>
-import ${pkg};
+import ${pkg}
 <% } %>
 
 <% for(pkg in importEntityJavaPackages){ %>
-import ${pkg};
+import ${pkg}
 <% } %>
 
 /**
@@ -47,9 +47,9 @@ class ${entity} {
     ${an.displayName}
     <% } %>
     <% if(field.propertyType == 'Integer'){ %>
-    var ${field.propertyName}: Int ? = null
+    var ${field.propertyName}: Int? = null
     <% }else{ %>
-    var ${field.propertyName}: ${field.propertyType} ? = null
+    var ${field.propertyName}: ${field.propertyType}? = null
     <% } %>
 
 <% } %>
@@ -73,11 +73,10 @@ class ${entity} {
 
 <% } %>
 <% if(entityToString){ %>
-    @Override
-    override fun toString(): String  {
+    override fun toString(): String {
         return "${entity}{" +
     <% for(field in table.fields){ %>
-       <% if(fieldLP.index==0){ %>
+       <% if(fieldLP.dataIndex==0){ %>
         "${field.propertyName}=" + ${field.propertyName} +
        <% }else{ %>
         ", ${field.propertyName}=" + ${field.propertyName} +

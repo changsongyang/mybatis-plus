@@ -1,3 +1,10 @@
+apply plugin: 'kotlin'
+
+compileTestKotlin {
+    kotlinOptions {
+        freeCompilerArgs = ['-Xjvm-default=all']
+    }
+}
 dependencies {
     implementation project(":mybatis-plus-spring")
     implementation "${lib.velocity}"
@@ -6,6 +13,7 @@ dependencies {
     implementation "${lib.enjoy}"
     implementation "${lib.'swagger-annotations'}"
     implementation "io.springfox:springfox-swagger2:3.0.0"
+    implementation "${lib."kotlin-stdlib-jdk8"}"
 
 
     compileOnly "org.jetbrains:annotations:24.1.0"
@@ -19,5 +27,6 @@ dependencies {
     testImplementation "${lib.firebird}"
     testImplementation "${lib.'swagger-annotations'}"
     testImplementation "${lib.'logback-classic'}"
+    testImplementation "${lib.'spring-web'}"
     testCompileOnly "org.jetbrains:annotations:24.1.0"
 }

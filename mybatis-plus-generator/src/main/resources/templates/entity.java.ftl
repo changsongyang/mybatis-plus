@@ -107,7 +107,7 @@ public class ${entity} {
             ", ${field.propertyName} = " + ${field.propertyName} +
         </#if>
     </#list>
-        "}";
+            "}";
     }
 </#if>
 }

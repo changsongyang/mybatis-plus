@@ -104,12 +104,12 @@ public class ${entity} {
         return "${entity}{" +
   #foreach($field in ${table.fields})
     #if($!{foreach.index}==0)
-        "${field.propertyName} = " + ${field.propertyName} +
+            "${field.propertyName} = " + ${field.propertyName} +
     #else
-        ", ${field.propertyName} = " + ${field.propertyName} +
+            ", ${field.propertyName} = " + ${field.propertyName} +
     #end
   #end
-        "}";
+            "}";
     }
 #end
 }
