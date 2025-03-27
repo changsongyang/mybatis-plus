@@ -8,6 +8,11 @@ import com.baomidou.mybatisplus.generator.config.po.TableField;
 import com.baomidou.mybatisplus.generator.config.rules.DateType;
 import com.baomidou.mybatisplus.generator.config.rules.DbColumnType;
 import com.baomidou.mybatisplus.generator.config.rules.IColumnType;
+import com.baomidou.mybatisplus.generator.engine.AbstractTemplateEngine;
+import com.baomidou.mybatisplus.generator.engine.BeetlTemplateEngine;
+import com.baomidou.mybatisplus.generator.engine.EnjoyTemplateEngine;
+import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
+import com.baomidou.mybatisplus.generator.engine.VelocityTemplateEngine;
 import com.baomidou.mybatisplus.generator.fill.Column;
 import com.baomidou.mybatisplus.generator.fill.Property;
 import com.baomidou.mybatisplus.generator.query.DefaultQuery;
@@ -16,12 +21,18 @@ import com.baomidou.mybatisplus.generator.type.TypeRegistry;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * H2 代码生成
@@ -30,6 +41,8 @@ import java.util.Map;
  * @since 3.5.3
  */
 public class H2CodeGeneratorTest extends BaseGeneratorTest {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(H2CodeGeneratorTest.class);
 
     /**
      * 执行初始化数据库脚本
@@ -64,6 +77,46 @@ public class H2CodeGeneratorTest extends BaseGeneratorTest {
         generator.strategy(strategyConfig().build());
         generator.global(globalConfig().build());
         generator.execute();
+    }
+
+    static Stream<Arguments> testByTemplateEngine() {
+        return Stream.of(
+            Arguments.arguments("velocity", new VelocityTemplateEngine()),
+            Arguments.arguments("freemarker", new FreemarkerTemplateEngine()),
+            Arguments.arguments("beetl", new BeetlTemplateEngine()),
+            Arguments.arguments("enjoy", new EnjoyTemplateEngine())
+        );
+    }
+
+    @MethodSource
+    @ParameterizedTest
+    public void testByTemplateEngine(String engine, AbstractTemplateEngine templateEngine) {
+        String userDir = System.getProperty("user.dir");
+        String outputDir = userDir + File.separator + "src" + File.separator + "test" + File.separator + "java";
+        LOGGER.info("当前执行引擎:{}, 输出目录:{}", engine, outputDir);
+        AutoGenerator generator = new AutoGenerator(DATA_SOURCE_CONFIG);
+        generator.strategy(strategyConfig().addTablePrefix("t_")
+            .entityBuilder().enableFileOverride()
+            .mapperBuilder().enableFileOverride()
+                .controllerBuilder().enableFileOverride().serviceBuilder().enableFileOverride()
+            .build());
+        generator.packageInfo(new PackageConfig.Builder().moduleName("demo" + "." + engine).build());
+        generator.global(globalConfig().commentDate(() -> "2025-03-27").disableOpenDir().outputDir(outputDir).build());
+        generator.execute(templateEngine);
+
+        // -- 生成kotlin代码
+        LOGGER.info("当前执行引擎:{}, 执行生成Kotlin代码.", engine);
+        outputDir = userDir + File.separator + "src" + File.separator + "test" + File.separator + "kotlin";
+        generator = new AutoGenerator(DATA_SOURCE_CONFIG);
+
+        generator.strategy(strategyConfig().addTablePrefix("t_")
+            .entityBuilder().enableFileOverride().importPackageFunction(ArrayList::new)
+            .mapperBuilder().enableFileOverride().importPackageFunction(ArrayList::new)
+            .controllerBuilder().enableFileOverride().serviceBuilder().enableFileOverride()
+            .build());
+        generator.packageInfo(new PackageConfig.Builder().moduleName(engine).build());
+        generator.global(globalConfig().enableKotlin().commentDate(() -> "2025-03-27").disableOpenDir().outputDir(outputDir).build());
+        generator.execute(templateEngine);
     }
 
     /**
