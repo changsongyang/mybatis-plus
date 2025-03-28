@@ -33,6 +33,10 @@ public interface CompatibleSet {
 
     boolean executeBatch(SqlSessionFactory sqlSessionFactory, Log log, Consumer<SqlSession> consumer);
 
+    /**
+     * @deprecated 3.5.12 无需实现
+     */
+    @Deprecated
     InputStream getInputStream(String path) throws Exception;
 
 }

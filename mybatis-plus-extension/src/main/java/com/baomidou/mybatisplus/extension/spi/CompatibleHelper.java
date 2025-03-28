@@ -15,6 +15,10 @@
  */
 package com.baomidou.mybatisplus.extension.spi;
 
+import com.baomidou.mybatisplus.core.toolkit.Assert;
+import org.apache.ibatis.logging.Log;
+import org.apache.ibatis.logging.LogFactory;
+
 import java.util.ServiceLoader;
 
 /**
@@ -22,13 +26,42 @@ import java.util.ServiceLoader;
  */
 public class CompatibleHelper {
 
-    private static CompatibleSet COMPATIBLE_SET;
+    private static final Log LOG = LogFactory.getLog(CompatibleHelper.class);
 
-    public static CompatibleSet getCompatibleSet() {
-        if (null == COMPATIBLE_SET) {
-            ServiceLoader<CompatibleSet> loader = ServiceLoader.load(CompatibleSet.class);
-            COMPATIBLE_SET = loader.iterator().next();
+    private static CompatibleSet COMPATIBLE_SET = null;
+
+    static {
+        ServiceLoader<CompatibleSet> loader = ServiceLoader.load(CompatibleSet.class);
+        int size = 0;
+        for (CompatibleSet compatibleSet : loader) {
+            size++;
+            LOG.debug("Load compatibleSet: " + compatibleSet);
+            COMPATIBLE_SET = compatibleSet;
         }
+        if (size > 1) {
+            LOG.warn("There are currently multiple implementations, and the last one is used " + COMPATIBLE_SET);
+        }
+    }
+
+    /**
+     * 判断是否存在 {@link com.baomidou.mybatisplus.extension.spi.CompatibleSet} 实例
+     *
+     * @return 是否存在
+     * @since 3.5.12
+     */
+    public static boolean hasCompatibleSet() {
+        return COMPATIBLE_SET != null;
+    }
+
+    /**
+     * 获取{@link com.baomidou.mybatisplus.extension.spi.CompatibleSet}实例
+     * <p>当为空是会抛出异常,需要检查是否请使用{@link #hasCompatibleSet()}</p>
+     *
+     * @return {@link com.baomidou.mybatisplus.extension.spi.CompatibleSet}
+     */
+    public static CompatibleSet getCompatibleSet() {
+        Assert.notNull(COMPATIBLE_SET, "Please add specific implementation dependencies");
         return COMPATIBLE_SET;
     }
+
 }
