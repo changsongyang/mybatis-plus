@@ -15,6 +15,7 @@
  */
 package com.baomidou.mybatisplus.core.assist;
 
+import com.baomidou.mybatisplus.core.injector.SqlRunnerInjector;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
 import java.util.List;
@@ -34,6 +35,10 @@ public interface ISqlRunner {
     String SELECT_LIST = "com.baomidou.mybatisplus.core.mapper.SqlRunner.SelectList";
     String SELECT_OBJS = "com.baomidou.mybatisplus.core.mapper.SqlRunner.SelectObjs";
     String COUNT = "com.baomidou.mybatisplus.core.mapper.SqlRunner.Count";
+
+    /**
+     * @deprecated 3.5.12 {@link SqlRunnerInjector#SQL_SCRIPT}
+     */
     String SQL_SCRIPT = "${sql}";
     String SQL = "sql";
     String PAGE = "page";

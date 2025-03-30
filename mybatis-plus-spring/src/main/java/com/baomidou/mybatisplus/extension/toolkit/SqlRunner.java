@@ -19,14 +19,15 @@ import com.baomidou.mybatisplus.core.assist.ISqlRunner;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.GlobalConfigUtils;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
+import org.apache.ibatis.parsing.GenericTokenParser;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionUtils;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -39,7 +40,8 @@ import java.util.Optional;
  */
 public class SqlRunner implements ISqlRunner {
 
-    private final Log log = LogFactory.getLog(SqlRunner.class);
+    private static final Log LOG = LogFactory.getLog(SqlRunner.class);
+
     // 单例Query
     public static final SqlRunner DEFAULT = new SqlRunner();
 
@@ -100,10 +102,38 @@ public class SqlRunner implements ISqlRunner {
      * @param args 仅支持String
      * @return ignore
      */
-    private Map<String, String> sqlMap(String sql, Object... args) {
-        Map<String, String> sqlMap = CollectionUtils.newHashMapWithExpectedSize(1);
-        sqlMap.put(SQL, StringUtils.sqlArgsFill(sql, args));
+    private Map<String, Object> sqlMap(String sql, Object... args) {
+        Map<String, Object> sqlMap = getParams(args);
+        sqlMap.put(SQL, parse(sql));
         return sqlMap;
+    }
+
+    /**
+     * 获取执行语句
+     *
+     * @param sql    原始sql
+     * @return 执行语句
+     */
+    private String parse(String sql) {
+        return new GenericTokenParser("{", "}", content -> "#{" + content + "}").parse(sql);
+    }
+
+    /**
+     * 获取参数列表
+     *
+     * @param args 参数
+     * @return 参数map
+     * @since 3.5.12
+     */
+    private Map<String, Object> getParams(Object... args) {
+        if (args != null) {
+            Map<String, Object> params = CollectionUtils.newHashMapWithExpectedSize(args.length);
+            for (int i = 0; i < args.length; i++) {
+                params.put(String.valueOf(i), args[i]);
+            }
+            return params;
+        }
+        return new HashMap<>();
     }
 
     /**
@@ -115,9 +145,9 @@ public class SqlRunner implements ISqlRunner {
      * @return ignore
      */
     private Map<String, Object> sqlMap(String sql, IPage<?> page, Object... args) {
-        Map<String, Object> sqlMap = CollectionUtils.newHashMapWithExpectedSize(2);
+        Map<String, Object> sqlMap = getParams(args);
         sqlMap.put(PAGE, page);
-        sqlMap.put(SQL, StringUtils.sqlArgsFill(sql, args));
+        sqlMap.put(SQL, parse(sql));
         return sqlMap;
     }
 
@@ -178,7 +208,7 @@ public class SqlRunner implements ISqlRunner {
      */
     @Override
     public Object selectObj(String sql, Object... args) {
-        return SqlHelper.getObject(log, selectObjs(sql, args));
+        return SqlHelper.getObject(LOG, selectObjs(sql, args));
     }
 
     @Override
@@ -193,7 +223,7 @@ public class SqlRunner implements ISqlRunner {
 
     @Override
     public Map<String, Object> selectOne(String sql, Object... args) {
-        return SqlHelper.getObject(log, selectList(sql, args));
+        return SqlHelper.getObject(LOG, selectList(sql, args));
     }
 
     @Override

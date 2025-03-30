@@ -226,7 +226,9 @@ public final class StringUtils {
      *
      * @param content 填充内容
      * @param args    填充参数
+     * @deprecated 3.5.12
      */
+    @Deprecated
     public static String sqlArgsFill(String content, Object... args) {
         if (StringUtils.isNotBlank(content) && ArrayUtils.isNotEmpty(args)) {
             // 索引不能使用，因为 SQL 中的占位符数字与索引不相同
@@ -246,7 +248,9 @@ public final class StringUtils {
      * @param ptn      需要替换部分的正则表达式
      * @param replacer 替换处理器
      * @return 返回字符串构建起
+     * @deprecated 3.5.12
      */
+    @Deprecated
     public static StringBuilder replace(CharSequence src, Pattern ptn, BiIntFunction<Matcher, CharSequence> replacer) {
         int idx = 0, last = 0, len = src.length();
         Matcher m = ptn.matcher(src);
@@ -267,7 +271,10 @@ public final class StringUtils {
 
     /**
      * 获取SQL PARAMS字符串
+     *
+     * @deprecated 3.5.12
      */
+    @Deprecated
     public static String sqlParam(Object obj) {
         String repStr;
         if (obj instanceof Collection) {
@@ -283,7 +290,9 @@ public final class StringUtils {
      *
      * @param obj 原字符串
      * @return 单引号包含的原字符串
+     * @deprecated 3.5.12
      */
+    @Deprecated
     public static String quotaMark(Object obj) {
         String srcStr = String.valueOf(obj);
         if (obj instanceof CharSequence) {
@@ -298,7 +307,9 @@ public final class StringUtils {
      *
      * @param coll 集合
      * @return 单引号包含的原字符串的集合形式
+     * @deprecated 3.5.12
      */
+    @Deprecated
     public static String quotaMarkList(Collection<?> coll) {
         return coll.stream().map(StringUtils::quotaMark)
             .collect(joining(StringPool.COMMA, StringPool.LEFT_BRACKET, StringPool.RIGHT_BRACKET));

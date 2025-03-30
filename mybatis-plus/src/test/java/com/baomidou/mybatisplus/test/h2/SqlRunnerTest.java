@@ -19,6 +19,7 @@ import java.util.List;
 
 /**
  * SqlRunner测试
+ *
  * @author nieqiurong 2018/8/25 11:05.
  */
 @ExtendWith(SpringExtension.class)
@@ -32,37 +33,38 @@ class SqlRunnerTest {
 
     @Test
     @Order(3)
-    void testSelectCount(){
+    void testSelectCount() {
         long count = SqlRunner.db().selectCount("select count(1) from h2student");
         Assertions.assertTrue(count > 0);
-        count = SqlRunner.db().selectCount("select count(1) from h2student where id > {0}",0);
+        count = SqlRunner.db().selectCount("select count(1) from h2student where id > {0}", 0);
         Assertions.assertTrue(count > 0);
         count = SqlRunner.db(H2Student.class).selectCount("select count(1) from h2student");
         Assertions.assertTrue(count > 0);
-        count = SqlRunner.db(H2Student.class).selectCount("select count(1) from h2student where id > {0}",0);
+        count = SqlRunner.db(H2Student.class).selectCount("select count(1) from h2student where id > {0}", 0);
         Assertions.assertTrue(count > 0);
     }
 
     @Test
     @Transactional
     @Order(1)
-    void testInsert(){
-        Assertions.assertTrue(SqlRunner.db().insert("INSERT INTO h2student ( name, age ) VALUES ( {0}, {1} )","测试学生",2));
-        Assertions.assertTrue(SqlRunner.db(H2Student.class).insert("INSERT INTO h2student ( name, age ) VALUES ( {0}, {1} )","测试学生2",3));
+    void testInsert() {
+        Assertions.assertTrue(SqlRunner.db().insert("INSERT INTO h2student ( name, age ) VALUES ( {0}, {1} )", "测试学生", 2));
+        Assertions.assertTrue(SqlRunner.db(H2Student.class).insert("INSERT INTO h2student ( name, age ) VALUES ( {0}, {1} )", "测试学生2", 3));
     }
 
     @Test
     @Order(2)
-    void testTransactional(){
+    void testTransactional() {
         try {
             studentService.testSqlRunnerTransactional();
-        } catch (RuntimeException e){
+        } catch (RuntimeException e) {
             List<H2Student> list = studentService.list(new QueryWrapper<H2Student>().like("name", "sqlRunnerTx"));
             Assertions.assertTrue(CollectionUtils.isEmpty(list));
         }
     }
 
     @Test
+    @Order(4)
     void testSelectPage() {
         IPage page1 = SqlRunner.db().selectPage(new Page(1, 3), "select * from h2student");
         Assertions.assertEquals(page1.getRecords().size(), 3);
@@ -71,4 +73,24 @@ class SqlRunnerTest {
         IPage page3 = SqlRunner.db().selectPage(new Page(1, 3), "select * from h2student where id = {0}", 10086);
         Assertions.assertEquals(page3.getRecords().size(), 0);
     }
+
+    @Test
+    @Order(5)
+    void testInsertByDisorderParameter() {
+        Assertions.assertTrue(SqlRunner.db().insert("INSERT INTO h2student (id, name, age ) VALUES ( {3}, {2}, {1} )", "测试学生", 2, "'六翻了'", 10000));
+        Assertions.assertTrue(SqlRunner.db(H2Student.class).insert("INSERT INTO h2student ( name, age, id ) VALUES ( {0}, {1}, {2} )", "测试学生2", 3, 10001));
+        Assertions.assertEquals(2, SqlRunner.db().selectCount("select count(1) from h2student where (id = 10000 or id = 10001)"));
+    }
+
+    @Test
+    @Order(6)
+    void testSpecialParameters() {
+        var name = "`测`的'的'\\//塞'2";
+        Assertions.assertTrue(SqlRunner.db().insert("INSERT INTO h2student (id, name, age ) VALUES ( {3}, {0}, {1} )", name, 2, "'六翻了'", 10004));
+        Assertions.assertEquals(10004L, SqlRunner.db().selectObj("select id from h2student where name = {0}", name));
+        name = "`测`的'的'\\//塞'2" + "2";
+        Assertions.assertTrue(SqlRunner.db().update("update h2student set name = {0} where id = {1}", name, 10004L));
+        Assertions.assertEquals(10004L, SqlRunner.db().selectObj("select id from h2student where name = {0}", name));
+    }
+
 }
