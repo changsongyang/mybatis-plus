@@ -42,6 +42,8 @@ public class SqlRunnerInjector {
     protected LanguageDriver languageDriver;
 
     /**
+     * 注入动态执行脚本
+     *
      * @since 3.5.12
      */
     public static final String SQL_SCRIPT = "<script>" +

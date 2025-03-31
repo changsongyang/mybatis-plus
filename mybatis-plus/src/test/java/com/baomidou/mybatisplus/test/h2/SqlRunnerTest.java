@@ -6,7 +6,10 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.baomidou.mybatisplus.test.h2.entity.H2Student;
+import com.baomidou.mybatisplus.test.h2.enums.AgeEnum;
 import com.baomidou.mybatisplus.test.h2.service.IH2StudentService;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * SqlRunner测试
@@ -91,6 +95,86 @@ class SqlRunnerTest {
         name = "`测`的'的'\\//塞'2" + "2";
         Assertions.assertTrue(SqlRunner.db().update("update h2student set name = {0} where id = {1}", name, 10004L));
         Assertions.assertEquals(10004L, SqlRunner.db().selectObj("select id from h2student where name = {0}", name));
+    }
+
+    @Test
+    @Order(7)
+    void testByMap() {
+        var map = Map.of("name", "test", "age", AgeEnum.TWO, "id", 11000L);
+        Assertions.assertTrue(SqlRunner.db().insert("INSERT INTO h2student (id, name, age ) VALUES ( {id}, {name}, {age} )", map));
+    }
+
+    @Test
+    @Order(8)
+    void testByEntity() {
+        var entity = new H2Student();
+        entity.setId(11001L);
+        entity.setName("test");
+        entity.setAge(12);
+        Assertions.assertTrue(SqlRunner.db().insert("INSERT INTO h2student (id, name, age ) VALUES ( {id}, {name}, {age} )", entity));
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class StudentDto {
+
+        private Long id;
+
+        private String name;
+
+        private AgeEnum age;
+    }
+
+    @Test
+    @Order(9)
+    void testByDto() {
+        var studentDto = new StudentDto(11002L, "测试学生", AgeEnum.THREE);
+        Assertions.assertTrue(SqlRunner.db().insert("INSERT INTO h2student (id, name, age ) VALUES ( {id}, {name}, {age} )", studentDto));
+        Map<String, Object> resultMap = SqlRunner.db().selectOne("select * from h2student where id = {id}", studentDto);
+        Assertions.assertNotNull(resultMap);
+        Assertions.assertEquals(studentDto.getName(), resultMap.get("NAME"));
+        Assertions.assertEquals(studentDto.getAge().getValue(), resultMap.get("AGE"));
+        Assertions.assertEquals(studentDto.getId(), resultMap.get("ID"));
+    }
+
+    @Test
+    @Order(10)
+    void testByArray() {
+        var array = new Object[]{11003L, "测试学生", AgeEnum.THREE};
+        Assertions.assertTrue(SqlRunner.db().insert("INSERT INTO h2student (id, name, age ) VALUES ( {0}, {1}, {2} )", array));
+        Map<String, Object> resultMap = SqlRunner.db().selectOne("select * from h2student where id = {0}", array);
+        Assertions.assertNotNull(resultMap);
+        Assertions.assertEquals("测试学生", resultMap.get("NAME"));
+        Assertions.assertEquals(AgeEnum.THREE.getValue(), resultMap.get("AGE"));
+        Assertions.assertEquals(11003L, resultMap.get("ID"));
+    }
+
+    @Test
+    @Order(11)
+    void testByList() {
+        var list = List.of(11004L, "测试学生", AgeEnum.THREE);
+        Assertions.assertTrue(SqlRunner.db().insert("INSERT INTO h2student (id, name, age ) VALUES ( {0}, {1}, {2} )", list));
+        Map<String, Object> resultMap = SqlRunner.db().selectOne("select * from h2student where id = {0}", list);
+        Assertions.assertNotNull(resultMap);
+        Assertions.assertEquals("测试学生", resultMap.get("NAME"));
+        Assertions.assertEquals(AgeEnum.THREE.getValue(), resultMap.get("AGE"));
+        Assertions.assertEquals(11004L, resultMap.get("ID"));
+    }
+
+    record StudentDtoRecord(Long id, String name, AgeEnum age) {
+
+    }
+
+    @Test
+    @Order(12)
+    void testByRecord() {
+        var studentDto = new StudentDtoRecord(11005L, "测试学生", AgeEnum.THREE);
+        Assertions.assertTrue(SqlRunner.db().insert("INSERT INTO h2student (id, name, age ) VALUES ( {id}, {name}, {age} )", studentDto));
+        Map<String, Object> resultMap = SqlRunner.db().selectOne("select * from h2student where id = {id}", studentDto);
+        Assertions.assertNotNull(resultMap);
+        Assertions.assertEquals(studentDto.name, resultMap.get("NAME"));
+        Assertions.assertEquals(studentDto.age.getValue(), resultMap.get("AGE"));
+        Assertions.assertEquals(studentDto.id, resultMap.get("ID"));
     }
 
 }
