@@ -17,22 +17,15 @@ package com.baomidou.mybatisplus.extension.toolkit;
 
 import com.baomidou.mybatisplus.core.assist.ISqlRunner;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.GlobalConfigUtils;
+import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
-import org.apache.ibatis.parsing.GenericTokenParser;
-import org.apache.ibatis.reflection.MetaObject;
-import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.ibatis.type.SimpleTypeRegistry;
 import org.mybatis.spring.SqlSessionUtils;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -44,6 +37,7 @@ import java.util.Optional;
  * <li>当参数为 Map 时可通过{key}进行属性访问
  * <li>当参数为 JavaBean 时可通过{property}进行属性访问
  * <li>当参数为 List 时直接访问索引 {0} </li>
+ * <li>当参数为 Array 时直接访问索引 {0} </li>
  * </p>
  *
  * @author Caratacus, nieqiurong
@@ -51,19 +45,34 @@ import java.util.Optional;
  */
 public class SqlRunner implements ISqlRunner {
 
+    /**
+     * 日志对象
+     */
     private static final Log LOG = LogFactory.getLog(SqlRunner.class);
 
-    // 单例Query
+    /**
+     * 默认实例 (使用{@link SqlHelper#FACTORY}进行会话操作)
+     */
     public static final SqlRunner DEFAULT = new SqlRunner();
 
     /**
-     * 实体类 (当未指定时,将使用{@link SqlHelper#FACTORY}进行会话操作)
+     * 实体类 (需要被扫描注入的实体对象,当未指定时,将使用{@link SqlHelper#FACTORY}进行会话操作)
+     *
+     * @see com.baomidou.mybatisplus.core.metadata.TableInfoHelper#initTableInfo(MapperBuilderAssistant, Class)
      */
     private Class<?> clazz;
 
+    /**
+     * 默认构造,使用{@link SqlHelper#FACTORY}进行会话操作
+     */
     public SqlRunner() {
     }
 
+    /**
+     * 通过实体类构造
+     *
+     * @param clazz 实体类
+     */
     public SqlRunner(Class<?> clazz) {
         this.clazz = clazz;
     }
@@ -140,67 +149,6 @@ public class SqlRunner implements ISqlRunner {
         Map<String, Object> sqlMap = getParams(args);
         sqlMap.put(SQL, parse(sql));
         return sqlMap;
-    }
-
-    /**
-     * 获取执行语句
-     *
-     * @param sql 原始sql
-     * @return 执行语句
-     * @since 3.5.12
-     */
-    private String parse(String sql) {
-        return new GenericTokenParser("{", "}", content -> "#{" + content + "}").parse(sql);
-    }
-
-    /**
-     * 获取参数列表
-     *
-     * @param args 参数(单参数时,支持使用Map,List,JavaBean访问)
-     * @return 参数map
-     * @since 3.5.12
-     */
-    private Map<String, Object> getParams(Object... args) {
-        if (args != null && args.length > 0) {
-            if (args.length == 1) {
-                // 暂定支持 Map,Collection,JavaBean
-                Object arg = args[0];
-                if (arg instanceof Map) {
-                    //noinspection unchecked
-                    return new HashMap<String, Object>((Map) arg);
-                }
-                if (arg instanceof Collection) {
-                    Collection<?> collection = (Collection<?>) arg;
-                    Map<String, Object> params = new HashMap<>(CollectionUtils.newHashMapWithExpectedSize(collection.size()));
-                    Iterator<?> iterator = collection.iterator();
-                    int index = 0;
-                    while (iterator.hasNext()) {
-                        params.put(String.valueOf(index), iterator.next());
-                        index++;
-                    }
-                    return params;
-                }
-                Class<?> cls = arg.getClass();
-                if (!(cls.isPrimitive()
-                    || SimpleTypeRegistry.isSimpleType(cls)
-                    || cls.isArray() || cls.isEnum())
-                ) {
-                    MetaObject metaObject = SystemMetaObject.forObject(arg);
-                    String[] getterNames = metaObject.getGetterNames();
-                    Map<String, Object> params = new HashMap<>(CollectionUtils.newHashMapWithExpectedSize(getterNames.length));
-                    for (String getterName : getterNames) {
-                        params.put(getterName, metaObject.getValue(getterName));
-                    }
-                    return params;
-                }
-            }
-            Map<String, Object> params = CollectionUtils.newHashMapWithExpectedSize(args.length);
-            for (int i = 0; i < args.length; i++) {
-                params.put(String.valueOf(i), args[i]);
-            }
-            return params;
-        }
-        return new HashMap<>();
     }
 
     /**

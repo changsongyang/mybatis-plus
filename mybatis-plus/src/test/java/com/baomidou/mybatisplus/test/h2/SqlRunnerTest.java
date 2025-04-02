@@ -18,6 +18,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -102,6 +103,22 @@ class SqlRunnerTest {
     void testByMap() {
         var map = Map.of("name", "test", "age", AgeEnum.TWO, "id", 11000L);
         Assertions.assertTrue(SqlRunner.db().insert("INSERT INTO h2student (id, name, age ) VALUES ( {id}, {name}, {age} )", map));
+        Map<String, Object> resultMap = SqlRunner.db().selectOne("select * from h2student where id = {id}", map);
+        Assertions.assertNotNull(resultMap);
+        Assertions.assertEquals(map.get("name"), resultMap.get("NAME"));
+        Assertions.assertEquals(AgeEnum.TWO.getValue(), resultMap.get("AGE"));
+        Assertions.assertEquals(map.get("id"), resultMap.get("ID"));
+        map = new HashMap<>();
+        map.put("name","test");
+        map.put("age", AgeEnum.TWO);
+        map.put("id", 11100L);
+        map.put("size", "测试size");
+        Assertions.assertTrue(SqlRunner.db().insert("INSERT INTO h2student (id, name, age ) VALUES ( {id}, {size}, {age} )", map));
+        resultMap = SqlRunner.db().selectOne("select * from h2student where id = {id}", map);
+        Assertions.assertNotNull(resultMap);
+        Assertions.assertEquals(map.get("size"), resultMap.get("NAME"));
+        Assertions.assertEquals(AgeEnum.TWO.getValue(), resultMap.get("AGE"));
+        Assertions.assertEquals(map.get("id"), resultMap.get("ID"));
     }
 
     @Test
@@ -143,6 +160,10 @@ class SqlRunnerTest {
         var array = new Object[]{11003L, "测试学生", AgeEnum.THREE};
         Assertions.assertTrue(SqlRunner.db().insert("INSERT INTO h2student (id, name, age ) VALUES ( {0}, {1}, {2} )", array));
         Map<String, Object> resultMap = SqlRunner.db().selectOne("select * from h2student where id = {0}", array);
+        Assertions.assertNotNull(resultMap);
+        Assertions.assertEquals("测试学生", resultMap.get("NAME"));
+        Assertions.assertEquals(AgeEnum.THREE.getValue(), resultMap.get("AGE"));
+        resultMap = SqlRunner.db().selectOne("select * from h2student where id = {0}", new long[]{11003L});
         Assertions.assertNotNull(resultMap);
         Assertions.assertEquals("测试学生", resultMap.get("NAME"));
         Assertions.assertEquals(AgeEnum.THREE.getValue(), resultMap.get("AGE"));
