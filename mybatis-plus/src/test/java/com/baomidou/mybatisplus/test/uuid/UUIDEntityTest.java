@@ -1,5 +1,7 @@
 package com.baomidou.mybatisplus.test.uuid;
 
+import com.baomidou.mybatisplus.core.config.GlobalConfig;
+import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.baomidou.mybatisplus.test.BaseDbTest;
 import org.apache.ibatis.session.Configuration;
 import org.junit.jupiter.api.Assertions;
@@ -55,6 +57,7 @@ public class UUIDEntityTest extends BaseDbTest<UUIDEntityMapper> {
         doTest(m -> Assertions.assertDoesNotThrow(()-> m.deleteById(new UUIDEntity(){})));
         doTest(m -> Assertions.assertDoesNotThrow(()-> m.deleteById(new DeleteByIdDto<>(UUID.randomUUID()))));
         doTest(m -> Assertions.assertDoesNotThrow(()-> m.deleteById(new DeleteByIdDto<>(UUID.randomUUID().toString()))));
+        doTest(m -> Assertions.assertDoesNotThrow(()-> SqlRunner.db(UUIDEntity.class).delete("delete from entity where id = {0}", UUID.randomUUID())));
     }
 
 
@@ -78,5 +81,10 @@ public class UUIDEntityTest extends BaseDbTest<UUIDEntityMapper> {
                 "name VARCHAR(30) NULL DEFAULT NULL,\n" +
                 "PRIMARY KEY (id)" +
                 ")");
+    }
+
+    @Override
+    protected GlobalConfig globalConfig() {
+        return super.globalConfig().setEnableSqlRunner(true);
     }
 }

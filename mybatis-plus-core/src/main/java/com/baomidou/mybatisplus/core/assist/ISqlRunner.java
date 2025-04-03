@@ -17,16 +17,7 @@ package com.baomidou.mybatisplus.core.assist;
 
 import com.baomidou.mybatisplus.core.injector.SqlRunnerInjector;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import org.apache.ibatis.parsing.GenericTokenParser;
-import org.apache.ibatis.reflection.MetaObject;
-import org.apache.ibatis.reflection.SystemMetaObject;
-import org.apache.ibatis.type.SimpleTypeRegistry;
 
-import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -44,13 +35,6 @@ import java.util.Map;
  * @since 2018/2/7
  */
 public interface ISqlRunner {
-
-    /**
-     * 默认分词处理器
-     *
-     * @since 3.5.12
-     */
-    GenericTokenParser TOKEN_PARSER = new GenericTokenParser("{", "}", content -> "#{" + content + "}");
 
     /**
      * INSERT 语句
@@ -185,75 +169,4 @@ public interface ISqlRunner {
      * @return 分页数据
      */
     <E extends IPage<Map<String, Object>>> E selectPage(E page, String sql, Object... args);
-
-
-    /**
-     * 获取执行语句
-     *
-     * @param sql 原始sql
-     * @return 执行语句
-     * @since 3.5.12
-     */
-    default String parse(String sql) {
-        return TOKEN_PARSER.parse(sql);
-    }
-
-    /**
-     * 获取参数列表
-     *
-     * @param args 参数(单参数时,支持使用Map,List,Array,JavaBean访问)
-     * @return 参数map
-     * @since 3.5.12
-     */
-    @SuppressWarnings("rawtypes")
-    default Map<String, Object> getParams(Object... args) {
-        if (args != null && args.length > 0) {
-            if (args.length == 1) {
-                // 暂定支持 Map,Collection,Array,JavaBean
-                Object arg = args[0];
-                if (arg instanceof Map) {
-                    //noinspection unchecked
-                    return new HashMap<String, Object>((Map) arg);
-                }
-                if (arg instanceof Collection) {
-                    Collection<?> collection = (Collection<?>) arg;
-                    Map<String, Object> params = new HashMap<>(CollectionUtils.newHashMapWithExpectedSize(collection.size()));
-                    Iterator<?> iterator = collection.iterator();
-                    int index = 0;
-                    while (iterator.hasNext()) {
-                        params.put(String.valueOf(index), iterator.next());
-                        index++;
-                    }
-                    return params;
-                }
-                Class<?> cls = arg.getClass();
-                if (cls.isArray()) {
-                    int length = Array.getLength(arg);
-                    Map<String, Object> params = new HashMap<>(CollectionUtils.newHashMapWithExpectedSize(length));
-                    for (int i = 0; i < length; i++) {
-                        params.put(String.valueOf(i), Array.get(arg, i));
-                    }
-                    return params;
-                }
-                if (!(cls.isPrimitive()
-                    || SimpleTypeRegistry.isSimpleType(cls)
-                    || cls.isEnum())
-                ) {
-                    MetaObject metaObject = SystemMetaObject.forObject(arg);
-                    String[] getterNames = metaObject.getGetterNames();
-                    Map<String, Object> params = new HashMap<>(CollectionUtils.newHashMapWithExpectedSize(getterNames.length));
-                    for (String getterName : getterNames) {
-                        params.put(getterName, metaObject.getValue(getterName));
-                    }
-                    return params;
-                }
-            }
-            Map<String, Object> params = CollectionUtils.newHashMapWithExpectedSize(args.length);
-            for (int i = 0; i < args.length; i++) {
-                params.put(String.valueOf(i), args[i]);
-            }
-            return params;
-        }
-        return new HashMap<>();
-    }
 }

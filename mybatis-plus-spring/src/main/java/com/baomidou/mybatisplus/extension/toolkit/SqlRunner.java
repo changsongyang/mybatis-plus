@@ -15,7 +15,7 @@
  */
 package com.baomidou.mybatisplus.extension.toolkit;
 
-import com.baomidou.mybatisplus.core.assist.ISqlRunner;
+import com.baomidou.mybatisplus.core.assist.AbstractSqlRunner;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.GlobalConfigUtils;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
@@ -43,7 +43,7 @@ import java.util.Optional;
  * @author Caratacus, nieqiurong
  * @since 2016-12-11
  */
-public class SqlRunner implements ISqlRunner {
+public class SqlRunner extends AbstractSqlRunner {
 
     /**
      * 日志对象
@@ -147,7 +147,7 @@ public class SqlRunner implements ISqlRunner {
      */
     private Map<String, Object> sqlMap(String sql, Object... args) {
         Map<String, Object> sqlMap = getParams(args);
-        sqlMap.put(SQL, parse(sql));
+        sqlMap.put(SQL, parse(sql, args));
         return sqlMap;
     }
 
@@ -162,7 +162,7 @@ public class SqlRunner implements ISqlRunner {
     private Map<String, Object> sqlMap(String sql, IPage<?> page, Object... args) {
         Map<String, Object> sqlMap = getParams(args);
         sqlMap.put(PAGE, page);
-        sqlMap.put(SQL, parse(sql));
+        sqlMap.put(SQL, parse(sql, args));
         return sqlMap;
     }
 
