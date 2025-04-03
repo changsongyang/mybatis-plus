@@ -168,6 +168,9 @@ class SqlRunnerTest {
         Assertions.assertEquals("测试学生", resultMap.get("NAME"));
         Assertions.assertEquals(AgeEnum.THREE.getValue(), resultMap.get("AGE"));
         Assertions.assertEquals(11003L, resultMap.get("ID"));
+        Assertions.assertNull(SqlRunner.db().selectOne("select * from h2student where id = {0} and name= {1}", (Object) new Object[]{11003L, "234"}));
+        Assertions.assertNull(SqlRunner.db().selectOne("select * from h2student where id = {0} and name= {1}", new Object[]{11003L, "234"}));
+        Assertions.assertNull(SqlRunner.db().selectOne("select * from h2student where id = {0} and name= {1}", 11003L, "234"));
     }
 
     @Test

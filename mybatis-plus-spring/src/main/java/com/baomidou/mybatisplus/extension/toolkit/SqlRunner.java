@@ -133,40 +133,6 @@ public class SqlRunner extends AbstractSqlRunner {
     }
 
     /**
-     * 获取sqlMap参数
-     * <p>
-     * 自3.5.12开始,(当传入的参数是单参数时,支持使用Map,Array,List,JavaBean)
-     * <li>当参数为 Map 时可通过{key}进行属性访问
-     * <li>当参数为 JavaBean 时可通过{property}进行属性访问
-     * <li>当参数为 List 时直接访问索引 {0} </li>
-     * </p>
-     *
-     * @param sql  指定参数的格式: {0}, {1} 或者 {property1}, {property2}
-     * @param args 参数
-     * @return 参数集合
-     */
-    private Map<String, Object> sqlMap(String sql, Object... args) {
-        Map<String, Object> sqlMap = getParams(args);
-        sqlMap.put(SQL, parse(sql, args));
-        return sqlMap;
-    }
-
-    /**
-     * 获取sqlMap参数
-     *
-     * @param sql  指定参数的格式: {0}, {1} 或者 {property1}, {property2}
-     * @param page 分页模型
-     * @param args 参数
-     * @return 参数集合
-     */
-    private Map<String, Object> sqlMap(String sql, IPage<?> page, Object... args) {
-        Map<String, Object> sqlMap = getParams(args);
-        sqlMap.put(PAGE, page);
-        sqlMap.put(SQL, parse(sql, args));
-        return sqlMap;
-    }
-
-    /**
      * 执行更新语句
      *
      * @param sql  指定参数的格式: {0}, {1} 或者 {property1}, {property2}
