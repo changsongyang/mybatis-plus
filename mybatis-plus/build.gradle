@@ -37,7 +37,7 @@ dependencies {
     testImplementation "${lib.h2}"
     testImplementation "${lib.sqlserver}"
     testImplementation "${lib.postgresql}"
-    testImplementation lib.oracle as ConfigurableFileTree
+    testImplementation "${lib.oracle}"
     testImplementation "${lib.mysql}"
     testImplementation "${lib.'spring-context-support'}"
     testImplementation "${lib.'spring-jdbc'}"
