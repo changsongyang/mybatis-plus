@@ -16,6 +16,7 @@
 package com.baomidou.mybatisplus.generator.index;
 
 import com.baomidou.mybatisplus.generator.IGenerateMapperMethodHandler;
+import com.baomidou.mybatisplus.generator.config.ConstVal;
 
 /**
  * @author nieqiurong
@@ -78,10 +79,7 @@ public abstract class AbstractMapperMethodHandler implements IGenerateMapperMeth
      * @since 3.5.12
      */
     public boolean isPrimaryKey(String indexName) {
-        // 有些数据库用的PRIMARY_KEY_7
-        String idxTemp = indexName.toUpperCase();
-        return "PRIMARY".equals(idxTemp)
-            || indexName.startsWith("PRIMARY");
+        return indexName.toUpperCase().startsWith(ConstVal.PRIMARY);
     }
 
 }

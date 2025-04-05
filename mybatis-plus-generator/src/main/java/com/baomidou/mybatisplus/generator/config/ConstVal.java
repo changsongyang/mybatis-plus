@@ -91,4 +91,10 @@ public interface ConstVal {
      * @see com.baomidou.mybatisplus.core.metadata.TableInfoHelper.DEFAULT_ID_NAME
      */
     String DEFAULT_ID_NAME = "id";
+
+    /**
+     * 主键
+     * @since 3.5.12
+     */
+    String PRIMARY = "PRIMARY";
 }
