@@ -75,7 +75,8 @@ public class DefaultGenerateMapperMethodHandler extends AbstractMapperMethodHand
             if (this.singleIndex && indexSize > 1) {
                 continue;
             }
-            if ("PRIMARY".equals(indexName) && indexSize == 1) {
+            // use byId
+            if (indexSize == 1 && isPrimaryKey(indexName)) {
                 continue;
             }
             List<TableField> tableFieldList = new ArrayList<>();

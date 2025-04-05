@@ -77,7 +77,8 @@ public class DefaultGenerateMapperLambdaMethodHandler extends AbstractMapperMeth
             if (this.singleIndex && indexSize > 1) {
                 continue;
             }
-            if ("PRIMARY".equals(indexName) && indexSize == 1) {
+            // use byId
+            if (indexSize == 1 && isPrimaryKey(indexName)) {
                 continue;
             }
             Map<String, TableField> tableFieldMap = tableInfo.getTableFieldMap();

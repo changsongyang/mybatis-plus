@@ -70,4 +70,18 @@ public abstract class AbstractMapperMethodHandler implements IGenerateMapperMeth
             "    }\n";
     }
 
+    /**
+     * 判断当前索引名称是否为主键索引 (索引名为PRIMARY或PRIMARY开头的为主键索引)
+     *
+     * @param indexName 索引名称
+     * @return 是否为主键索引
+     * @since 3.5.12
+     */
+    public boolean isPrimaryKey(String indexName) {
+        // 有些数据库用的PRIMARY_KEY_7
+        String idxTemp = indexName.toUpperCase();
+        return "PRIMARY".equals(idxTemp)
+            || indexName.startsWith("PRIMARY");
+    }
+
 }
