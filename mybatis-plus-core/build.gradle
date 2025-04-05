@@ -7,4 +7,6 @@ dependencies {
     implementation "${lib.'imadcn'}"
 
     testImplementation "${lib.'logback-classic'}"
+    testImplementation "${lib."mybatis-spring"}"
+    testImplementation "${lib.'spring-jdbc'}"
 }

@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.core.handlers.IJsonTypeHandler;
 import com.baomidou.mybatisplus.core.override.MybatisMapperProxy;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.reflection.MetaObject;
+import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.defaults.DefaultSqlSession;
@@ -69,14 +71,8 @@ public class MybatisUtils {
             // TODO 原生mybatis下只能这样了.
             return GlobalConfigUtils.getGlobalConfig(mybatisMapperProxy.getSqlSession().getConfiguration()).getSqlSessionFactory();
         }
-        Field declaredField;
-        try {
-            declaredField = sqlSession.getClass().getDeclaredField("sqlSessionFactory");
-            declaredField.setAccessible(true);
-            return (SqlSessionFactory) declaredField.get(sqlSession);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        MetaObject metaObject = SystemMetaObject.forObject(sqlSession);
+        return (SqlSessionFactory) metaObject.getValue("sqlSessionFactory");
     }
 
     /**
