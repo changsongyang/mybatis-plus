@@ -32,7 +32,7 @@ public class CompatibleHelper {
     private static CompatibleSet COMPATIBLE_SET = null;
 
     static {
-        ServiceLoader<CompatibleSet> loader = ServiceLoader.load(CompatibleSet.class);
+        ServiceLoader<CompatibleSet> loader = ServiceLoader.load(CompatibleSet.class, CompatibleSet.class.getClassLoader());
         int size = 0;
         for (CompatibleSet compatibleSet : loader) {
             size++;
