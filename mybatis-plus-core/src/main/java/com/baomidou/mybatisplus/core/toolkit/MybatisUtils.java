@@ -1,5 +1,6 @@
 package com.baomidou.mybatisplus.core.toolkit;
 
+import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
 import com.baomidou.mybatisplus.core.handlers.IJsonTypeHandler;
 import com.baomidou.mybatisplus.core.override.MybatisMapperProxy;
@@ -7,6 +8,7 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
+import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.defaults.DefaultSqlSession;
@@ -60,19 +62,26 @@ public class MybatisUtils {
 
     /**
      * 获取SqlSessionFactory
+     * <p>当自定义实现{@link SqlSession}时,请实现对{@link SqlSessionFactory}的访问 (spring的方式)</p>
+     * <p>当无法获得{@link SqlSessionFactory}时,需要将{@link SqlSessionFactory}绑定至上下文对象中(原生mybatis访问方式)</p>
      *
      * @param mybatisMapperProxy {@link MybatisMapperProxy}
      * @return SqlSessionFactory
+     * @see DefaultSqlSession
+     * @see GlobalConfigUtils#getGlobalConfig(Configuration)
+     * @see GlobalConfigUtils#setGlobalConfig(Configuration, GlobalConfig)
      * @since 3.5.7
      */
     public static SqlSessionFactory getSqlSessionFactory(MybatisMapperProxy<?> mybatisMapperProxy) {
         SqlSession sqlSession = mybatisMapperProxy.getSqlSession();
-        if (sqlSession instanceof DefaultSqlSession) {
-            // TODO 原生mybatis下只能这样了.
-            return GlobalConfigUtils.getGlobalConfig(mybatisMapperProxy.getSqlSession().getConfiguration()).getSqlSessionFactory();
-        }
         MetaObject metaObject = SystemMetaObject.forObject(sqlSession);
-        return (SqlSessionFactory) metaObject.getValue("sqlSessionFactory");
+        String property = "sqlSessionFactory";
+        if (metaObject.hasGetter(property)) {
+            return (SqlSessionFactory) metaObject.getValue(property);
+        }
+        SqlSessionFactory sqlSessionFactory = GlobalConfigUtils.getGlobalConfig(mybatisMapperProxy.getSqlSession().getConfiguration()).getSqlSessionFactory();
+        Assert.isTrue(sqlSessionFactory != null, "Please implement access to the sqlSessionFactory property or bind sqlSessionFactory to global access.");
+        return sqlSessionFactory;
     }
 
     /**
