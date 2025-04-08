@@ -32,6 +32,7 @@ public class MybatisUtilsTest {
         var mybatisMapperProxy = new MybatisMapperProxy<>(sqlSession, MyMapper.class, new HashMap<>());
         SqlSessionFactory sqlSessionFactory = MybatisUtils.getSqlSessionFactory(mybatisMapperProxy);
         Assertions.assertNotNull(sqlSessionFactory);
+        Assertions.assertNotNull(MybatisUtils.getSqlSessionFactory(sqlSession));
     }
 
     @Test
@@ -40,6 +41,7 @@ public class MybatisUtilsTest {
         var mybatisMapperProxy = new MybatisMapperProxy<>(sqlSession, MyMapper.class, new HashMap<>());
         SqlSessionFactory sqlSessionFactory = MybatisUtils.getSqlSessionFactory(mybatisMapperProxy);
         Assertions.assertNotNull(sqlSessionFactory);
+        Assertions.assertNotNull(MybatisUtils.getSqlSessionFactory(sqlSession));
     }
 
     @Test
@@ -47,6 +49,7 @@ public class MybatisUtilsTest {
         var sqlSession = new SqlSessionTemplate(getDefaultSqlSessionFactory());
         var mybatisMapperProxy = new MybatisMapperProxy<>(sqlSession, MyMapper.class, new HashMap<>());
         Assertions.assertNotNull(MybatisUtils.getSqlSessionFactory(mybatisMapperProxy));
+        Assertions.assertNotNull(MybatisUtils.getSqlSessionFactory(sqlSession));
     }
 
     static class MySqlSessionTemplate extends SqlSessionTemplate {
@@ -61,6 +64,7 @@ public class MybatisUtilsTest {
         var sqlSession = new MySqlSessionTemplate(getDefaultSqlSessionFactory());
         var mybatisMapperProxy = new MybatisMapperProxy<>(sqlSession, MyMapper.class, new HashMap<>());
         Assertions.assertNotNull(MybatisUtils.getSqlSessionFactory(mybatisMapperProxy));
+        Assertions.assertNotNull(MybatisUtils.getSqlSessionFactory(sqlSession));
     }
 
     private SqlSessionFactory getDefaultSqlSessionFactory() {

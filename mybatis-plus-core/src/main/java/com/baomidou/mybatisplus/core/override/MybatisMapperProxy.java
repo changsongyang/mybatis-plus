@@ -15,6 +15,7 @@
  */
 package com.baomidou.mybatisplus.core.override;
 
+import com.baomidou.mybatisplus.core.metadata.MapperProxyMetadata;
 import com.baomidou.mybatisplus.core.plugins.IgnoreStrategy;
 import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
 import com.baomidou.mybatisplus.core.toolkit.MybatisUtils;
@@ -171,8 +172,8 @@ public class MybatisMapperProxy<T> implements InvocationHandler, Serializable {
                 return methodHandle.bindTo(proxy).invokeWithArguments(args);
             } else {
                 try {
-                    MybatisMapperProxy<?> mybatisMapperProxy = MybatisUtils.getMybatisMapperProxy(proxy);
-                    Class<?> mapperInterface = mybatisMapperProxy.getMapperInterface();
+                    MapperProxyMetadata mapperProxyMetadata = MybatisUtils.getMapperProxy(proxy);
+                    Class<?> mapperInterface = mapperProxyMetadata.getMapperInterface();
                     IgnoreStrategy ignoreStrategy = InterceptorIgnoreHelper.findIgnoreStrategy(mapperInterface, method);
                     if (ignoreStrategy == null) {
                         ignoreStrategy = IgnoreStrategy.builder().build();

@@ -2,7 +2,7 @@ package com.baomidou.mybatisplus.extension.repository;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.override.MybatisMapperProxy;
+import com.baomidou.mybatisplus.core.metadata.MapperProxyMetadata;
 import com.baomidou.mybatisplus.core.toolkit.MybatisUtils;
 import com.baomidou.mybatisplus.core.toolkit.reflect.GenericTypeUtils;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
@@ -44,8 +44,8 @@ public abstract class AbstractRepository<M extends BaseMapper<T>, T>  implements
 
     protected SqlSessionFactory getSqlSessionFactory() {
         if (this.sqlSessionFactory == null) {
-            MybatisMapperProxy<?> mybatisMapperProxy = MybatisUtils.getMybatisMapperProxy(this.getBaseMapper());
-            this.sqlSessionFactory = MybatisUtils.getSqlSessionFactory(mybatisMapperProxy);
+            MapperProxyMetadata mapperProxyMetadata = MybatisUtils.getMapperProxy(this.getBaseMapper());
+            this.sqlSessionFactory = MybatisUtils.getSqlSessionFactory(mapperProxyMetadata.getSqlSession());
         }
         return this.sqlSessionFactory;
     }
@@ -56,8 +56,8 @@ public abstract class AbstractRepository<M extends BaseMapper<T>, T>  implements
      */
     public Class<M> getMapperClass() {
         if (this.mapperClass == null) {
-            MybatisMapperProxy<?> mybatisMapperProxy = MybatisUtils.getMybatisMapperProxy(this.getBaseMapper());
-            this.mapperClass = (Class<M>) mybatisMapperProxy.getMapperInterface();
+            MapperProxyMetadata mapperProxyMetadata = MybatisUtils.getMapperProxy(this.getBaseMapper());
+            this.mapperClass = (Class<M>) mapperProxyMetadata.getMapperInterface();
         }
         return this.mapperClass;
     }
