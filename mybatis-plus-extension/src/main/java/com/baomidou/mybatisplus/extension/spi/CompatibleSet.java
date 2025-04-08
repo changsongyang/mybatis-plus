@@ -39,4 +39,15 @@ public interface CompatibleSet {
     @Deprecated
     InputStream getInputStream(String path) throws Exception;
 
+    /**
+     * 获取容器bean实例
+     *
+     * @param clz 类型
+     * @return bean实例 (当无实例时返回null)
+     * @since 3.5.12
+     */
+    default <T> T getBean(Class<T> clz) {
+        return null;
+    }
+
 }

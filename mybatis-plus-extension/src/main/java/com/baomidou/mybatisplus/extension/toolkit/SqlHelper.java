@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.spi.CompatibleHelper;
+import com.baomidou.mybatisplus.extension.spi.CompatibleSet;
 import org.apache.ibatis.executor.BatchResult;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.session.ExecutorType;
@@ -296,6 +297,13 @@ public final class SqlHelper {
         Assert.notNull(entityClass, "entityClass can't be null!");
         TableInfo tableInfo = Optional.ofNullable(TableInfoHelper.getTableInfo(entityClass)).orElseThrow(() -> ExceptionUtils.mpe("Can not find TableInfo from Class: \"%s\".", entityClass.getName()));
         Class<?> mapperClass = ClassUtils.toClassConfident(tableInfo.getCurrentNamespace());
+        if (CompatibleHelper.hasCompatibleSet()) {
+            CompatibleSet compatibleSet = CompatibleHelper.getCompatibleSet();
+            Object bean = compatibleSet.getBean(mapperClass);
+            if (bean != null) {
+                return (M) bean;
+            }
+        }
         return (M) tableInfo.getConfiguration().getMapper(mapperClass, sqlSession);
     }
 

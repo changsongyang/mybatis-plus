@@ -24,6 +24,7 @@ import com.baomidou.mybatisplus.core.handlers.PostInitTableInfoHandler;
 import com.baomidou.mybatisplus.core.incrementer.IKeyGenerator;
 import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
 import com.baomidou.mybatisplus.core.injector.ISqlInjector;
+import com.baomidou.mybatisplus.extension.spring.MybatisPlusApplicationContextAware;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
@@ -373,6 +374,12 @@ public class MybatisPlusAutoConfiguration implements InitializingBean {
             logger.debug(
                 "Not found configuration for registering mapper bean using @MapperScan, MapperFactoryBean and MapperScannerConfigurer.");
         }
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(MybatisPlusApplicationContextAware.class)
+    public MybatisPlusApplicationContextAware mybatisPlusSpringApplicationContextAware() {
+        return new MybatisPlusApplicationContextAware();
     }
 
 }

@@ -16,9 +16,11 @@
 package com.baomidou.mybatisplus.extension.spi;
 
 import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
+import com.baomidou.mybatisplus.extension.spring.MybatisPlusApplicationContextAware;
 import lombok.SneakyThrows;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.ibatis.logging.Log;
+import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.reflection.ExceptionUtil;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
@@ -26,6 +28,8 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.MyBatisExceptionTranslator;
 import org.mybatis.spring.SqlSessionHolder;
 import org.mybatis.spring.SqlSessionUtils;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -36,6 +40,8 @@ import java.util.function.Consumer;
  * spring 兼容方法集接口实现类
  */
 public class SpringCompatibleSet implements CompatibleSet {
+
+    private static final Log LOG = LogFactory.getLog(SpringCompatibleSet.class);
 
     @Override
     public SqlSession getSqlSession(SqlSessionFactory sessionFactory) {
@@ -88,4 +94,16 @@ public class SpringCompatibleSet implements CompatibleSet {
     public InputStream getInputStream(String path) throws Exception {
         return new ClassPathResource(path).getInputStream();
     }
+
+    @Override
+    public <T> T getBean(Class<T> clz) {
+        if (MybatisPlusApplicationContextAware.hasApplicationContext()) {
+            ApplicationContext applicationContext = MybatisPlusApplicationContextAware.getApplicationContext();
+            ObjectProvider<T> provider = applicationContext.getBeanProvider(clz);
+            return provider.getIfAvailable();
+        }
+        LOG.warn("MybatisPlusApplicationContextAware is not initialized. Please ensure that MybatisPlusApplicationContextAware is properly registered as a Spring Bean in the application context.");
+        return null;
+    }
+
 }
