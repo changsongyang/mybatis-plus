@@ -37,7 +37,9 @@ public interface CompatibleSet {
      * @deprecated 3.5.12 无需实现
      */
     @Deprecated
-    InputStream getInputStream(String path) throws Exception;
+    default InputStream getInputStream(String path) throws Exception {
+        return null;
+    }
 
     /**
      * 获取容器bean实例
