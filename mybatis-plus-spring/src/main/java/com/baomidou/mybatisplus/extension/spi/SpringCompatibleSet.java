@@ -15,6 +15,7 @@
  */
 package com.baomidou.mybatisplus.extension.spi;
 
+import com.baomidou.mybatisplus.core.toolkit.AopUtils;
 import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
 import com.baomidou.mybatisplus.extension.spring.MybatisPlusApplicationContextAware;
 import lombok.SneakyThrows;
@@ -28,6 +29,7 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.MyBatisExceptionTranslator;
 import org.mybatis.spring.SqlSessionHolder;
 import org.mybatis.spring.SqlSessionUtils;
+import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.ClassPathResource;
@@ -104,6 +106,17 @@ public class SpringCompatibleSet implements CompatibleSet {
         }
         LOG.warn("MybatisPlusApplicationContextAware is not initialized. Please ensure that MybatisPlusApplicationContextAware is properly registered as a Spring Bean in the application context.");
         return null;
+    }
+
+    @Override
+    public Object getProxyTargetObject(Object mapper) {
+        Object result = mapper;
+        if (AopUtils.isLoadSpringAop()) {
+            while (org.springframework.aop.support.AopUtils.isAopProxy(result)) {
+                result = AopProxyUtils.getSingletonTarget(result);
+            }
+        }
+        return result;
     }
 
 }
