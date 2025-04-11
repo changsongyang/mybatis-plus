@@ -70,7 +70,7 @@ public class DatabaseMetaDataWrapper {
             try {
                 con.close();
             } catch (SQLException sqlException) {
-                sqlException.printStackTrace();
+                logger.error("关闭数据库连接出现错误:", sqlException);
             }
         });
     }
@@ -82,15 +82,18 @@ public class DatabaseMetaDataWrapper {
     public List<DatabaseMetaDataWrapper.Index> getIndex(String tableName) {
         List<DatabaseMetaDataWrapper.Index> indexList = new ArrayList<>();
         try (ResultSet resultSet = databaseMetaData.getIndexInfo(catalog, schema, tableName, false, false)) {
-            while (resultSet.next()) {
-                Index index = new Index(resultSet);
-                // skip function index
-                if (StringUtils.isNotBlank(index.getColumnName())) {
-                    indexList.add(new Index(resultSet));
+            // clickhouse v2驱动没实现返回了个null
+            if (resultSet != null) {
+                while (resultSet.next()) {
+                    Index index = new Index(resultSet);
+                    // skip function index
+                    if (StringUtils.isNotBlank(index.getColumnName())) {
+                        indexList.add(index);
+                    }
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("读取索引信息:" + tableName + "错误:", e);
+            logger.error("读取{}索引信息出现错误:", tableName, e);
         }
         return indexList;
     }
