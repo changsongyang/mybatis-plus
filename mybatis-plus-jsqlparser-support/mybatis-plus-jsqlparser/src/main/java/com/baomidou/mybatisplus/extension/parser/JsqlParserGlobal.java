@@ -79,11 +79,26 @@ public class JsqlParserGlobal {
      * @param executorService 线程池 (自行控制线程池关闭)
      * @param addShutdownHook 是否注册退出关闭钩子
      * @since 3.5.11
+     * @deprecated 3.5.12 推荐使用 {@link #setExecutorService(ExecutorService, Thread)}
      */
+    @Deprecated
     public static void setExecutorService(ExecutorService executorService, boolean addShutdownHook) {
         JsqlParserGlobal.executorService = executorService;
         if (addShutdownHook) {
             JsqlParserThreadPool.addShutdownHook(executorService);
+        }
+    }
+
+    /**
+     * 设置解析线程池
+     * @param executorService 线程池 (自行控制线程池关闭)
+     * @param shutdownHook 关闭钩子
+     * @since 3.5.12
+     */
+    public static void setExecutorService(ExecutorService executorService, Thread shutdownHook) {
+        JsqlParserGlobal.executorService = executorService;
+        if (shutdownHook != null) {
+            Runtime.getRuntime().addShutdownHook(shutdownHook);
         }
     }
 

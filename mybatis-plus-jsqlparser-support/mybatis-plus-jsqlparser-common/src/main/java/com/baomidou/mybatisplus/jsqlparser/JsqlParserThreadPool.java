@@ -47,7 +47,9 @@ public class JsqlParserThreadPool {
      * 注册Jvm退出钩子
      *
      * @param executorService 线程池
+     * @deprecated 3.5.12
      */
+    @Deprecated
     public static void addShutdownHook(ExecutorService executorService) {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (!executorService.isShutdown()) {
@@ -66,10 +68,6 @@ public class JsqlParserThreadPool {
             thread.setDaemon(true);
             return thread;
         });
-
-        static {
-            addShutdownHook(executorService);
-        }
 
         /**
          * 默认解析线程池(固定大小,默认大小{@link #DEFAULT_THREAD_SIZE})
