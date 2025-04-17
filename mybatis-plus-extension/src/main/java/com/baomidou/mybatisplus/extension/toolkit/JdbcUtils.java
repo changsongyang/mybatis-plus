@@ -131,7 +131,7 @@ public class JdbcUtils {
             return DbType.REDSHIFT;
         } else if (url.contains(":opengauss:")) {
             return DbType.OPENGAUSS;
-        } else if (url.contains(":taos:") || url.contains(":taos-rs:")) {
+        } else if (url.contains(":taos:") || url.contains(":taos-rs:") || url.contains(":taos-ws:")) {
             return DbType.TDENGINE;
         } else if (url.contains(":informix")) {
             return DbType.INFORMIX;
