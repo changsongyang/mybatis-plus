@@ -1,0 +1,2 @@
+- fix: 修复在`Spring`中使用`@PostConstruct`调用`Db`方法查询出现警告日志
+- feat: 升级`Jsqlparser`5.2
