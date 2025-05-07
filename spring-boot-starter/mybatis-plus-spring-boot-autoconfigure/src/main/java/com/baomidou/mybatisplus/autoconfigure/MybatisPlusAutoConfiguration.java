@@ -24,6 +24,7 @@ import com.baomidou.mybatisplus.core.handlers.PostInitTableInfoHandler;
 import com.baomidou.mybatisplus.core.incrementer.IKeyGenerator;
 import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
 import com.baomidou.mybatisplus.core.injector.ISqlInjector;
+import com.baomidou.mybatisplus.core.spi.CompatibleHelper;
 import com.baomidou.mybatisplus.extension.spring.MybatisPlusApplicationContextAware;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import org.apache.ibatis.annotations.Mapper;
@@ -147,6 +148,9 @@ public class MybatisPlusAutoConfiguration implements InitializingBean {
     public void afterPropertiesSet() {
         if (!CollectionUtils.isEmpty(mybatisPlusPropertiesCustomizers)) {
             mybatisPlusPropertiesCustomizers.forEach(i -> i.customize(properties));
+        }
+        if (CompatibleHelper.hasCompatibleSet()) {
+            CompatibleHelper.getCompatibleSet().setContext(applicationContext);
         }
         checkConfigFileExists();
     }

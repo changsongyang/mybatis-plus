@@ -45,6 +45,8 @@ public class SpringCompatibleSet implements CompatibleSet {
 
     private static final Log LOG = LogFactory.getLog(SpringCompatibleSet.class);
 
+    private static volatile ApplicationContext applicationContext;
+
     @Override
     public SqlSession getSqlSession(SqlSessionFactory sessionFactory) {
         return SqlSessionUtils.getSqlSession(sessionFactory);
@@ -99,13 +101,13 @@ public class SpringCompatibleSet implements CompatibleSet {
 
     @Override
     public <T> T getBean(Class<T> clz) {
-        if (MybatisPlusApplicationContextAware.hasApplicationContext()) {
-            ApplicationContext applicationContext = MybatisPlusApplicationContextAware.getApplicationContext();
-            ObjectProvider<T> provider = applicationContext.getBeanProvider(clz);
-            return provider.getIfAvailable();
+        if (applicationContext == null && !MybatisPlusApplicationContextAware.hasApplicationContext()) {
+            LOG.warn("MybatisPlusApplicationContextAware is not initialized. Please ensure that MybatisPlusApplicationContextAware is properly registered as a Spring Bean in the application context.");
+            return null;
         }
-        LOG.warn("MybatisPlusApplicationContextAware is not initialized. Please ensure that MybatisPlusApplicationContextAware is properly registered as a Spring Bean in the application context.");
-        return null;
+        ApplicationContext context = applicationContext !=null  ? applicationContext : MybatisPlusApplicationContextAware.getApplicationContext();
+        ObjectProvider<T> provider = context.getBeanProvider(clz);
+        return provider.getIfAvailable();
     }
 
     @Override
@@ -117,6 +119,11 @@ public class SpringCompatibleSet implements CompatibleSet {
             }
         }
         return result;
+    }
+
+    @Override
+    public void setContext(Object context) {
+        applicationContext = (ApplicationContext) context;
     }
 
 }
