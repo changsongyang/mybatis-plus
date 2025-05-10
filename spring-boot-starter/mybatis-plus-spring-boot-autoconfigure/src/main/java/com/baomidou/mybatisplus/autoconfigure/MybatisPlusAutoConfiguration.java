@@ -24,7 +24,6 @@ import com.baomidou.mybatisplus.core.handlers.PostInitTableInfoHandler;
 import com.baomidou.mybatisplus.core.incrementer.IKeyGenerator;
 import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
 import com.baomidou.mybatisplus.core.injector.ISqlInjector;
-import com.baomidou.mybatisplus.core.spi.CompatibleHelper;
 import com.baomidou.mybatisplus.extension.spring.MybatisPlusApplicationContextAware;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import org.apache.ibatis.annotations.Mapper;
@@ -149,9 +148,6 @@ public class MybatisPlusAutoConfiguration implements InitializingBean {
         if (!CollectionUtils.isEmpty(mybatisPlusPropertiesCustomizers)) {
             mybatisPlusPropertiesCustomizers.forEach(i -> i.customize(properties));
         }
-        if (CompatibleHelper.hasCompatibleSet()) {
-            CompatibleHelper.getCompatibleSet().setContext(applicationContext);
-        }
         checkConfigFileExists();
     }
 
@@ -169,6 +165,7 @@ public class MybatisPlusAutoConfiguration implements InitializingBean {
         MybatisSqlSessionFactoryBean factory = new MybatisSqlSessionFactoryBean();
         factory.setDataSource(dataSource);
         factory.setVfs(SpringBootVFS.class);
+        factory.setApplicationContext(this.applicationContext);
         if (StringUtils.hasText(this.properties.getConfigLocation())) {
             factory.setConfigLocation(this.resourceLoader.getResource(this.properties.getConfigLocation()));
         }
@@ -380,7 +377,13 @@ public class MybatisPlusAutoConfiguration implements InitializingBean {
         }
     }
 
+    /**
+     * @deprecated 3.5.13
+     * @see MybatisSqlSessionFactoryBean#setApplicationContext(ApplicationContext)
+     * @return MybatisPlusApplicationContextAware
+     */
     @Bean
+    @Deprecated
     @ConditionalOnMissingBean(MybatisPlusApplicationContextAware.class)
     public MybatisPlusApplicationContextAware mybatisPlusSpringApplicationContextAware() {
         return new MybatisPlusApplicationContextAware();
