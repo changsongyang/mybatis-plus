@@ -367,7 +367,7 @@ public class DataSourceConfig {
         public Builder(@NotNull String url, String username, String password) {
             this();
             if (StringUtils.isBlank(url)) {
-                throw new RuntimeException("无法创建文件，请正确输入 url 配置信息！");
+                throw new IllegalArgumentException("`url` cannot be empty");
             }
             this.dataSourceConfig.url = url;
             this.dataSourceConfig.username = username;
@@ -393,7 +393,7 @@ public class DataSourceConfig {
                 this.dataSourceConfig.connection = conn;
                 this.dataSourceConfig.username = conn.getMetaData().getUserName();
             } catch (SQLException ex) {
-                throw new RuntimeException("构建数据库配置对象失败!", ex);
+                throw new RuntimeException(ex);
             }
         }
 
