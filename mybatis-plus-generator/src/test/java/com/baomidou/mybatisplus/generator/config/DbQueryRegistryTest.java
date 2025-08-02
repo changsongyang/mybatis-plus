@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.generator.config.querys.DMQuery;
 import com.baomidou.mybatisplus.generator.config.querys.DbQueryRegistry;
 import com.baomidou.mybatisplus.generator.config.querys.FirebirdQuery;
 import com.baomidou.mybatisplus.generator.config.querys.GaussDBSqlQuery;
-import com.baomidou.mybatisplus.generator.config.querys.GaussQuery;
+import com.baomidou.mybatisplus.generator.config.querys.ZenithQuery;
 import com.baomidou.mybatisplus.generator.config.querys.GbaseQuery;
 import com.baomidou.mybatisplus.generator.config.querys.H2Query;
 import com.baomidou.mybatisplus.generator.config.querys.KingbaseESQuery;
@@ -43,7 +43,7 @@ public class DbQueryRegistryTest {
         Assertions.assertInstanceOf(DMQuery.class, dbQueryRegistry.getDbQuery(DbType.DM));
         Assertions.assertInstanceOf(KingbaseESQuery.class, dbQueryRegistry.getDbQuery(DbType.KINGBASE_ES));
         Assertions.assertInstanceOf(MySqlQuery.class, dbQueryRegistry.getDbQuery(DbType.MYSQL));
-        Assertions.assertInstanceOf(GaussQuery.class, dbQueryRegistry.getDbQuery(DbType.GAUSS));
+        Assertions.assertInstanceOf(ZenithQuery.class, dbQueryRegistry.getDbQuery(DbType.GAUSS));
         Assertions.assertInstanceOf(GaussDBSqlQuery.class, dbQueryRegistry.getDbQuery(DbType.GAUSS_DB));
         Assertions.assertInstanceOf(OscarQuery.class, dbQueryRegistry.getDbQuery(DbType.OSCAR));
         Assertions.assertInstanceOf(FirebirdQuery.class, dbQueryRegistry.getDbQuery(DbType.FIREBIRD));
