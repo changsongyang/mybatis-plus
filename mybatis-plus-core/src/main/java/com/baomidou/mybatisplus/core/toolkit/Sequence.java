@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * 分布式高效有序 ID 生产黑科技(sequence)
  *
- * <p>优化开源项目：https://gitee.com/yu120/sequence</p>
+ * <p>优化开源项目：<a href="https://gitee.com/yu120/sequence">sequence</a></p>
  *
  * @author hubin
  * @since 2016-08-18
