@@ -6,5 +6,7 @@
 - feat: `OracleDdlGenerator`支持指定`schema`模式运行
 - feat: 适配华为云`GaussDb`数据库
 - feat: 主键生成器初始化增加错误降级处理
+- feat: 新增spring-boot4支持
 - opt: `SqlUtils`中`replaceSqlPlaceholder`方法增加缓存处理
-- opt： 优化`DDL`执行记录表检查是否存在
+- opt：优化`DDL`执行记录表检查是否存在
+- opt: 容器环境下workerId获取优化
