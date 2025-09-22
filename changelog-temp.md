@@ -1,0 +1,2 @@
+- fix: 修复Enjoy模板生成xml错误.
+- feat: 支持springboot4.0.0-M3
