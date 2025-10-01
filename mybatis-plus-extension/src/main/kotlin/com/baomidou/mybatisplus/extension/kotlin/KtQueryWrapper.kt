@@ -15,14 +15,11 @@
  */
 package com.baomidou.mybatisplus.extension.kotlin
 
-import com.baomidou.mybatisplus.core.conditions.SharedString
+import com.baomidou.mybatisplus.core.conditions.ISqlSegment
 import com.baomidou.mybatisplus.core.conditions.query.Query
-import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils
-import com.baomidou.mybatisplus.core.toolkit.support.ColumnCache
-import java.util.concurrent.atomic.AtomicInteger
+import com.baomidou.mybatisplus.core.toolkit.Constants
 import java.util.function.Predicate
 import kotlin.reflect.KProperty1
 
@@ -33,71 +30,34 @@ import kotlin.reflect.KProperty1
  * @since 2018-11-02
  */
 @Suppress("serial")
-open class KtQueryWrapper<T : Any> : AbstractKtWrapper<T, KtQueryWrapper<T>>, Query<KtQueryWrapper<T>, T, KProperty1<in T, *>> {
+open class KtQueryWrapper<T : Any> : AbstractKtWrapper<T, KtQueryWrapper<T>>,
+    Query<T, KProperty1<in T, *>, KtQueryWrapper<T>> {
 
-    /**
-     * 查询字段
-     */
-    private var sqlSelect: SharedString = SharedString()
+    constructor() : super()
 
     constructor(entity: T) {
-        this.entity = entity
-        super.initNeed()
+        setEntity(entity)
     }
+
 
     constructor(entityClass: Class<T>) {
-        this.entityClass = entityClass
-        super.initNeed()
+        setEntityClass(entityClass)
     }
 
-    internal constructor(entity: T?, entityClass: Class<T>, sqlSelect: SharedString, paramNameSeq: AtomicInteger,
-                         paramNameValuePairs: Map<String, Any>, columnMap: Map<String, ColumnCache>,
-                         lastSql: SharedString, sqlComment: SharedString, sqlFirst: SharedString) {
-        this.entity = entity
-        this.paramNameSeq = paramNameSeq
-        this.paramNameValuePairs = paramNameValuePairs
-        this.expression = MergeSegments()
-        this.columnMap = columnMap
-        this.sqlSelect = sqlSelect
-        this.entityClass = entityClass
-        this.lastSql = lastSql
-        this.sqlComment = sqlComment
-        this.sqlFirst = sqlFirst
-    }
-
-    override fun select(condition: Boolean, columns: MutableList<KProperty1<in T, *>>): KtQueryWrapper<T> {
-        if (condition && CollectionUtils.isNotEmpty(columns)) {
-            this.sqlSelect.stringValue = columnsToString(false, columns)
+    override fun select(condition: Boolean, sqlSegment: ISqlSegment): KtQueryWrapper<T> {
+        return maybeDo(condition) {
+            selectBodyOrSetSql.add(sqlSegment.sqlSegment)
         }
-        return typedThis
-    }
-
-    override fun select(predicate: Predicate<TableFieldInfo>): KtQueryWrapper<T> {
-        return select(entityClass, predicate) as KtQueryWrapper<T>
     }
 
     override fun select(entityClass: Class<T>, predicate: Predicate<TableFieldInfo>): KtQueryWrapper<T> {
-        this.entityClass = entityClass
-        this.sqlSelect.stringValue = TableInfoHelper.getTableInfo(getEntityClass()).chooseSelect(predicate)
-        return typedThis
+        setEntityClass(entityClass)
+        selectBodyOrSetSql.add(TableInfoHelper.getTableInfo(context.getEntityClass()).chooseSelect(predicate))
+        return selfOrChildren()
     }
 
     override fun getSqlSelect(): String? {
-        return sqlSelect.stringValue
-    }
-
-    /**
-     * 用于生成嵌套 sql
-     *
-     * 故 sqlSelect 不向下传递
-     */
-    override fun instance(): KtQueryWrapper<T> {
-        return KtQueryWrapper(entity, entityClass, sqlSelect, paramNameSeq, paramNameValuePairs, columnMap,
-            SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString())
-    }
-
-    override fun clear() {
-        super.clear()
-        sqlSelect.toNull()
+        return if (selectBodyOrSetSql.isNullOrEmpty()) null
+        else selectBodyOrSetSql.joinToString(separator = Constants.COMMA)
     }
 }

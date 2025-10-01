@@ -19,7 +19,7 @@ public class OrderByMapperTest extends BaseDbTest<OrderByMapper> {
     @Test
     void test() {
         doTest(mapper -> {
-            mapper.selectList(Wrappers.emptyWrapper());
+            mapper.selectList(null);
 
             mapper.selectList(Wrappers.<OrderByEntity>lambdaQuery().select(OrderByEntity::getName));
         });

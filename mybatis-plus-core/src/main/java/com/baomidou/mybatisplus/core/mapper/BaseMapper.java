@@ -18,7 +18,6 @@ package com.baomidou.mybatisplus.core.mapper;
 import com.baomidou.mybatisplus.core.batch.BatchSqlSession;
 import com.baomidou.mybatisplus.core.batch.MybatisBatch;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.enums.SqlMethod;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -35,11 +34,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.BiPredicate;
 
 /*
@@ -243,7 +238,7 @@ public interface BaseMapper<T> extends Mapper<T> {
      * 根据 Wrapper 更新记录
      * <p>此方法无法进行自动填充,如需自动填充请使用{@link #update(Object, Wrapper)}</p>
      *
-     * @param updateWrapper {@link UpdateWrapper} or {@link LambdaUpdateWrapper}
+     * @param updateWrapper {@link UpdateWrapper} or {@link UpdateWrapper}
      * @since 3.5.4
      */
     default int update(@Param(Constants.WRAPPER) Wrapper<T> updateWrapper) {

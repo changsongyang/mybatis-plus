@@ -5,6 +5,7 @@ dependencies {
     implementation "${lib.cglib}"
     implementation "${lib.'spring-aop'}"
     implementation "${lib.'imadcn'}"
+    implementation "${lib."kotlin-reflect"}"
 
     testImplementation "${lib.'logback-classic'}"
     testImplementation "${lib."mybatis-spring"}"

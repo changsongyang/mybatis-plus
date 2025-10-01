@@ -1,14 +1,12 @@
 package com.baomidou.mybatisplus.test.toolkit;
 
 import com.baomidou.mybatisplus.annotation.DbType;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.spi.CompatibleHelper;
 import com.baomidou.mybatisplus.core.spi.CompatibleSet;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
-import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.conditions.update.UpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
@@ -156,7 +154,7 @@ class DbTest extends BaseDbTest<EntityMapper> {
 
     @Test
     void testGetOne() {
-        LambdaQueryWrapper<Entity> wrapper = Wrappers.lambdaQuery(Entity.class);
+        QueryWrapper<Entity> wrapper = Wrappers.lambdaQuery(Entity.class);
         Assertions.assertThrows(TooManyResultsException.class, () -> Db.getOne(wrapper));
         Entity one = Db.getOne(wrapper, false);
         Assertions.assertNotNull(one);
@@ -270,7 +268,7 @@ class DbTest extends BaseDbTest<EntityMapper> {
         List<Entity> list = query.eq("id", 1L).list();
         assertEquals(1, list.size());
 
-        LambdaQueryChainWrapper<Entity> lambdaQuery = Db.lambdaQuery(Entity.class);
+        QueryChainWrapper<Entity> lambdaQuery = Db.lambdaQuery(Entity.class);
         list = lambdaQuery.eq(Entity::getId, 1L).list();
         assertEquals(1, list.size());
 
@@ -278,7 +276,7 @@ class DbTest extends BaseDbTest<EntityMapper> {
         update.eq("id", 1L).set("name", "bee bee I'm a sheep").update();
         assertEquals("bee bee I'm a sheep", lambdaQuery.eq(Entity::getId, 1L).one().getName());
 
-        LambdaUpdateChainWrapper<Entity> lambdaUpdate = Db.lambdaUpdate(Entity.class);
+        UpdateChainWrapper<Entity> lambdaUpdate = Db.lambdaUpdate(Entity.class);
         lambdaUpdate.eq(Entity::getId, 1L).set(Entity::getName, "be better").update();
         assertEquals("be better", lambdaQuery.eq(Entity::getId, 1L).one().getName());
     }

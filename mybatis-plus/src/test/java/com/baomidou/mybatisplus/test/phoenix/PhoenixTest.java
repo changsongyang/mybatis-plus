@@ -1,7 +1,6 @@
 package com.baomidou.mybatisplus.test.phoenix;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import com.baomidou.mybatisplus.test.phoenix.entity.PhoenixTestInfo;
@@ -42,7 +41,7 @@ public class PhoenixTest {
             assertEquals (1, mapper.upsert(testInfo));
         }
 
-        assertEquals(size, mapper.selectList(Wrappers.emptyWrapper()).size());
+        assertEquals(size, mapper.selectList(null).size());
     }
 
 
@@ -60,13 +59,13 @@ public class PhoenixTest {
             sqlSession.commit();
 //            sqlSession.flushStatements();
         }
-        assertEquals(size, mapper.selectList(Wrappers.emptyWrapper()).size());
+        assertEquals(size, mapper.selectList(null).size());
     }
 
     @Test
     void a02_page() {
         Page<PhoenixTestInfo> page = new Page<>(2, 100);
-        IPage<PhoenixTestInfo> result = mapper.selectPage(page, Wrappers.emptyWrapper());
+        IPage<PhoenixTestInfo> result = mapper.selectPage(page, null);
 
         assertEquals(10000, result.getTotal());
         assertEquals(2, result.getCurrent());

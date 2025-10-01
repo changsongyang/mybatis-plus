@@ -15,6 +15,7 @@
  */
 package com.baomidou.mybatisplus.extension.kotlin
 
+import com.baomidou.mybatisplus.core.conditions.ISqlSegment
 import com.baomidou.mybatisplus.core.conditions.query.Query
 import com.baomidou.mybatisplus.core.mapper.BaseMapper
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo
@@ -28,47 +29,24 @@ import kotlin.reflect.KProperty1
  * @since 2020-10-18
  */
 @Suppress("serial")
-open class KtQueryChainWrapper<T : Any>(
-    internal val baseMapper: BaseMapper<T>?
-) : AbstractChainWrapper<T, KProperty1<in T, *>, KtQueryChainWrapper<T>, KtQueryWrapper<T>>(),
-    ChainQuery<T>, Query<KtQueryChainWrapper<T>, T, KProperty1<in T, *>> {
+open class KtQueryChainWrapper<T : Any> : AbstractChainWrapper<T, KProperty1<in T, *>, KtQueryChainWrapper<T>, KtQueryWrapper<T>>,
+    Query<T, KProperty1<in T, *>, KtQueryChainWrapper<T>>, ChainQuery<T, KtQueryChainWrapper<T>> {
 
-    constructor(baseMapper: BaseMapper<T>, entityClass: Class<T>) : this(baseMapper) {
-        super.wrapperChildren = KtQueryWrapper(entityClass)
-    }
+    constructor() : super()
 
-    constructor(baseMapper: BaseMapper<T>, entity: T) : this(baseMapper) {
-        super.wrapperChildren = KtQueryWrapper(entity)
-    }
+    constructor(baseMapper: BaseMapper<T>) : super(baseMapper)
 
-    constructor(entityClass: Class<T>) : this(null) {
-        super.wrapperChildren = KtQueryWrapper(entityClass)
-    }
+    constructor(entityClass: Class<T>) : super(entityClass)
 
-    constructor(entity: T) : this(null) {
-        super.wrapperChildren = KtQueryWrapper(entity)
-        super.setEntityClass(entity.javaClass)
-    }
+    override fun instanceDelegate(): KtQueryWrapper<T> = KtQueryWrapper()
 
-    override fun select(condition: Boolean, columns: MutableList<KProperty1<in T, *>>): KtQueryChainWrapper<T> {
-        wrapperChildren.select(condition, columns)
-        return typedThis
-    }
-
-    override fun select(predicate: Predicate<TableFieldInfo>): KtQueryChainWrapper<T> {
-        return select(entityClass, predicate)
+    override fun select(condition: Boolean, sqlSegment: ISqlSegment): KtQueryChainWrapper<T> {
+        delegateWrapper.select(condition, sqlSegment)
+        return selfOrChildren()
     }
 
     override fun select(entityClass: Class<T>, predicate: Predicate<TableFieldInfo>): KtQueryChainWrapper<T> {
-        wrapperChildren.select(entityClass, predicate)
-        return typedThis
-    }
-
-    override fun getBaseMapper(): BaseMapper<T>? {
-        return baseMapper
-    }
-
-    override fun getEntityClass(): Class<T> {
-        return super.wrapperChildren.entityClass
+        delegateWrapper.select(entityClass, predicate)
+        return selfOrChildren()
     }
 }

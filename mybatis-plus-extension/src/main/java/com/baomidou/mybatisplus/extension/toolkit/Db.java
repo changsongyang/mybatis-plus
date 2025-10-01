@@ -19,15 +19,9 @@ import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
-import com.baomidou.mybatisplus.core.toolkit.Assert;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.baomidou.mybatisplus.core.toolkit.Constants;
-import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
-import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.conditions.update.UpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.kotlin.KtQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.kotlin.KtUpdateChainWrapper;
@@ -583,9 +577,9 @@ public class Db {
      * 链式查询 lambda 式
      * <p>注意：不支持 Kotlin </p>
      *
-     * @return LambdaQueryWrapper 的包装类
+     * @return QueryWrapper 的包装类
      */
-    public static <T> LambdaQueryChainWrapper<T> lambdaQuery(Class<T> entityClass) {
+    public static <T> QueryChainWrapper<T> lambdaQuery(Class<T> entityClass) {
         return ChainWrappers.lambdaQueryChain(entityClass);
     }
 
@@ -611,9 +605,9 @@ public class Db {
      * 链式更改 lambda 式
      * <p>注意：不支持 Kotlin </p>
      *
-     * @return LambdaUpdateWrapper 的包装类
+     * @return UpdateWrapper 的包装类
      */
-    public static <T> LambdaUpdateChainWrapper<T> lambdaUpdate(Class<T> entityClass) {
+    public static <T> UpdateChainWrapper<T> lambdaUpdate(Class<T> entityClass) {
         return ChainWrappers.lambdaUpdateChain(entityClass);
     }
 
@@ -666,13 +660,7 @@ public class Db {
      * @return 实体类型
      */
     protected static <T> Class<T> getEntityClass(AbstractWrapper<T, ?, ?> queryWrapper) {
-        Class<T> entityClass = queryWrapper.getEntityClass();
-        if (entityClass == null) {
-            T entity = queryWrapper.getEntity();
-            if (entity != null) {
-                entityClass = getEntityClass(entity);
-            }
-        }
+        Class<T> entityClass = queryWrapper.getContext().getEntityClass();
         Assert.notNull(entityClass, "error: can not get entityClass from wrapper");
         return entityClass;
     }

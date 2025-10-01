@@ -63,8 +63,8 @@ class MybatisTest {
             H2UserMapper mapper = sqlSession.getMapper(H2UserMapper.class);
             Assertions.assertEquals(1, mapper.myInsertWithNameVersion("test", 2));
             Assertions.assertEquals(1, mapper.insert(new H2User("test")));
-            Assertions.assertEquals(2, mapper.selectCount(new QueryWrapper<H2User>().lambda().eq(H2User::getName, "test")));
-            Assertions.assertEquals(2, mapper.delete(new QueryWrapper<H2User>().lambda().eq(H2User::getName, "test")));
+            Assertions.assertEquals(2, mapper.selectCount(new QueryWrapper<H2User>().eq(H2User::getName, "test")));
+            Assertions.assertEquals(2, mapper.delete(new QueryWrapper<H2User>().eq(H2User::getName, "test")));
             H2User h2User = new H2User(66L, "66666", AgeEnum.THREE, 666);
             Assertions.assertEquals(1, mapper.insert(h2User));
             h2User.setName("7777777777");

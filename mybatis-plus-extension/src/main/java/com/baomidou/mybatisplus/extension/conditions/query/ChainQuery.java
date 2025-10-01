@@ -1,26 +1,12 @@
-/*
- * Copyright (c) 2011-2025, baomidou (jobob@qq.com).
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.baomidou.mybatisplus.extension.conditions.query;
+
+import com.baomidou.mybatisplus.core.conditions.SelfChildren;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.conditions.AbstractChainWrapper;
+import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 
 import java.util.List;
 import java.util.Optional;
-
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.conditions.ChainWrapper;
-import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 
 /**
  * 具有查询方法的定义
@@ -28,7 +14,7 @@ import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
  * @author miemie
  * @since 2018-12-19
  */
-public interface ChainQuery<T> extends ChainWrapper<T> {
+public interface ChainQuery<T, Children extends AbstractChainWrapper<T, ?, ?, ?>> extends SelfChildren<Children> {
 
     /**
      * 获取集合
@@ -36,7 +22,7 @@ public interface ChainQuery<T> extends ChainWrapper<T> {
      * @return 集合
      */
     default List<T> list() {
-        return execute(mapper -> mapper.selectList(getWrapper()));
+        return selfOrChildren().execute(mapper -> mapper.selectList(selfOrChildren().delegate()));
     }
 
     /**
@@ -47,7 +33,7 @@ public interface ChainQuery<T> extends ChainWrapper<T> {
      * @since 3.5.3.2
      */
     default List<T> list(IPage<T> page) {
-        return execute(mapper -> mapper.selectList(page, getWrapper()));
+        return selfOrChildren().execute(mapper -> mapper.selectList(page, selfOrChildren().delegate()));
     }
 
     /**
@@ -56,7 +42,7 @@ public interface ChainQuery<T> extends ChainWrapper<T> {
      * @return 单个
      */
     default T one() {
-        return execute(mapper -> mapper.selectOne(getWrapper()));
+        return selfOrChildren().execute(mapper -> mapper.selectOne(selfOrChildren().delegate()));
     }
 
     /**
@@ -75,7 +61,7 @@ public interface ChainQuery<T> extends ChainWrapper<T> {
      * @return count
      */
     default Long count() {
-        return execute(mapper -> SqlHelper.retCount(mapper.selectCount(getWrapper())));
+        return selfOrChildren().execute(mapper -> SqlHelper.retCount(mapper.selectCount(selfOrChildren().delegate())));
     }
 
     /**
@@ -94,6 +80,6 @@ public interface ChainQuery<T> extends ChainWrapper<T> {
      * @return 分页数据
      */
     default <E extends IPage<T>> E page(E page) {
-        return execute(mapper -> mapper.selectPage(page, getWrapper()));
+        return selfOrChildren().execute(mapper -> mapper.selectPage(page, selfOrChildren().delegate()));
     }
 }

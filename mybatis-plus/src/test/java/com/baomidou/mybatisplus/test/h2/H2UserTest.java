@@ -1,51 +1,16 @@
 package com.baomidou.mybatisplus.test.h2;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDateTime;
-import java.util.AbstractList;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import com.baomidou.mybatisplus.core.metadata.OrderItem;
-import com.baomidou.mybatisplus.test.h2.mapper.H2UserMapper;
-import org.apache.ibatis.exceptions.PersistenceException;
-import org.apache.ibatis.exceptions.TooManyResultsException;
-import org.apache.ibatis.plugin.Interceptor;
-import org.apache.ibatis.session.Configuration;
-import org.apache.ibatis.session.ResultHandler;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
+import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.DataChangeRecorderInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
@@ -53,10 +18,29 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.test.h2.entity.H2User;
 import com.baomidou.mybatisplus.test.h2.enums.AgeEnum;
 import com.baomidou.mybatisplus.test.h2.mapper.H2StudentMapper;
+import com.baomidou.mybatisplus.test.h2.mapper.H2UserMapper;
 import com.baomidou.mybatisplus.test.h2.service.IH2UserService;
-
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.select.Select;
+import org.apache.ibatis.exceptions.PersistenceException;
+import org.apache.ibatis.exceptions.TooManyResultsException;
+import org.apache.ibatis.plugin.Interceptor;
+import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.session.ResultHandler;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.util.*;
 
 /**
  * Mybatis Plus H2 Junit Test
@@ -563,17 +547,17 @@ class H2UserTest extends BaseTest {
     @Test
     void testLambdaWrapperClear() {
         userService.save(new H2User("小红", AgeEnum.TWO));
-        LambdaQueryWrapper<H2User> lambdaQueryWrapper = new QueryWrapper<H2User>().lambda().eq(H2User::getName, "小宝");
-        lambdaQueryWrapper.orderByDesc(H2User::getName);
-        Assertions.assertEquals(0, userService.count(lambdaQueryWrapper));
-        lambdaQueryWrapper.clear();
-        lambdaQueryWrapper.eq(H2User::getName, "小红");
-        Assertions.assertEquals(1, userService.count(lambdaQueryWrapper));
-        LambdaUpdateWrapper<H2User> lambdaUpdateWrapper = new UpdateWrapper<H2User>().lambda().set(H2User::getName, "小红二号");
-        Assertions.assertFalse(userService.update(lambdaUpdateWrapper.eq(H2User::getName, "小红一号")));
-        lambdaUpdateWrapper.clear();
-        lambdaUpdateWrapper.set(H2User::getName, "小红一号");
-        Assertions.assertTrue(userService.update(lambdaUpdateWrapper.eq(H2User::getName, "小红")));
+        QueryWrapper<H2User> QueryWrapper = new QueryWrapper<H2User>().eq(H2User::getName, "小宝");
+        QueryWrapper.orderByDesc(H2User::getName);
+        Assertions.assertEquals(0, userService.count(QueryWrapper));
+        QueryWrapper.clear();
+        QueryWrapper.eq(H2User::getName, "小红");
+        Assertions.assertEquals(1, userService.count(QueryWrapper));
+        UpdateWrapper<H2User> UpdateWrapper = new UpdateWrapper<H2User>().set(H2User::getName, "小红二号");
+        Assertions.assertFalse(userService.update(UpdateWrapper.eq(H2User::getName, "小红一号")));
+        UpdateWrapper.clear();
+        UpdateWrapper.set(H2User::getName, "小红一号");
+        Assertions.assertTrue(userService.update(UpdateWrapper.eq(H2User::getName, "小红")));
     }
 
     @Test
@@ -702,10 +686,10 @@ class H2UserTest extends BaseTest {
     @Test
     @Order(28)
     void testServiceGetOneOptThrowEx() {
-        userService.getOneOpt(new LambdaQueryWrapper<H2User>().eq(H2User::getName, "test1"), false)
+        userService.getOneOpt(new QueryWrapper<H2User>().eq(H2User::getName, "test1"), false)
             .ifPresent(u -> log(u.toString()));
 
-        userService.getOneOpt(new LambdaQueryWrapper<H2User>().eq(H2User::getName, "test"), false)
+        userService.getOneOpt(new QueryWrapper<H2User>().eq(H2User::getName, "test"), false)
             .ifPresent(u -> log(u.toString()));
 
         // 异常情况
@@ -821,12 +805,12 @@ class H2UserTest extends BaseTest {
         );
 
         Assertions.assertEquals(
-            userService.pageMaps(new Page<>(1, 2, false), Wrappers.emptyWrapper()).getRecords().size(),
-            userService.listMaps(new Page<>(1, 2, false), Wrappers.emptyWrapper()).size()
+            userService.pageMaps(new Page<>(1, 2, false), null).getRecords().size(),
+            userService.listMaps(new Page<>(1, 2, false), null).size()
         );
         Assertions.assertEquals(
-            userService.pageMaps(new Page<>(2, 2, false), Wrappers.emptyWrapper()).getRecords().size(),
-            userService.listMaps(new Page<>(2, 2, false), Wrappers.emptyWrapper()).size()
+            userService.pageMaps(new Page<>(2, 2, false), null).getRecords().size(),
+            userService.listMaps(new Page<>(2, 2, false), null).size()
         );
     }
 
@@ -836,15 +820,15 @@ class H2UserTest extends BaseTest {
         Assertions.assertEquals(userService.list(new Page<>(1, 2)).size(), userService.page(new Page<>(1, 2)).getRecords().size());
         Assertions.assertEquals(userService.list(new Page<>(2, 2)).size(), userService.page(new Page<>(2, 2)).getRecords().size());
         Assertions.assertEquals(
-            userService.list(new Page<>(1, 2, false), Wrappers.emptyWrapper()).size(),
-            userService.page(new Page<>(1, 2, false), Wrappers.emptyWrapper()).getRecords().size()
+            userService.list(new Page<>(1, 2, false), null).size(),
+            userService.page(new Page<>(1, 2, false), null).getRecords().size()
         );
 
         List<H2User> list = userService.list(new Page<>(2, 2, false));
 
         Assertions.assertEquals(
-            userService.list(new Page<>(2, 2, false), Wrappers.emptyWrapper()).size(),
-            userService.page(new Page<>(2, 2, false), Wrappers.emptyWrapper()).getRecords().size()
+            userService.list(new Page<>(2, 2, false), null).size(),
+            userService.page(new Page<>(2, 2, false), null).getRecords().size()
         );
     }
 
@@ -857,47 +841,8 @@ class H2UserTest extends BaseTest {
             .orderByDesc(H2User::getDeleted, H2User::getPrice).orderByDesc(true, H2User::getDeleted, H2User::getTestType)
             .groupBy(H2User::getAge, H2User::getTestType).groupBy(true, H2User::getAge, H2User::getTestType);
 
-        new LambdaQueryChainWrapper<>(H2User.class)
+        new QueryChainWrapper<>(H2User.class)
             .select(H2User::getAge).select(true, H2User::getDeleted, H2User::getDeleted)
-            .orderBy(true, true, H2User::getAge, H2User::getAge)
-            .orderByAsc(H2User::getAge, H2User::getDeleted).orderByAsc(true, H2User::getAge, H2User::getTestType)
-            .orderByDesc(H2User::getDeleted, H2User::getPrice).orderByDesc(true, H2User::getDeleted, H2User::getTestType)
-            .groupBy(H2User::getAge, H2User::getTestType).groupBy(true, H2User::getAge, H2User::getTestType);
-
-        // 重写方法保留支持.
-        new LambdaQueryChainWrapper<>(H2User.class) {
-            @Override
-            protected LambdaQueryChainWrapper<H2User> doOrderByDesc(boolean condition, SFunction<H2User, ?> column, List<SFunction<H2User, ?>> columns) {
-                System.out.println("-------处理OrderByDesc----------");
-                return super.doOrderByDesc(condition, column, columns);
-            }
-
-            @Override
-            protected LambdaQueryChainWrapper<H2User> doOrderByAsc(boolean condition, SFunction<H2User, ?> column, List<SFunction<H2User, ?>> columns) {
-                System.out.println("-------处理OrderByAsc----------");
-                return super.doOrderByAsc(condition, column, columns);
-            }
-
-            @Override
-            protected LambdaQueryChainWrapper<H2User> doOrderBy(boolean condition, boolean isAsc, SFunction<H2User, ?> column, List<SFunction<H2User, ?>> columns) {
-                System.out.println("-------处理OrderBy----------");
-                return super.doOrderBy(condition, isAsc, column, columns);
-            }
-
-            @Override
-            protected LambdaQueryChainWrapper<H2User> doGroupBy(boolean condition, SFunction<H2User, ?> column, List<SFunction<H2User, ?>> columns) {
-                System.out.println("-------处理GroupBy----------");
-                return super.doGroupBy(condition, column, columns);
-            }
-
-            @Override
-            protected LambdaQueryChainWrapper<H2User> doSelect(boolean condition, List<SFunction<H2User, ?>> columns) {
-                System.out.println("-------处理Select----------");
-                return super.doSelect(condition, columns);
-            }
-        }
-            .select(H2User::getAge)
-            .select(true, H2User::getDeleted, H2User::getDeleted)
             .orderBy(true, true, H2User::getAge, H2User::getAge)
             .orderByAsc(H2User::getAge, H2User::getDeleted).orderByAsc(true, H2User::getAge, H2User::getTestType)
             .orderByDesc(H2User::getDeleted, H2User::getPrice).orderByDesc(true, H2User::getDeleted, H2User::getTestType)
@@ -919,10 +864,10 @@ class H2UserTest extends BaseTest {
         BaseMapper<H2User> baseMapper = userService.getBaseMapper();
         Page<H2User> page = new Page<>(1, 1000000);
         System.out.println("--------------------------------------------");
-        baseMapper.selectList(page, Wrappers.emptyWrapper());
+        baseMapper.selectList(page, null);
         List<Long> ids = new ArrayList<>();
         System.out.println("---------------selectListByPage-------------------");
-        baseMapper.selectList(page, Wrappers.emptyWrapper(), resultContext -> {
+        baseMapper.selectList(page, null, resultContext -> {
             H2User resultObject = resultContext.getResultObject();
             ids.add(resultObject.getTestId());
             System.out.println(resultObject);
@@ -931,20 +876,20 @@ class H2UserTest extends BaseTest {
         baseMapper.selectByIds(ids, resultContext -> System.out.println(resultContext.getResultObject()));
         System.out.println("---------------selectList-------------------");
         System.out.println("---------------selectObjs-------------------");
-        baseMapper.selectObjs(Wrappers.emptyWrapper(), (ResultHandler<Long>) resultContext -> System.out.println(resultContext.getResultObject()));
+        baseMapper.selectObjs(null, (ResultHandler<Long>) resultContext -> System.out.println(resultContext.getResultObject()));
         System.out.println("---------------selectByMap-------------------");
         baseMapper.selectByMap(new HashMap<>(), resultContext -> System.out.println(resultContext.getResultObject()));
         System.out.println("---------------selectMapsByPage-------------------");
-        baseMapper.selectMaps(Page.of(1, 100000), Wrappers.emptyWrapper(), resultContext -> resultContext.getResultObject().forEach((k, v) -> System.out.println(k + "--------" + v)));
+        baseMapper.selectMaps(Page.of(1, 100000), null, resultContext -> resultContext.getResultObject().forEach((k, v) -> System.out.println(k + "--------" + v)));
         System.out.println("---------------selectMaps-------------------");
-        baseMapper.selectMaps(Wrappers.emptyWrapper(), resultContext -> resultContext.getResultObject().forEach((k, v) -> System.out.println(k + "--------" + v)));
+        baseMapper.selectMaps(null, resultContext -> resultContext.getResultObject().forEach((k, v) -> System.out.println(k + "--------" + v)));
     }
 
     @Test
     void testSelectOne() {
         Assertions.assertTrue(userService.list().size() > 2);
-        Assertions.assertThrows(TooManyResultsException.class, () -> userService.getBaseMapper().selectOne(Wrappers.emptyWrapper()));
-        Assertions.assertNotNull(userService.getBaseMapper().selectOne(Wrappers.emptyWrapper(), false));
+        Assertions.assertThrows(TooManyResultsException.class, () -> userService.getBaseMapper().selectOne(null));
+        Assertions.assertNotNull(userService.getBaseMapper().selectOne(null, false));
     }
 
     @Test

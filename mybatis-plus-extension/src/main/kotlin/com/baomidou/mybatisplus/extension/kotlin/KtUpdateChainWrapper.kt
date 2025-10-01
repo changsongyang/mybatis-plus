@@ -15,10 +15,12 @@
  */
 package com.baomidou.mybatisplus.extension.kotlin
 
+import com.baomidou.mybatisplus.core.conditions.ISqlSegment
 import com.baomidou.mybatisplus.core.conditions.update.Update
 import com.baomidou.mybatisplus.core.mapper.BaseMapper
 import com.baomidou.mybatisplus.extension.conditions.AbstractChainWrapper
 import com.baomidou.mybatisplus.extension.conditions.update.ChainUpdate
+import java.util.function.Supplier
 import kotlin.reflect.KProperty1
 
 /**
@@ -26,53 +28,34 @@ import kotlin.reflect.KProperty1
  * @since 2020-10-18
  */
 @Suppress("serial")
-open class KtUpdateChainWrapper<T : Any>(
-    internal val baseMapper: BaseMapper<T>?
-) : AbstractChainWrapper<T, KProperty1<in T, *>, KtUpdateChainWrapper<T>, KtUpdateWrapper<T>>(),
-    ChainUpdate<T>, Update<KtUpdateChainWrapper<T>, KProperty1<in T, *>> {
+open class KtUpdateChainWrapper<T : Any> : AbstractChainWrapper<T, KProperty1<in T, *>, KtUpdateChainWrapper<T>, KtUpdateWrapper<T>>,
+    Update<KProperty1<in T, *>, KtUpdateChainWrapper<T>>, ChainUpdate<T, KtUpdateChainWrapper<T>> {
 
-    constructor(baseMapper: BaseMapper<T>, entityClass: Class<T>) : this(baseMapper) {
-        super.wrapperChildren = KtUpdateWrapper(entityClass)
-    }
+    constructor() : super()
 
-    constructor(baseMapper: BaseMapper<T>, entity: T) : this(baseMapper) {
-        super.wrapperChildren = KtUpdateWrapper(entity)
-    }
+    constructor(baseMapper: BaseMapper<T>) : super(baseMapper)
 
-    constructor(entityClass: Class<T>) : this(null) {
-        super.wrapperChildren = KtUpdateWrapper(entityClass)
-    }
+    constructor(entityClass: Class<T>) : super(entityClass)
 
-    constructor(entity: T) : this(null) {
-        super.wrapperChildren = KtUpdateWrapper(entity)
-        super.setEntityClass(entity.javaClass)
-    }
+    override fun instanceDelegate(): KtUpdateWrapper<T> = KtUpdateWrapper()
 
-    override fun set(condition: Boolean, column: KProperty1<in T, *>, value: Any?, mapping: String?): KtUpdateChainWrapper<T> {
-        wrapperChildren.set(condition, column, value, mapping)
-        return typedThis
+    override fun set(condition: Boolean, column: ISqlSegment, value: Any, mapping: Supplier<String>?): KtUpdateChainWrapper<T> {
+        delegateWrapper.set(condition, column, value, mapping!!)
+        return selfOrChildren()
     }
 
     override fun setSql(condition: Boolean, setSql: String, vararg params: Any): KtUpdateChainWrapper<T> {
-        wrapperChildren.setSql(condition, setSql, *params)
-        return typedThis
+        delegateWrapper.setSql(condition, setSql, *params)
+        return selfOrChildren()
     }
 
-    override fun setDecrBy(condition: Boolean, column: KProperty1<in T, *>, `val`: Number): KtUpdateChainWrapper<T> {
-        wrapperChildren.setDecrBy(condition, column, `val`)
-        return typedThis
+    override fun setIncrBy(condition: Boolean, column: ISqlSegment, value: Number): KtUpdateChainWrapper<T> {
+        delegateWrapper.setIncrBy(condition, column, value)
+        return selfOrChildren()
     }
 
-    override fun setIncrBy(condition: Boolean, column: KProperty1<in T, *>, `val`: Number): KtUpdateChainWrapper<T> {
-        wrapperChildren.setIncrBy(condition, column, `val`)
-        return typedThis
-    }
-
-    override fun getBaseMapper(): BaseMapper<T>? {
-        return baseMapper
-    }
-
-    override fun getEntityClass(): Class<T> {
-        return super.wrapperChildren.entityClass
+    override fun setDecrBy(condition: Boolean, column: ISqlSegment, value: Number): KtUpdateChainWrapper<T> {
+        delegateWrapper.setDecrBy(condition, column, value)
+        return selfOrChildren()
     }
 }

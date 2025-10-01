@@ -1,7 +1,6 @@
 package com.baomidou.mybatisplus.core.conditions;
 
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.Update;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
@@ -32,14 +31,14 @@ class UpdateWrapperIncrDecrTest extends BaseWrapperTest {
                 .setIncrBy("role_id", 1).setDecrBy("username", 1),
             "role_id=role_id + 1,username=username - 1");
 
-        assertEquals(new LambdaUpdateWrapper<User>()
+        assertEquals(new UpdateWrapper<User>()
                 .setIncrBy(User::getRoleId, 1).setDecrBy(User::getName, 1),
             "role_id=role_id + 1,username=username - 1");
     }
 
     @Test
     void testIncrByAndDecrByBigDecimal() {
-        assertEquals(new LambdaUpdateWrapper<User>()
+        assertEquals(new UpdateWrapper<User>()
                 .setIncrBy(User::getRoleId, new BigDecimal("1"))
                 .setIncrBy(User::getRoleId, new BigDecimal(1))
                 .setIncrBy(User::getRoleId, new BigDecimal(1.0000))
@@ -49,7 +48,7 @@ class UpdateWrapperIncrDecrTest extends BaseWrapperTest {
             "role_id=role_id + 1,role_id=role_id + 1,role_id=role_id + 1," +
                 "role_id=role_id + 1.0000,role_id=role_id + 0.01,role_id=role_id + 2340");
 
-        assertEquals(new LambdaUpdateWrapper<User>()
+        assertEquals(new UpdateWrapper<User>()
                 .setDecrBy(User::getRoleId, new BigDecimal("1"))
                 .setDecrBy(User::getRoleId, new BigDecimal(1))
                 .setDecrBy(User::getRoleId, new BigDecimal(1.0000))

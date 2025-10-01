@@ -15,6 +15,8 @@
  */
 package com.baomidou.mybatisplus.core;
 
+import lombok.Data;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.JarURLConnection;
@@ -65,4 +67,26 @@ public class MybatisPlusVersion {
         return jarFile.getManifest().getMainAttributes().getValue(Attributes.Name.IMPLEMENTATION_VERSION);
     }
 
+    public static void main(String[] args) {
+        new xx<Entity>().eq(Entity::getName);
+    }
+
+    public static class xx<T> {
+        public <V> void eq(String map) {
+            System.out.println(1);
+        }
+
+        public <V> void eq(SFunction<T> map) {
+            System.out.println(2);
+        }
+    }
+
+    interface SFunction<T> {
+        Object apply(T t);
+    }
+
+    @Data
+    public static class Entity {
+        private String name;
+    }
 }

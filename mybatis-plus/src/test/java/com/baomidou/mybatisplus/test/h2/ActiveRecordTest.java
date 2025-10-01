@@ -1,6 +1,5 @@
 package com.baomidou.mybatisplus.test.h2;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -129,7 +128,7 @@ class ActiveRecordTest {
         try {
             h2StudentService.testTransactional();
         } catch (MybatisPlusException e) {
-            List<H2Student> students = new H2Student().selectList(new QueryWrapper<H2Student>().lambda().like(H2Student::getName, "tx"));
+            List<H2Student> students = new H2Student().selectList(new QueryWrapper<H2Student>().like(H2Student::getName, "tx"));
             Assertions.assertTrue(CollectionUtils.isEmpty(students));
         }
     }
@@ -151,16 +150,16 @@ class ActiveRecordTest {
         H2Student student = new H2Student().setName(name).setAge(2);
         student.delete(new QueryWrapper<H2Student>().comment("deleteAllStu"));
         Assertions.assertTrue(student.insert());
-        boolean updated = new H2Student().setName(nameNew).update(new QueryWrapper<H2Student>().comment("updateStuName1").lambda()
+        boolean updated = new H2Student().setName(nameNew).update(new QueryWrapper<H2Student>().comment("updateStuName1")
             .eq(H2Student::getName, name)
         );
         Assertions.assertTrue(updated);
         H2Student h2Student = student.selectOne(
-            new QueryWrapper<H2Student>().lambda().comment("getStuByUniqueName")
+            new QueryWrapper<H2Student>().comment("getStuByUniqueName")
                 .eq(H2Student::getName, nameNew)
         );
         Assertions.assertNotNull(h2Student);
-        LambdaQueryWrapper<H2Student> queryWrapper = new QueryWrapper<H2Student>().lambda().ge(H2Student::getAge, 1);
+        QueryWrapper<H2Student> queryWrapper = new QueryWrapper<H2Student>().ge(H2Student::getAge, 1);
         long userCount = student.selectCount(queryWrapper.comment("getStuCount"));
         Assertions.assertEquals(1, userCount);
         List<H2Student> h2StudentList = student.selectList(queryWrapper.comment("getStuList"));

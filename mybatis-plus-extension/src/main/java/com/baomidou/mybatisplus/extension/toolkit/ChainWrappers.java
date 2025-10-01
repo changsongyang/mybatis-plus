@@ -16,9 +16,7 @@
 package com.baomidou.mybatisplus.extension.toolkit;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
-import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.conditions.update.UpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.kotlin.KtQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.kotlin.KtUpdateChainWrapper;
@@ -53,34 +51,34 @@ public final class ChainWrappers {
      * 链式查询 lambda 式
      * <p>注意：不支持 Kotlin </p>
      *
-     * @return LambdaQueryWrapper 的包装类
+     * @return QueryWrapper 的包装类
      */
-    public static <T> LambdaQueryChainWrapper<T> lambdaQueryChain(BaseMapper<T> mapper) {
-        return new LambdaQueryChainWrapper<>(mapper);
+    public static <T> QueryChainWrapper<T> lambdaQueryChain(BaseMapper<T> mapper) {
+        return new QueryChainWrapper<>(mapper);
     }
 
-    public static <T> LambdaQueryChainWrapper<T> lambdaQueryChain(Class<T> entityClass) {
-        return new LambdaQueryChainWrapper<>(entityClass);
-    }
-
-    /**
-     * 链式查询 lambda 式
-     * <p>注意：不支持 Kotlin </p>
-     *
-     * @return LambdaQueryWrapper 的包装类
-     */
-    public static <T> LambdaQueryChainWrapper<T> lambdaQueryChain(BaseMapper<T> mapper, T entity) {
-        return new LambdaQueryChainWrapper<>(mapper, entity);
+    public static <T> QueryChainWrapper<T> lambdaQueryChain(Class<T> entityClass) {
+        return new QueryChainWrapper<>(entityClass);
     }
 
     /**
      * 链式查询 lambda 式
      * <p>注意：不支持 Kotlin </p>
      *
-     * @return LambdaQueryWrapper 的包装类
+     * @return QueryWrapper 的包装类
      */
-    public static <T> LambdaQueryChainWrapper<T> lambdaQueryChain(BaseMapper<T> mapper, Class<T> entityClass) {
-        return new LambdaQueryChainWrapper<>(mapper, entityClass);
+    public static <T> QueryChainWrapper<T> lambdaQueryChain(BaseMapper<T> mapper, T entity) {
+        return new QueryChainWrapper<>(mapper).setEntity(entity);
+    }
+
+    /**
+     * 链式查询 lambda 式
+     * <p>注意：不支持 Kotlin </p>
+     *
+     * @return QueryWrapper 的包装类
+     */
+    public static <T> QueryChainWrapper<T> lambdaQueryChain(BaseMapper<T> mapper, Class<T> entityClass) {
+        return new QueryChainWrapper<>(mapper).setEntityClass(entityClass);
     }
 
     /**
@@ -90,7 +88,7 @@ public final class ChainWrappers {
      * @return KtQueryWrapper 的包装类
      */
     public static <T> KtQueryChainWrapper<T> ktQueryChain(BaseMapper<T> mapper, Class<T> entityClass) {
-        return new KtQueryChainWrapper<>(mapper, entityClass);
+        return new KtQueryChainWrapper<>(mapper).setEntityClass(entityClass);
     }
 
     /**
@@ -100,7 +98,7 @@ public final class ChainWrappers {
      * @return KtQueryWrapper 的包装类
      */
     public static <T> KtQueryChainWrapper<T> ktQueryChain(BaseMapper<T> mapper, T entity) {
-        return new KtQueryChainWrapper<>(mapper, entity);
+        return new KtQueryChainWrapper<>(mapper).setEntity(entity);
     }
 
     /**
@@ -132,14 +130,14 @@ public final class ChainWrappers {
      * 链式更改 lambda 式
      * <p>注意：不支持 Kotlin </p>
      *
-     * @return LambdaUpdateWrapper 的包装类
+     * @return UpdateWrapper 的包装类
      */
-    public static <T> LambdaUpdateChainWrapper<T> lambdaUpdateChain(BaseMapper<T> mapper) {
-        return new LambdaUpdateChainWrapper<>(mapper);
+    public static <T> UpdateChainWrapper<T> lambdaUpdateChain(BaseMapper<T> mapper) {
+        return new UpdateChainWrapper<>(mapper);
     }
 
-    public static <T> LambdaUpdateChainWrapper<T> lambdaUpdateChain(Class<T> entityClass) {
-        return new LambdaUpdateChainWrapper<>(entityClass);
+    public static <T> UpdateChainWrapper<T> lambdaUpdateChain(Class<T> entityClass) {
+        return new UpdateChainWrapper<>(entityClass);
     }
 
     /**
@@ -149,7 +147,18 @@ public final class ChainWrappers {
      * @return KtQueryWrapper 的包装类
      */
     public static <T> KtUpdateChainWrapper<T> ktUpdateChain(BaseMapper<T> mapper, Class<T> entityClass) {
-        return new KtUpdateChainWrapper<>(mapper, entityClass);
+        return new KtUpdateChainWrapper<>(mapper).setEntityClass(entityClass);
+    }
+
+
+    /**
+     * 链式更改 lambda 式
+     * 仅支持 Kotlin
+     *
+     * @return KtQueryWrapper 的包装类
+     */
+    public static <T> KtUpdateChainWrapper<T> ktUpdateChain(BaseMapper<T> mapper, T entity) {
+        return new KtUpdateChainWrapper<>(mapper).setEntity(entity);
     }
 
     /**
@@ -162,16 +171,4 @@ public final class ChainWrappers {
     public static <T> KtUpdateChainWrapper<T> ktUpdateChain(Class<T> entityClass) {
         return new KtUpdateChainWrapper<>(entityClass);
     }
-
-
-    /**
-     * 链式更改 lambda 式
-     * 仅支持 Kotlin
-     *
-     * @return KtQueryWrapper 的包装类
-     */
-    public static <T> KtUpdateChainWrapper<T> ktUpdateChain(BaseMapper<T> mapper, T entity) {
-        return new KtUpdateChainWrapper<>(mapper, entity);
-    }
-
 }

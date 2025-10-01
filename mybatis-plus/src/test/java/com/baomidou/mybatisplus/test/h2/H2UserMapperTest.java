@@ -1,7 +1,6 @@
 package com.baomidou.mybatisplus.test.h2;
 
 import com.baomidou.mybatisplus.core.batch.MybatisBatch;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -26,12 +25,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
@@ -375,7 +369,7 @@ class H2UserMapperTest extends BaseTest {
         Assertions.assertEquals(1, userMapper.deleteByMap(map));
 
         // 查询列表
-        LambdaQueryWrapper<H2User> wrapper = new QueryWrapper<H2User>().lambda().like(H2User::getName, "mp");
+        QueryWrapper<H2User> wrapper = new QueryWrapper<H2User>().like(H2User::getName, "mp");
         log(wrapper.getSqlSegment());
 
         List<H2User> h2UserList = userMapper.selectList(wrapper);
@@ -399,7 +393,7 @@ class H2UserMapperTest extends BaseTest {
         h2User.setAge(AgeEnum.THREE);
         h2User.setDesc(null);
         Assertions.assertTrue(userMapper.update(h2User,
-                new UpdateWrapper<H2User>().lambda()
+            new UpdateWrapper<H2User>()
                         .set(H2User::getDesc, "")
                         .eq(H2User::getName, "Jerry")) > 0);
 
@@ -430,7 +424,7 @@ class H2UserMapperTest extends BaseTest {
 
         // 查询结果集，测试 lambda 对象后 QueryWrapper 是否参数继续传递
         QueryWrapper<H2User> qw = new QueryWrapper<>();
-        qw.lambda().eq(H2User::getName, NQQ);
+        qw.eq(H2User::getName, NQQ);
         List<Map<String, Object>> mapList = userMapper.selectMaps(qw);
         if (CollectionUtils.isNotEmpty(mapList)) {
             for (Map<String, Object> m : mapList) {
@@ -466,17 +460,17 @@ class H2UserMapperTest extends BaseTest {
         int insertCount = userMapper.insert(new H2User().setName(name).setAge(AgeEnum.ONE));
         Assertions.assertEquals(1, insertCount);
         int updateCount = userMapper.update(new H2User(),
-                new UpdateWrapper<H2User>().comment("updateUserName1").lambda()
+            new UpdateWrapper<H2User>().comment("updateUserName1")
                         .set(H2User::getName, nameNew)
                         .eq(H2User::getName, name)
         );
         Assertions.assertEquals(1, updateCount);
         H2User h2User = userMapper.selectOne(
-                new QueryWrapper<H2User>().lambda().comment("getUserByUniqueName")
+            new QueryWrapper<H2User>().comment("getUserByUniqueName")
                         .eq(H2User::getName, nameNew)
         );
         Assertions.assertNotNull(h2User);
-        LambdaQueryWrapper<H2User> queryWrapper = new QueryWrapper<H2User>().lambda().ge(H2User::getAge, 1);
+        QueryWrapper<H2User> queryWrapper = new QueryWrapper<H2User>().ge(H2User::getAge, 1);
         long userCount = userMapper.selectCount(queryWrapper.comment("getUserCount"));
         Assertions.assertEquals(1, userCount);
         List<H2User> h2UserList = userMapper.selectList(queryWrapper.comment("getUserList"));

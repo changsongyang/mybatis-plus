@@ -1,21 +1,7 @@
-/*
- * Copyright (c) 2011-2025, baomidou (jobob@qq.com).
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.baomidou.mybatisplus.extension.conditions.update;
 
-import com.baomidou.mybatisplus.extension.conditions.ChainWrapper;
+import com.baomidou.mybatisplus.core.conditions.SelfChildren;
+import com.baomidou.mybatisplus.extension.conditions.AbstractChainWrapper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 
 /**
@@ -24,7 +10,7 @@ import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
  * @author miemie
  * @since 2018-12-19
  */
-public interface ChainUpdate<T> extends ChainWrapper<T> {
+public interface ChainUpdate<T, Children extends AbstractChainWrapper<T, ?, ?, ?>> extends SelfChildren<Children> {
 
     /**
      * 更新数据
@@ -43,7 +29,7 @@ public interface ChainUpdate<T> extends ChainWrapper<T> {
      * @return 是否成功
      */
     default boolean update(T entity) {
-        return execute(mapper -> SqlHelper.retBool(mapper.update(entity, getWrapper())));
+        return selfOrChildren().execute(mapper -> SqlHelper.retBool(mapper.update(entity, selfOrChildren().delegate())));
     }
 
     /**
@@ -52,6 +38,6 @@ public interface ChainUpdate<T> extends ChainWrapper<T> {
      * @return 是否成功
      */
     default boolean remove() {
-        return execute(mapper -> SqlHelper.retBool(mapper.delete(getWrapper())));
+        return selfOrChildren().execute(mapper -> SqlHelper.retBool(mapper.delete(selfOrChildren().delegate())));
     }
 }

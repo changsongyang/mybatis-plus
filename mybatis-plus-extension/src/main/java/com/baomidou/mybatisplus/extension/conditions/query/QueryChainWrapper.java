@@ -15,14 +15,14 @@
  */
 package com.baomidou.mybatisplus.extension.conditions.query;
 
+import com.baomidou.mybatisplus.core.conditions.ISqlSegment;
 import com.baomidou.mybatisplus.core.conditions.query.Query;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
-import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.conditions.AbstractChainWrapper;
 
-import java.util.List;
 import java.util.function.Predicate;
 
 /**
@@ -32,64 +32,35 @@ import java.util.function.Predicate;
  * @since 2018-12-19
  */
 @SuppressWarnings({"serial"})
-public class QueryChainWrapper<T> extends AbstractChainWrapper<T, String, QueryChainWrapper<T>, QueryWrapper<T>>
-    implements ChainQuery<T>, Query<QueryChainWrapper<T>, T, String> {
+public class QueryChainWrapper<T> extends AbstractChainWrapper<T, SFunction<T, ?>, QueryChainWrapper<T>, QueryWrapper<T>>
+    implements Query<T, SFunction<T, ?>, QueryChainWrapper<T>>, ChainQuery<T, QueryChainWrapper<T>> {
 
-    private final BaseMapper<T> baseMapper;
-    private final Class<T> entityClass;
+    public QueryChainWrapper() {
+        super();
+    }
 
     public QueryChainWrapper(BaseMapper<T> baseMapper) {
-        super();
-        this.baseMapper = baseMapper;
-        this.entityClass = null;
-        super.wrapperChildren = new QueryWrapper<>();
+        super(baseMapper);
     }
 
     public QueryChainWrapper(Class<T> entityClass) {
-        super();
-        this.baseMapper = null;
-        this.entityClass = entityClass;
-        super.wrapperChildren = new QueryWrapper<>();
+        super(entityClass);
     }
 
     @Override
-    public QueryChainWrapper<T> select(boolean condition, List<String> columns) {
-        wrapperChildren.select(condition, columns);
-        return typedThis;
+    protected QueryWrapper<T> instanceDelegate() {
+        return new QueryWrapper<>();
+    }
+
+    @Override
+    public QueryChainWrapper<T> select(boolean condition, ISqlSegment sqlSegment) {
+        delegateWrapper.select(condition, sqlSegment);
+        return selfOrChildren();
     }
 
     @Override
     public QueryChainWrapper<T> select(Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
-        wrapperChildren.select(entityClass, predicate);
-        return typedThis;
+        delegateWrapper.select(entityClass, predicate);
+        return selfOrChildren();
     }
-
-    @Override
-    public String getSqlSelect() {
-        throw ExceptionUtils.mpe("can not use this method for \"%s\"", "getSqlSelect");
-    }
-
-    @Override
-    public BaseMapper<T> getBaseMapper() {
-        return baseMapper;
-    }
-
-    /**
-     * 获取当前实体Class
-     *
-     * @return Class
-     */
-    @Override
-    public Class<T> getEntityClass() {
-        return entityClass;
-    }
-
-
-    public LambdaQueryChainWrapper<T> lambda(){
-        return new LambdaQueryChainWrapper<>(
-            baseMapper,
-            wrapperChildren.lambda()
-        );
-    }
-
 }

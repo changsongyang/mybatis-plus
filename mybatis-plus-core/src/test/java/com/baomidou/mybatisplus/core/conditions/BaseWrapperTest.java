@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class BaseWrapperTest {
 
     void logParams(AbstractWrapper<?, ?, ?> wrapper) {
-        wrapper.getParamNameValuePairs().forEach((k, v) -> {
+        wrapper.getContext().getParamNameValuePairs().forEach((k, v) -> {
             System.out.println("key: '" + k + "'\t\tvalue: '" + v + StringPool.SINGLE_QUOTE);
             assertThat(k).startsWith(Constants.WRAPPER_PARAM);
         });

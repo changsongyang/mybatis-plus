@@ -17,9 +17,6 @@ package com.baomidou.mybatisplus.extension.kotlin
 
 import com.baomidou.mybatisplus.core.conditions.AbstractWrapper
 import com.baomidou.mybatisplus.core.toolkit.LambdaUtils
-import com.baomidou.mybatisplus.core.toolkit.StringPool
-import com.baomidou.mybatisplus.core.toolkit.support.ColumnCache
-import java.util.stream.Collectors.joining
 import kotlin.reflect.KProperty1
 
 /**
@@ -31,45 +28,18 @@ import kotlin.reflect.KProperty1
  * @since 2018-11-07
  */
 @Suppress("serial")
-abstract class AbstractKtWrapper<T, Children : AbstractKtWrapper<T, Children>> : AbstractWrapper<T, KProperty1<in T, *>, Children>() {
+abstract class AbstractKtWrapper<T, Children : AbstractKtWrapper<T, Children>> :
+    AbstractWrapper<T, KProperty1<in T, *>, Children>() {
 
-    /**
-     * 列 Map
-     */
-    protected lateinit var columnMap: Map<String, ColumnCache>
-
-    /**
-     * 重载方法，默认 onlyColumn = true
-     */
-    override fun columnToString(kProperty: KProperty1<in T, *>): String? = columnToString(kProperty, true)
-
-    /**
-     * 核心实现方法，供重载使用
-     */
-    private fun columnToString(kProperty: KProperty1<in T, *>, onlyColumn: Boolean): String? {
-        return columnMap[LambdaUtils.formatKey(kProperty.name)]?.let { if (onlyColumn) it.column else it.columnSelect }
+    override fun convMut2ColInSel(mutable: KProperty1<in T, *>): String {
+        return context.getColumnCache(LambdaUtils.formatKey(mutable.name)).columnSelect
     }
 
-    /**
-     * 批量处理传入的属性，正常情况下的输出就像：
-     *
-     * "user_id" AS "userId" , "user_name" AS "userName"
-     */
-    fun columnsToString(onlyColumn: Boolean, vararg columns: KProperty1<in T, *>): String =
-        columns.mapNotNull { columnToString(it, onlyColumn) }.joinToString(separator = StringPool.COMMA)
+    override fun convMut2Col(mutable: KProperty1<in T, *>): String {
+        return context.getColumnCache(LambdaUtils.formatKey(mutable.name)).column
+    }
 
-    /**
-     * 批量处理传入的属性，正常情况下的输出就像：
-     *
-     * "user_id" AS "userId" , "user_name" AS "userName"
-     */
-    fun columnsToString(onlyColumn: Boolean, columns: MutableList<KProperty1<in T, *>>): String =
-        columns.stream().map { columnToString(it, onlyColumn) }.collect(joining(StringPool.COMMA))
-
-    override fun initNeed() {
-        super.initNeed()
-        if (!::columnMap.isInitialized) {
-            columnMap = LambdaUtils.getColumnMap(this.entityClass)
-        }
+    override fun convMut2ColMapping(mutable: KProperty1<in T, *>): String {
+        return context.getColumnCache(LambdaUtils.formatKey(mutable.name)).mapping
     }
 }

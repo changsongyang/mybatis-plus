@@ -15,9 +15,19 @@
  */
 package com.baomidou.mybatisplus.core.conditions.interfaces;
 
+import com.baomidou.mybatisplus.core.conditions.ISqlSegment;
+import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
+
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiPredicate;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * 查询条件封装
@@ -26,7 +36,7 @@ import java.util.function.BiPredicate;
  * @author hubin miemie HCL
  * @since 2017-05-26
  */
-public interface Compare<Children, R> extends Serializable {
+public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
 
     /**
      * map 所有非空属性等于 =
@@ -34,7 +44,7 @@ public interface Compare<Children, R> extends Serializable {
      * @param params map 类型的参数, key 是字段名, value 是字段值
      * @return children
      */
-    default <V> Children allEq(Map<R, V> params) {
+    default <V> Children allEq(Map<String, V> params) {
         return allEq(params, true);
     }
 
@@ -45,7 +55,7 @@ public interface Compare<Children, R> extends Serializable {
      * @param null2IsNull 是否参数为 null 自动执行 isNull 方法, false 则忽略这个字段
      * @return children
      */
-    default <V> Children allEq(Map<R, V> params, boolean null2IsNull) {
+    default <V> Children allEq(Map<String, V> params, boolean null2IsNull) {
         return allEq(true, params, null2IsNull);
     }
 
@@ -57,7 +67,7 @@ public interface Compare<Children, R> extends Serializable {
      * @param null2IsNull 是否参数为 null 自动执行 isNull 方法, false 则忽略这个字段
      * @return children
      */
-    <V> Children allEq(boolean condition, Map<R, V> params, boolean null2IsNull);
+    <V> Children allEq(boolean condition, Map<String, V> params, boolean null2IsNull);
 
     /**
      * 字段过滤接口，传入多参数时允许对参数进行过滤
@@ -66,7 +76,7 @@ public interface Compare<Children, R> extends Serializable {
      * @param params map 类型的参数, key 是字段名, value 是字段值
      * @return children
      */
-    default <V> Children allEq(BiPredicate<R, V> filter, Map<R, V> params) {
+    default <V> Children allEq(BiPredicate<String, V> filter, Map<String, V> params) {
         return allEq(filter, params, true);
     }
 
@@ -78,7 +88,7 @@ public interface Compare<Children, R> extends Serializable {
      * @param null2IsNull 是否参数为 null 自动执行 isNull 方法, false 则忽略这个字段
      * @return children
      */
-    default <V> Children allEq(BiPredicate<R, V> filter, Map<R, V> params, boolean null2IsNull) {
+    default <V> Children allEq(BiPredicate<String, V> filter, Map<String, V> params, boolean null2IsNull) {
         return allEq(true, filter, params, null2IsNull);
     }
 
@@ -91,17 +101,48 @@ public interface Compare<Children, R> extends Serializable {
      * @param null2IsNull 是否参数为 null 自动执行 isNull 方法, false 则忽略这个字段
      * @return children
      */
-    <V> Children allEq(boolean condition, BiPredicate<R, V> filter, Map<R, V> params, boolean null2IsNull);
+    <V> Children allEq(boolean condition, BiPredicate<String, V> filter, Map<String, V> params, boolean null2IsNull);
 
-    /**
-     * 等于 =
-     *
-     * @param column    字段
-     * @param val       值
-     * @return children
-     */
-    default Children eq(R column, Object val) {
-        return eq(true, column, val);
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children eq(String column, Object value) {
+        return eq(true, column, value);
+    }
+
+    default Children eq(String column, Object value, String mapping) {
+        return eq(true, column, value, mapping);
+    }
+
+    default Children eq(boolean condition, String column, Object value) {
+        return eq(condition, column, value, null);
+    }
+
+    default Children eq(boolean condition, String column, Object value, String mapping) {
+        return eq(condition, strCol2Segment(column), value, () -> mapping);
+    }
+
+    default Children eq(Mut column, Object value) {
+        return eq(true, column, value, false);
+    }
+
+    default Children eq(Mut column, Object value, boolean mapping) {
+        return eq(true, column, value, mapping);
+    }
+
+    default Children eq(Mut column, Object value, String mapping) {
+        return eq(true, column, value, mapping);
+    }
+
+    default Children eq(boolean condition, Mut column, Object value) {
+        return eq(condition, column, value, false);
+    }
+
+    default Children eq(boolean condition, Mut column, Object value, boolean mapping) {
+        return eq(condition, convMut2ColSegment(column), value, mappingSupplier(mapping, column));
+    }
+
+    default Children eq(boolean condition, Mut column, Object value, String mapping) {
+        return eq(condition, convMut2ColSegment(column), value, () -> mapping);
     }
 
     /**
@@ -109,20 +150,28 @@ public interface Compare<Children, R> extends Serializable {
      *
      * @param condition 执行条件
      * @param column    字段
-     * @param val       值
+     * @param value     值
+     * @param mapping   mapping
      * @return children
      */
-    Children eq(boolean condition, R column, Object val);
+    Children eq(boolean condition, ISqlSegment column, Object value, Supplier<String> mapping);
 
-    /**
-     * 不等于 &lt;&gt;
-     *
-     * @param column    字段
-     * @param val       值
-     * @return children
-     */
-    default Children ne(R column, Object val) {
-        return ne(true, column, val);
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children ne(String column, Object value) {
+        return ne(true, column, value);
+    }
+
+    default Children ne(boolean condition, String column, Object value) {
+        return ne(condition, strCol2Segment(column), value);
+    }
+
+    default Children ne(Mut column, Object value) {
+        return ne(true, column, value);
+    }
+
+    default Children ne(boolean condition, Mut column, Object value) {
+        return ne(condition, convMut2ColSegment(column), value);
     }
 
     /**
@@ -130,20 +179,27 @@ public interface Compare<Children, R> extends Serializable {
      *
      * @param condition 执行条件
      * @param column    字段
-     * @param val       值
+     * @param value     值
      * @return children
      */
-    Children ne(boolean condition, R column, Object val);
+    Children ne(boolean condition, ISqlSegment column, Object value);
 
-    /**
-     * 大于 &gt;
-     *
-     * @param column    字段
-     * @param val       值
-     * @return children
-     */
-    default Children gt(R column, Object val) {
-        return gt(true, column, val);
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children gt(String column, Object value) {
+        return gt(true, column, value);
+    }
+
+    default Children gt(boolean condition, String column, Object value) {
+        return gt(condition, strCol2Segment(column), value);
+    }
+
+    default Children gt(Mut column, Object value) {
+        return gt(true, column, value);
+    }
+
+    default Children gt(boolean condition, Mut column, Object value) {
+        return gt(condition, convMut2ColSegment(column), value);
     }
 
     /**
@@ -151,20 +207,27 @@ public interface Compare<Children, R> extends Serializable {
      *
      * @param condition 执行条件
      * @param column    字段
-     * @param val       值
+     * @param value     值
      * @return children
      */
-    Children gt(boolean condition, R column, Object val);
+    Children gt(boolean condition, ISqlSegment column, Object value);
 
-    /**
-     * 大于等于 &gt;=
-     *
-     * @param column    字段
-     * @param val       值
-     * @return children
-     */
-    default Children ge(R column, Object val) {
-        return ge(true, column, val);
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children ge(String column, Object value) {
+        return ge(true, column, value);
+    }
+
+    default Children ge(boolean condition, String column, Object value) {
+        return ge(condition, strCol2Segment(column), value);
+    }
+
+    default Children ge(Mut column, Object value) {
+        return ge(true, column, value);
+    }
+
+    default Children ge(boolean condition, Mut column, Object value) {
+        return ge(condition, convMut2ColSegment(column), value);
     }
 
     /**
@@ -172,20 +235,27 @@ public interface Compare<Children, R> extends Serializable {
      *
      * @param condition 执行条件
      * @param column    字段
-     * @param val       值
+     * @param value     值
      * @return children
      */
-    Children ge(boolean condition, R column, Object val);
+    Children ge(boolean condition, ISqlSegment column, Object value);
 
-    /**
-     * 小于 &lt;
-     *
-     * @param column    字段
-     * @param val       值
-     * @return children
-     */
-    default Children lt(R column, Object val) {
-        return lt(true, column, val);
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children lt(String column, Object value) {
+        return lt(true, column, value);
+    }
+
+    default Children lt(boolean condition, String column, Object value) {
+        return lt(condition, strCol2Segment(column), value);
+    }
+
+    default Children lt(Mut column, Object value) {
+        return lt(true, column, value);
+    }
+
+    default Children lt(boolean condition, Mut column, Object value) {
+        return lt(condition, convMut2ColSegment(column), value);
     }
 
     /**
@@ -193,20 +263,27 @@ public interface Compare<Children, R> extends Serializable {
      *
      * @param condition 执行条件
      * @param column    字段
-     * @param val       值
+     * @param value     值
      * @return children
      */
-    Children lt(boolean condition, R column, Object val);
+    Children lt(boolean condition, ISqlSegment column, Object value);
 
-    /**
-     * 小于等于 &lt;=
-     *
-     * @param column    字段
-     * @param val       值
-     * @return children
-     */
-    default Children le(R column, Object val) {
-        return le(true, column, val);
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children le(String column, Object value) {
+        return le(true, column, value);
+    }
+
+    default Children le(boolean condition, String column, Object value) {
+        return le(condition, strCol2Segment(column), value);
+    }
+
+    default Children le(Mut column, Object value) {
+        return le(true, column, value);
+    }
+
+    default Children le(boolean condition, Mut column, Object value) {
+        return le(condition, convMut2ColSegment(column), value);
     }
 
     /**
@@ -214,24 +291,29 @@ public interface Compare<Children, R> extends Serializable {
      *
      * @param condition 执行条件
      * @param column    字段
-     * @param val       值
+     * @param value     值
      * @return children
      */
-    Children le(boolean condition, R column, Object val);
+    Children le(boolean condition, ISqlSegment column, Object value);
 
+    /*----------------------------------------------------------------------------------------------------------------*/
 
-    /**
-     * BETWEEN 值1 AND 值2
-     *
-     * @param column    字段
-     * @param val1      值1
-     * @param val2      值2
-     * @return children
-     */
-    default Children between(R column, Object val1, Object val2) {
+    default Children between(String column, Object val1, Object val2) {
         return between(true, column, val1, val2);
     }
 
+    default Children between(boolean condition, String column, Object val1, Object val2) {
+        return between(condition, strCol2Segment(column), val1, val2);
+    }
+
+    default Children between(Mut column, Object val1, Object val2) {
+        return between(true, column, val1, val2);
+    }
+
+    default Children between(boolean condition, Mut column, Object val1, Object val2) {
+        return between(condition, convMut2ColSegment(column), val1, val2);
+    }
+
     /**
      * BETWEEN 值1 AND 值2
      *
@@ -241,20 +323,26 @@ public interface Compare<Children, R> extends Serializable {
      * @param val2      值2
      * @return children
      */
-    Children between(boolean condition, R column, Object val1, Object val2);
+    Children between(boolean condition, ISqlSegment column, Object val1, Object val2);
 
-    /**
-     * NOT BETWEEN 值1 AND 值2
-     *
-     * @param column    字段
-     * @param val1      值1
-     * @param val2      值2
-     * @return children
-     */
-    default Children notBetween(R column, Object val1, Object val2) {
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children notBetween(String column, Object val1, Object val2) {
         return notBetween(true, column, val1, val2);
     }
 
+    default Children notBetween(boolean condition, String column, Object val1, Object val2) {
+        return notBetween(condition, strCol2Segment(column), val1, val2);
+    }
+
+    default Children notBetween(Mut column, Object val1, Object val2) {
+        return notBetween(true, column, val1, val2);
+    }
+
+    default Children notBetween(boolean condition, Mut column, Object val1, Object val2) {
+        return notBetween(condition, convMut2ColSegment(column), val1, val2);
+    }
+
     /**
      * NOT BETWEEN 值1 AND 值2
      *
@@ -264,17 +352,24 @@ public interface Compare<Children, R> extends Serializable {
      * @param val2      值2
      * @return children
      */
-    Children notBetween(boolean condition, R column, Object val1, Object val2);
+    Children notBetween(boolean condition, ISqlSegment column, Object val1, Object val2);
 
-    /**
-     * LIKE '%值%'
-     *
-     * @param column    字段
-     * @param val       值
-     * @return children
-     */
-    default Children like(R column, Object val) {
-        return like(true, column, val);
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children like(String column, Object value) {
+        return like(true, column, value);
+    }
+
+    default Children like(boolean condition, String column, Object value) {
+        return like(condition, strCol2Segment(column), value);
+    }
+
+    default Children like(Mut column, Object value) {
+        return like(true, column, value);
+    }
+
+    default Children like(boolean condition, Mut column, Object value) {
+        return like(condition, convMut2ColSegment(column), value);
     }
 
     /**
@@ -282,20 +377,27 @@ public interface Compare<Children, R> extends Serializable {
      *
      * @param condition 执行条件
      * @param column    字段
-     * @param val       值
+     * @param value     值
      * @return children
      */
-    Children like(boolean condition, R column, Object val);
+    Children like(boolean condition, ISqlSegment column, Object value);
 
-    /**
-     * NOT LIKE '%值%'
-     *
-     * @param column    字段
-     * @param val       值
-     * @return children
-     */
-    default Children notLike(R column, Object val) {
-        return notLike(true, column, val);
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children notLike(String column, Object value) {
+        return notLike(true, column, value);
+    }
+
+    default Children notLike(boolean condition, String column, Object value) {
+        return notLike(condition, strCol2Segment(column), value);
+    }
+
+    default Children notLike(Mut column, Object value) {
+        return notLike(true, column, value);
+    }
+
+    default Children notLike(boolean condition, Mut column, Object value) {
+        return notLike(condition, convMut2ColSegment(column), value);
     }
 
     /**
@@ -303,20 +405,27 @@ public interface Compare<Children, R> extends Serializable {
      *
      * @param condition 执行条件
      * @param column    字段
-     * @param val       值
+     * @param value     值
      * @return children
      */
-    Children notLike(boolean condition, R column, Object val);
+    Children notLike(boolean condition, ISqlSegment column, Object value);
 
-    /**
-     * NOT LIKE '%值'
-     *
-     * @param column 字段
-     * @param val    值
-     * @return children
-     */
-    default Children notLikeLeft(R column, Object val) {
-        return notLikeLeft(true, column, val);
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children notLikeLeft(String column, Object value) {
+        return notLikeLeft(true, column, value);
+    }
+
+    default Children notLikeLeft(boolean condition, String column, Object value) {
+        return notLikeLeft(condition, strCol2Segment(column), value);
+    }
+
+    default Children notLikeLeft(Mut column, Object value) {
+        return notLikeLeft(true, column, value);
+    }
+
+    default Children notLikeLeft(boolean condition, Mut column, Object value) {
+        return notLikeLeft(condition, convMut2ColSegment(column), value);
     }
 
     /**
@@ -324,41 +433,55 @@ public interface Compare<Children, R> extends Serializable {
      *
      * @param condition 执行条件
      * @param column    字段
-     * @param val       值
+     * @param value     值
      * @return children
      */
-    Children notLikeLeft(boolean condition, R column, Object val);
+    Children notLikeLeft(boolean condition, ISqlSegment column, Object value);
 
-    /**
-     * NOT LIKE '值%'
-     *
-     * @param column 字段
-     * @param val 值
-     * @return children
-     */
-    default Children notLikeRight(R column, Object val) {
-        return notLikeRight(true, column, val);
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children notLikeRight(String column, Object value) {
+        return notLikeRight(true, column, value);
+    }
+
+    default Children notLikeRight(boolean condition, String column, Object value) {
+        return notLikeRight(condition, strCol2Segment(column), value);
+    }
+
+    default Children notLikeRight(Mut column, Object value) {
+        return notLikeRight(true, column, value);
+    }
+
+    default Children notLikeRight(boolean condition, Mut column, Object value) {
+        return notLikeRight(condition, convMut2ColSegment(column), value);
     }
 
     /**
      * NOT LIKE '值%'
      *
      * @param condition 执行条件
-     * @param column 字段
-     * @param val 值
-     * @return children
-     */
-    Children notLikeRight(boolean condition, R column, Object val);
-
-    /**
-     * LIKE '%值'
-     *
      * @param column    字段
-     * @param val       值
+     * @param value     值
      * @return children
      */
-    default Children likeLeft(R column, Object val) {
-        return likeLeft(true, column, val);
+    Children notLikeRight(boolean condition, ISqlSegment column, Object value);
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children likeLeft(String column, Object value) {
+        return likeLeft(true, column, value);
+    }
+
+    default Children likeLeft(boolean condition, String column, Object value) {
+        return likeLeft(condition, strCol2Segment(column), value);
+    }
+
+    default Children likeLeft(Mut column, Object value) {
+        return likeLeft(true, column, value);
+    }
+
+    default Children likeLeft(boolean condition, Mut column, Object value) {
+        return likeLeft(condition, convMut2ColSegment(column), value);
     }
 
     /**
@@ -366,20 +489,27 @@ public interface Compare<Children, R> extends Serializable {
      *
      * @param condition 执行条件
      * @param column    字段
-     * @param val       值
+     * @param value     值
      * @return children
      */
-    Children likeLeft(boolean condition, R column, Object val);
+    Children likeLeft(boolean condition, ISqlSegment column, Object value);
 
-    /**
-     * LIKE '值%'
-     *
-     * @param column    字段
-     * @param val       值
-     * @return children
-     */
-    default Children likeRight(R column, Object val) {
-        return likeRight(true, column, val);
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children likeRight(String column, Object value) {
+        return likeRight(true, column, value);
+    }
+
+    default Children likeRight(boolean condition, String column, Object value) {
+        return likeRight(condition, strCol2Segment(column), value);
+    }
+
+    default Children likeRight(Mut column, Object value) {
+        return likeRight(true, column, value);
+    }
+
+    default Children likeRight(boolean condition, Mut column, Object value) {
+        return likeRight(condition, convMut2ColSegment(column), value);
     }
 
     /**
@@ -387,8 +517,584 @@ public interface Compare<Children, R> extends Serializable {
      *
      * @param condition 执行条件
      * @param column    字段
-     * @param val       值
+     * @param value     值
      * @return children
      */
-    Children likeRight(boolean condition, R column, Object val);
+    Children likeRight(boolean condition, ISqlSegment column, Object value);
+
+    /*----------------------------------------------------------------------------------------------------------------------------------------*/
+
+    default Children isNull(String column) {
+        return isNull(true, column);
+    }
+
+    default Children isNull(boolean condition, String column) {
+        return isNull(condition, strCol2Segment(column));
+    }
+
+    default Children isNull(Mut column) {
+        return isNull(true, column);
+    }
+
+    default Children isNull(boolean condition, Mut column) {
+        return isNull(condition, convMut2ColSegment(column));
+    }
+
+    /**
+     * 字段 IS NULL
+     * <p>例: isNull(true, "name")</p>
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @return children
+     */
+    Children isNull(boolean condition, ISqlSegment column);
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children isNotNull(String column) {
+        return isNotNull(true, column);
+    }
+
+    default Children isNotNull(boolean condition, String column) {
+        return isNotNull(condition, strCol2Segment(column));
+    }
+
+    default Children isNotNull(Mut column) {
+        return isNotNull(true, column);
+    }
+
+    default Children isNotNull(boolean condition, Mut column) {
+        return isNotNull(condition, convMut2ColSegment(column));
+    }
+
+    /**
+     * 字段 IS NOT NULL
+     * <p>例: isNotNull(true, "name")</p>
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @return children
+     */
+    Children isNotNull(boolean condition, ISqlSegment column);
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children in(String column, Collection<?> coll) {
+        return in(true, column, coll);
+    }
+
+    default Children in(boolean condition, String column, Collection<?> coll) {
+        return in(condition, strCol2Segment(column), coll);
+    }
+
+    default Children in(Mut column, Collection<?> coll) {
+        return in(true, column, coll);
+    }
+
+    default Children in(boolean condition, Mut column, Collection<?> coll) {
+        return in(condition, convMut2ColSegment(column), coll);
+    }
+
+    /**
+     * 字段 IN (value.get(0), value.get(1), ...)
+     * <p>例: in(true, "id", Arrays.asList(1, 2, 3, 4, 5))</p>
+     *
+     * <li> 注意！当集合为 空或null 时, sql会拼接为：WHERE (字段名 IN ()), 执行时报错</li>
+     * <li> 若要在特定条件下不拼接, 可在 condition 条件中判断 </li>
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param coll      数据集合
+     * @return children
+     */
+    Children in(boolean condition, ISqlSegment column, Collection<?> coll);
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children in(String column, Object... values) {
+        return in(true, column, values);
+    }
+
+    default Children in(boolean condition, String column, Object... values) {
+        return in(condition, strCol2Segment(column), values);
+    }
+
+    default Children in(Mut column, Object... values) {
+        return in(true, column, values);
+    }
+
+    default Children in(boolean condition, Mut column, Object... values) {
+        return in(condition, convMut2ColSegment(column), values);
+    }
+
+    /**
+     * 字段 IN (v0, v1, ...)
+     * <p>例: in(true, "id", 1, 2, 3, 4, 5)</p>
+     *
+     * <li> 注意！当数组为 空或null 时, sql会拼接为：WHERE (字段名 IN ()), 执行时报错</li>
+     * <li> 若要在特定条件下不拼接, 可在 condition 条件中判断 </li>
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param values    数据数组
+     * @return children
+     */
+    Children in(boolean condition, ISqlSegment column, Object... values);
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children notIn(String column, Collection<?> coll) {
+        return notIn(true, column, coll);
+    }
+
+    default Children notIn(Mut column, Collection<?> coll) {
+        return notIn(true, column, coll);
+    }
+
+    default Children notIn(boolean condition, Mut column, Collection<?> coll) {
+        return notIn(condition, convMut2ColSegment(column), coll);
+    }
+
+    default Children notIn(boolean condition, String column, Collection<?> coll) {
+        return notIn(condition, strCol2Segment(column), coll);
+    }
+
+    /**
+     * 字段 NOT IN (value.get(0), value.get(1), ...)
+     * <p>例: notIn(true, "id", Arrays.asList(1, 2, 3, 4, 5))</p>
+     *
+     * <li> 注意！当集合为 空或null 时, sql会拼接为：WHERE (字段名 NOT IN ()), 执行时报错</li>
+     * <li> 若要在特定条件下不拼接, 可在 condition 条件中判断 </li>
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param coll      数据集合
+     * @return children
+     */
+    Children notIn(boolean condition, ISqlSegment column, Collection<?> coll);
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children notIn(String column, Object... values) {
+        return notIn(true, column, values);
+    }
+
+    default Children notIn(boolean condition, String column, Object... values) {
+        return notIn(condition, strCol2Segment(column), values);
+    }
+
+    default Children notIn(Mut column, Object... values) {
+        return notIn(true, column, values);
+    }
+
+    default Children notIn(boolean condition, Mut column, Object... values) {
+        return notIn(condition, convMut2ColSegment(column), values);
+    }
+
+    /**
+     * 字段 NOT IN (v0, v1, ...)
+     * <p>例: notIn(true, "id", 1, 2, 3, 4, 5)</p>
+     *
+     * <li> 注意！当数组为 空或null 时, sql会拼接为：WHERE (字段名 NOT IN ()), 执行时报错</li>
+     * <li> 若要在特定条件下不拼接, 可在 condition 条件中判断 </li>
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param values    数据数组
+     * @return children
+     */
+    Children notIn(boolean condition, ISqlSegment column, Object... values);
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children eqSql(String column, String sql) {
+        return eqSql(true, column, sql);
+    }
+
+    default Children eqSql(boolean condition, String column, String sql) {
+        return eqSql(condition, strCol2Segment(column), sql);
+    }
+
+    default Children eqSql(Mut column, String sql) {
+        return eqSql(true, column, sql);
+    }
+
+    default Children eqSql(boolean condition, Mut column, String sql) {
+        return eqSql(condition, convMut2ColSegment(column), sql);
+    }
+
+    /**
+     * 字段 EQ ( sql语句 )
+     * <p>!! sql 注入方式的 eq 方法 !!</p>
+     * <p>例1: eqSql("id", "1")</p>
+     * <p>例2: eqSql("id", "select MAX(id) from table")</p>
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param sql       sql语句
+     * @return children
+     * @since 3.5.6
+     */
+    Children eqSql(boolean condition, ISqlSegment column, String sql);
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children inSql(String column, String sql) {
+        return inSql(true, column, sql);
+    }
+
+    default Children inSql(boolean condition, String column, String sql) {
+        return inSql(condition, strCol2Segment(column), sql);
+    }
+
+    default Children inSql(Mut column, String sql) {
+        return inSql(true, column, sql);
+    }
+
+    default Children inSql(boolean condition, Mut column, String sql) {
+        return inSql(condition, convMut2ColSegment(column), sql);
+    }
+
+    /**
+     * 字段 IN ( sql语句 )
+     * <p>!! sql 注入方式的 in 方法 !!</p>
+     * <p>例1: inSql(true, "id", "1")</p>
+     * <p>例2: inSql(true, "id", "select id from table where id &lt; 3")</p>
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param sql       sql语句
+     * @return children
+     */
+    Children inSql(boolean condition, ISqlSegment column, String sql);
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children gtSql(String column, String sql) {
+        return gtSql(true, column, sql);
+    }
+
+    default Children gtSql(boolean condition, String column, String sql) {
+        return gtSql(condition, strCol2Segment(column), sql);
+    }
+
+    default Children gtSql(Mut column, String sql) {
+        return gtSql(true, column, sql);
+    }
+
+    default Children gtSql(boolean condition, Mut column, String sql) {
+        return gtSql(condition, convMut2ColSegment(column), sql);
+    }
+
+    /**
+     * 字段 &gt; ( sql语句 )
+     * <p>例1: gtSql("id", "1")</p>
+     * <p>例1: gtSql("id", "select id from table where name = 'JunJun'")</p>
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param sql       sql语句
+     * @return children
+     */
+    Children gtSql(boolean condition, ISqlSegment column, String sql);
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children geSql(String column, String sql) {
+        return geSql(true, column, sql);
+    }
+
+    default Children geSql(Mut column, String sql) {
+        return geSql(true, column, sql);
+    }
+
+    default Children geSql(boolean condition, Mut column, String sql) {
+        return geSql(condition, convMut2ColSegment(column), sql);
+    }
+
+    default Children geSql(boolean condition, String column, String sql) {
+        return geSql(condition, strCol2Segment(column), sql);
+    }
+
+    /**
+     * 字段 >= ( sql语句 )
+     * <p>例1: geSql(true, "id", "1")</p>
+     * <p>例1: geSql(true, "id", "select id from table where name = 'JunJun'")</p>
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param sql       sql语句
+     * @return children
+     */
+    Children geSql(boolean condition, ISqlSegment column, String sql);
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children ltSql(String column, String sql) {
+        return ltSql(true, column, sql);
+    }
+
+    default Children ltSql(boolean condition, String column, String sql) {
+        return ltSql(condition, strCol2Segment(column), sql);
+    }
+
+    default Children ltSql(Mut column, String sql) {
+        return ltSql(true, column, sql);
+    }
+
+    default Children ltSql(boolean condition, Mut column, String sql) {
+        return ltSql(condition, convMut2ColSegment(column), sql);
+    }
+
+    /**
+     * 字段 &lt; ( sql语句 )
+     * <p>例1: ltSql(true, "id", "1")</p>
+     * <p>例1: ltSql(true , "id", "select id from table where name = 'JunJun'")</p>
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param sql       sql语句
+     * @return children
+     */
+    Children ltSql(boolean condition, ISqlSegment column, String sql);
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children leSql(String column, String sql) {
+        return leSql(true, column, sql);
+    }
+
+    default Children leSql(boolean condition, String column, String sql) {
+        return leSql(condition, strCol2Segment(column), sql);
+    }
+
+    default Children leSql(Mut column, String sql) {
+        return leSql(true, column, sql);
+    }
+
+    default Children leSql(boolean condition, Mut column, String sql) {
+        return leSql(condition, convMut2ColSegment(column), sql);
+    }
+
+    /**
+     * 字段 <= ( sql语句 )
+     * <p>例1: leSql(true, "id", "1")</p>
+     * <p>例1: leSql(true ,"id", "select id from table where name = 'JunJun'")</p>
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param sql       sql语句
+     * @return children
+     */
+    Children leSql(boolean condition, ISqlSegment column, String sql);
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children notInSql(String column, String sql) {
+        return notInSql(true, column, sql);
+    }
+
+    default Children notInSql(boolean condition, String column, String sql) {
+        return notInSql(condition, strCol2Segment(column), sql);
+    }
+
+    default Children notInSql(Mut column, String sql) {
+        return notInSql(true, column, sql);
+    }
+
+    default Children notInSql(boolean condition, Mut column, String sql) {
+        return notInSql(condition, convMut2ColSegment(column), sql);
+    }
+
+    /**
+     * 字段 NOT IN ( sql语句 )
+     * <p>!! sql 注入方式的 not in 方法 !!</p>
+     * <p>例1: notInSql(true, "id", "1, 2, 3, 4, 5, 6")</p>
+     * <p>例2: notInSql(true, "id", "select id from table where id &lt; 3")</p>
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param sql       sql语句 ---> 1,2,3,4,5,6 或者 select id from table where id &lt; 3
+     * @return children
+     */
+    Children notInSql(boolean condition, ISqlSegment column, String sql);
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    /**
+     * 分组：GROUP BY 字段, ...
+     * <p>例: groupBy(true, () -> "id")</p>
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @return children
+     */
+    Children groupBy(boolean condition, ISqlSegment column);
+
+    default Children groupBy(String column, String... columns) {
+        return groupBy(true, column, columns);
+    }
+
+    default Children groupBy(boolean condition, String column, String... columns) {
+        return groupBy(condition, column, ArrayUtils.isNotEmpty(columns) ? Arrays.asList(columns) : null);
+    }
+
+    default Children groupBy(Collection<String> columns) {
+        return groupBy(true, columns);
+    }
+
+    default Children groupBy(boolean condition, Collection<String> columns) {
+        return groupBy(condition, () -> columns.stream().filter(Objects::nonNull).collect(Collectors.joining(StringPool.COMMA)));
+    }
+
+    default Children groupBy(Mut column, Mut... columns) {
+        return groupBy(true, column, columns);
+    }
+
+    default Children groupBy(boolean condition, Mut column, Mut... columns) {
+        return groupBy(condition, column, ArrayUtils.isNotEmpty(columns) ? Arrays.asList(columns) : null);
+    }
+
+    default Children groupBy(boolean condition, String column, Collection<String> columns) {
+        return groupBy(condition, strPeek(column, columns));
+    }
+
+    default Children groupBy(boolean condition, Mut column, Collection<Mut> columns) {
+        return groupBy(condition, mutPeek(column, columns));
+    }
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children orderByAsc(Collection<String> columns) {
+        return orderBy(true, true, columns);
+    }
+
+    default Children orderByAsc(boolean condition, Collection<String> columns) {
+        return orderBy(condition, true, columns);
+    }
+
+    default Children orderByAsc(String column, String... columns) {
+        return orderBy(true, true, column, columns);
+    }
+
+    default Children orderByAsc(Mut column, Mut... columns) {
+        return orderBy(true, true, column, columns);
+    }
+
+    default Children orderByAsc(boolean condition, String column, String... columns) {
+        return orderBy(condition, true, column, columns);
+    }
+
+    default Children orderByAsc(boolean condition, Mut column, Mut... columns) {
+        return orderBy(condition, true, column, columns);
+    }
+
+    default Children orderByAsc(boolean condition, String column, Collection<String> columns) {
+        return orderBy(condition, true, column, columns);
+    }
+
+    default Children orderByAsc(boolean condition, Mut column, Collection<Mut> columns) {
+        return orderBy(condition, true, column, columns);
+    }
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children orderByDesc(Collection<String> columns) {
+        return orderBy(true, false, columns);
+    }
+
+    default Children orderByDesc(boolean condition, Collection<String> columns) {
+        return orderBy(condition, false, columns);
+    }
+
+    default Children orderByDesc(String column, String... columns) {
+        return orderBy(true, false, column, columns);
+    }
+
+    default Children orderByDesc(boolean condition, String column, String... columns) {
+        return orderBy(condition, false, column, columns);
+    }
+
+    default Children orderByDesc(Mut column, Mut... columns) {
+        return orderBy(true, false, column, columns);
+    }
+
+    default Children orderByDesc(boolean condition, Mut column, Mut... columns) {
+        return orderBy(condition, false, column, columns);
+    }
+
+    default Children orderByDesc(boolean condition, String column, Collection<String> columns) {
+        return orderBy(condition, false, column, columns);
+    }
+
+    default Children orderByDesc(boolean condition, Mut column, Collection<Mut> columns) {
+        return orderBy(condition, false, column, columns);
+    }
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    /**
+     * 排序：ORDER BY 字段, ...
+     * <p>例: orderBy(true, Arrays.asList("id", "name"))</p>
+     *
+     * @param condition 执行条件
+     * @param isAsc     是否是 ASC 排序
+     * @param column    字段
+     * @return children
+     */
+    Children orderBy(boolean condition, boolean isAsc, ISqlSegment column);
+
+    default Children orderBy(boolean condition, boolean isAsc, Collection<String> columns) {
+        return orderBy(condition, isAsc, () -> columns.stream().filter(Objects::nonNull).collect(Collectors.joining(StringPool.COMMA)));
+    }
+
+    default Children orderBy(boolean condition, boolean isAsc, String column, String... columns) {
+        return orderBy(condition, isAsc, column, ArrayUtils.isNotEmpty(columns) ? Arrays.asList(columns) : null);
+    }
+
+    default Children orderBy(boolean condition, boolean isAsc, Mut column, Mut... columns) {
+        return orderBy(condition, isAsc, column, ArrayUtils.isNotEmpty(columns) ? Arrays.asList(columns) : null);
+    }
+
+    default Children orderBy(boolean condition, boolean isAsc, String column, Collection<String> columns) {
+        return orderBy(condition, isAsc, strPeek(column, columns));
+    }
+
+    default Children orderBy(boolean condition, boolean isAsc, Mut column, Collection<Mut> columns) {
+        return orderBy(condition, isAsc, mutPeek(column, columns));
+    }
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children having(String sqlHaving, Object... params) {
+        return having(true, sqlHaving, params);
+    }
+
+    /**
+     * HAVING ( sql语句 )
+     * <p>例1: having(true, "sum(age) &gt; 10")</p>
+     * <p>例2: having(true, "sum(age) &gt; {0}", 10)</p>
+     *
+     * @param condition 执行条件
+     * @param sqlHaving sql 语句
+     * @param params    参数数组
+     * @return children
+     */
+    Children having(boolean condition, String sqlHaving, Object... params);
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children func(Consumer<Children> consumer) {
+        return func(true, consumer);
+    }
+
+    /**
+     * 消费函数
+     *
+     * @param condition 执行条件
+     * @param consumer  消费函数
+     * @return children
+     */
+    Children func(boolean condition, Consumer<Children> consumer);
 }

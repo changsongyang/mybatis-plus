@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper
 import org.apache.ibatis.builder.MapperBuilderAssistant
 import org.apache.ibatis.reflection.MetaObject
-import org.junit.jupiter.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -68,13 +68,13 @@ class MetaObjectHandlerTest {
         }
         val metaObject: MetaObject = configuration.newMetaObject(demo)
         metaObjectHandler.insertFill(metaObject)
-        Assertions.assertNotNull(demo.testString)
-        Assertions.assertNotNull(demo.testInt)
-        Assertions.assertNotNull(demo.testLong)
-        Assertions.assertNotNull(demo.testDate)
-        Assertions.assertNotNull(demo.testLocalDateTime)
-        Assertions.assertNotNull(demo.testBoolean)
-        Assertions.assertNotNull(demo.testLocalDate)
+        assertThat(demo.testString).isNotNull()
+        assertThat(demo.testInt).isNotNull()
+        assertThat(demo.testLong).isNotNull()
+        assertThat(demo.testDate).isNotNull()
+        assertThat(demo.testLocalDateTime).isNotNull()
+        assertThat(demo.testBoolean).isNotNull()
+        assertThat(demo.testLocalDate).isNotNull()
         println(demo)
     }
 

@@ -6,10 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
-import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.conditions.update.UpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.kotlin.KtQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.kotlin.KtUpdateChainWrapper;
@@ -267,7 +264,6 @@ public interface IRepository<T> {
     /**
      * 查询指定条件是否存在数据
      *
-     * @see Wrappers#emptyWrapper()
      */
     default boolean exists(Wrapper<T> queryWrapper) {
         return getBaseMapper().exists(queryWrapper);
@@ -276,10 +272,9 @@ public interface IRepository<T> {
     /**
      * 查询总记录数
      *
-     * @see Wrappers#emptyWrapper()
      */
     default long count() {
-        return count(Wrappers.emptyWrapper());
+        return count(null);
     }
 
     /**
@@ -315,10 +310,9 @@ public interface IRepository<T> {
     /**
      * 查询所有
      *
-     * @see Wrappers#emptyWrapper()
      */
     default List<T> list() {
-        return list(Wrappers.emptyWrapper());
+        return list((Wrapper<T>) null);
     }
 
     /**
@@ -329,7 +323,7 @@ public interface IRepository<T> {
      * @since 3.5.3.2
      */
     default List<T> list(IPage<T> page) {
-        return list(page, Wrappers.emptyWrapper());
+        return list(page, null);
     }
 
     /**
@@ -346,10 +340,9 @@ public interface IRepository<T> {
      * 无条件翻页查询
      *
      * @param page 翻页对象
-     * @see Wrappers#emptyWrapper()
      */
     default <E extends IPage<T>> E page(E page) {
-        return page(page, Wrappers.emptyWrapper());
+        return page(page, null);
     }
 
     /**
@@ -377,20 +370,18 @@ public interface IRepository<T> {
     /**
      * 查询所有列表
      *
-     * @see Wrappers#emptyWrapper()
      */
     default List<Map<String, Object>> listMaps() {
-        return listMaps(Wrappers.emptyWrapper());
+        return listMaps((Wrapper<T>) null);
     }
 
     /**
      * 查询列表
      *
      * @param page 分页条件
-     * @see Wrappers#emptyWrapper()
      */
     default List<Map<String, Object>> listMaps(IPage<? extends Map<String, Object>> page) {
-        return listMaps(page, Wrappers.emptyWrapper());
+        return listMaps(page, null);
     }
 
 
@@ -407,7 +398,7 @@ public interface IRepository<T> {
      * @param mapper 转换函数
      */
     default <V> List<V> listObjs(Function<? super Object, V> mapper) {
-        return listObjs(Wrappers.emptyWrapper(), mapper);
+        return listObjs(null, mapper);
     }
 
     /**
@@ -443,10 +434,9 @@ public interface IRepository<T> {
      * 无条件翻页查询
      *
      * @param page 翻页对象
-     * @see Wrappers#emptyWrapper()
      */
     default <E extends IPage<Map<String, Object>>> E pageMaps(E page) {
-        return pageMaps(page, Wrappers.emptyWrapper());
+        return pageMaps(page, null);
     }
 
     /**
@@ -497,9 +487,9 @@ public interface IRepository<T> {
      * 链式查询 lambda 式
      * <p>注意：不支持 Kotlin </p>
      *
-     * @return LambdaQueryWrapper 的包装类
+     * @return QueryWrapper 的包装类
      */
-    default LambdaQueryChainWrapper<T> lambdaQuery() {
+    default QueryChainWrapper<T> lambdaQuery() {
         return ChainWrappers.lambdaQueryChain(getBaseMapper(), getEntityClass());
     }
 
@@ -508,9 +498,9 @@ public interface IRepository<T> {
      * <p>注意：不支持 Kotlin </p>
      *
      * @param entity 实体对象
-     * @return LambdaQueryWrapper 的包装类
+     * @return QueryWrapper 的包装类
      */
-    default LambdaQueryChainWrapper<T> lambdaQuery(T entity) {
+    default QueryChainWrapper<T> lambdaQuery(T entity) {
         return ChainWrappers.lambdaQueryChain(getBaseMapper(), entity);
     }
 
@@ -547,9 +537,9 @@ public interface IRepository<T> {
      * 链式更改 lambda 式
      * <p>注意：不支持 Kotlin </p>
      *
-     * @return LambdaUpdateWrapper 的包装类
+     * @return UpdateWrapper 的包装类
      */
-    default LambdaUpdateChainWrapper<T> lambdaUpdate() {
+    default UpdateChainWrapper<T> lambdaUpdate() {
         return ChainWrappers.lambdaUpdateChain(getBaseMapper());
     }
 }

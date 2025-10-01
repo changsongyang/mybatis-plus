@@ -15,16 +15,12 @@
  */
 package com.baomidou.mybatisplus.extension.kotlin
 
-import com.baomidou.mybatisplus.core.conditions.SharedString
-import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments
+import com.baomidou.mybatisplus.core.conditions.ISqlSegment
 import com.baomidou.mybatisplus.core.conditions.update.Update
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils
 import com.baomidou.mybatisplus.core.toolkit.Constants
 import com.baomidou.mybatisplus.core.toolkit.StringPool
-import com.baomidou.mybatisplus.core.toolkit.StringUtils
-import com.baomidou.mybatisplus.core.toolkit.support.ColumnCache
 import java.math.BigDecimal
-import java.util.concurrent.atomic.AtomicInteger
+import java.util.function.Supplier
 import java.util.stream.Collectors.joining
 import kotlin.reflect.KProperty1
 
@@ -35,75 +31,47 @@ import kotlin.reflect.KProperty1
  * @since 2018-11-02
  */
 @Suppress("serial")
-open class KtUpdateWrapper<T : Any> : AbstractKtWrapper<T, KtUpdateWrapper<T>>, Update<KtUpdateWrapper<T>, KProperty1<in T, *>> {
+open class KtUpdateWrapper<T : Any> : AbstractKtWrapper<T, KtUpdateWrapper<T>>, Update<KProperty1<in T, *>, KtUpdateWrapper<T>> {
 
-    /**
-     * SQL 更新字段内容，例如：name='1', age=2
-     */
-    private val sqlSet = ArrayList<String>()
+    constructor() : super()
 
     constructor(entity: T) {
-        this.entity = entity
-        super.initNeed()
+        setEntity(entity)
     }
 
     constructor(entityClass: Class<T>) {
-        this.entityClass = entityClass
-        super.initNeed()
-    }
-
-    internal constructor(entity: T?, paramNameSeq: AtomicInteger, paramNameValuePairs: Map<String, Any>,
-                         columnMap: Map<String, ColumnCache>, lastSql: SharedString, sqlComment: SharedString,
-                         sqlFirst: SharedString) {
-        this.entity = entity
-        this.paramNameSeq = paramNameSeq
-        this.paramNameValuePairs = paramNameValuePairs
-        this.expression = MergeSegments()
-        this.columnMap = columnMap
-        this.lastSql = lastSql
-        this.sqlComment = sqlComment
-        this.sqlFirst = sqlFirst
+        setEntityClass(entityClass)
     }
 
     override fun getSqlSet(): String? {
-        return if (CollectionUtils.isEmpty(sqlSet)) null
-        else sqlSet.stream().collect(joining(StringPool.COMMA))
+        return if (selectBodyOrSetSql.isNullOrEmpty()) null
+        else selectBodyOrSetSql.stream().collect(joining(StringPool.COMMA))
     }
 
-    override fun set(condition: Boolean, column: KProperty1<in T, *>, value: Any?, mapping: String?): KtUpdateWrapper<T> {
+    override fun set(condition: Boolean, column: ISqlSegment, value: Any, mapping: Supplier<String>): KtUpdateWrapper<T> {
         return maybeDo(condition) {
-            val sql = formatParam(mapping, value)
-            sqlSet.add(columnsToString(column) + Constants.EQUALS + sql)
+            val sql = formatParam(value, mapping)
+            selectBodyOrSetSql.add(column.sqlSegment + Constants.EQUALS + sql)
         }
     }
 
     override fun setSql(condition: Boolean, setSql: String, vararg params: Any): KtUpdateWrapper<T> {
-        return maybeDo(condition && StringUtils.isNotBlank(setSql)) {
-            sqlSet.add(formatSqlMaybeWithParam(setSql, *params))
-        }
-    }
-
-    override fun setIncrBy(condition: Boolean, column: KProperty1<in T, *>, `val`: Number): KtUpdateWrapper<T> {
         return maybeDo(condition) {
-            val realColumn = columnToString(column)
-            sqlSet.add(String.format("%s=%s + %s", realColumn, realColumn, if (`val` is BigDecimal) `val`.toPlainString() else `val`))
+            selectBodyOrSetSql.add(formatSqlMaybeWithParam(setSql, *params))
         }
     }
 
-    override fun setDecrBy(condition: Boolean, column: KProperty1<in T, *>, `val`: Number): KtUpdateWrapper<T> {
+    override fun setIncrBy(condition: Boolean, column: ISqlSegment, value: Number): KtUpdateWrapper<T> {
         return maybeDo(condition) {
-            val realColumn = columnToString(column)
-            sqlSet.add(String.format("%s=%s - %s", realColumn, realColumn, if (`val` is BigDecimal) `val`.toPlainString() else `val`));
+            val tc = column.sqlSegment
+            selectBodyOrSetSql.add(String.format("%s=%s + %s", tc, tc, if (value is BigDecimal) value.toPlainString() else value))
         }
     }
 
-    override fun instance(): KtUpdateWrapper<T> {
-        return KtUpdateWrapper(entity, paramNameSeq, paramNameValuePairs, columnMap,
-            SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString())
-    }
-
-    override fun clear() {
-        super.clear()
-        sqlSet.clear()
+    override fun setDecrBy(condition: Boolean, column: ISqlSegment, value: Number): KtUpdateWrapper<T> {
+        return maybeDo(condition) {
+            val tc = column.sqlSegment
+            selectBodyOrSetSql.add(String.format("%s=%s - %s", tc, tc, if (value is BigDecimal) value.toPlainString() else value))
+        }
     }
 }

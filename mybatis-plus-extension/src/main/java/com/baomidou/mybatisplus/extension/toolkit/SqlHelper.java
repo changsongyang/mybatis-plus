@@ -19,10 +19,9 @@ import com.baomidou.mybatisplus.core.enums.SqlMethod;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
-import com.baomidou.mybatisplus.core.toolkit.*;
-import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.core.spi.CompatibleHelper;
 import com.baomidou.mybatisplus.core.spi.CompatibleSet;
+import com.baomidou.mybatisplus.core.toolkit.*;
 import org.apache.ibatis.executor.BatchResult;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.session.ExecutorType;
@@ -33,10 +32,7 @@ import java.sql.Statement;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.BiPredicate;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.function.*;
 import java.util.stream.IntStream;
 
 /**
@@ -317,7 +313,7 @@ public final class SqlHelper {
      * @param <M>         Mapper类型
      * @return 返回lambda执行结果
      */
-    public static <T, R, M extends BaseMapper<T>> R execute(Class<T> entityClass, SFunction<M, R> sFunction) {
+    public static <T, R, M extends BaseMapper<T>> R execute(Class<T> entityClass, Function<M, R> sFunction) {
         SqlSession sqlSession = SqlHelper.sqlSession(entityClass);
         try {
             return sFunction.apply(SqlHelper.getMapper(entityClass, sqlSession));

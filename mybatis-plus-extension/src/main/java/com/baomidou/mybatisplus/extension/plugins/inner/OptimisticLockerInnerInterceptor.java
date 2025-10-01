@@ -94,7 +94,7 @@ public class OptimisticLockerInnerInterceptor implements InnerInterceptor {
     private static final String UPDATED_VERSION_VAL_KEY = "#updatedVersionVal#";
 
     /**
-     * Support wrapper mode (update(LambdaUpdateWrapper) or update(UpdateWrapper))
+     * Support wrapper mode (update(UpdateWrapper) or update(UpdateWrapper))
      */
     private final boolean wrapperMode;
 
@@ -192,7 +192,7 @@ public class OptimisticLockerInnerInterceptor implements InnerInterceptor {
             if (!fieldEqFinder.isPresent()) {
                 return;
             }
-            final Map<String, Object> paramNameValuePairs = ((AbstractWrapper<?, ?, ?>) ew).getParamNameValuePairs();
+            final Map<String, Object> paramNameValuePairs = ((AbstractWrapper<?, ?, ?>) ew).getContext().getParamNameValuePairs();
             final Object originalVersionValue = paramNameValuePairs.get(fieldEqFinder.valueKey);
             if (originalVersionValue == null) {
                 return;

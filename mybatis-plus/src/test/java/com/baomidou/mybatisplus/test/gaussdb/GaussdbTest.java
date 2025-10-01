@@ -1,7 +1,6 @@
 package com.baomidou.mybatisplus.test.gaussdb;
 
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -105,7 +104,7 @@ public class GaussdbTest {
         new SqlRunner(dataSource.getConnection()).run(CREATE_TABLE);
         try (SqlSession sqlSession = sqlSessionFactory(dataSource).openSession(true)) {
             DemoMapper demoMapper = sqlSession.getMapper(DemoMapper.class);
-            LOGGER.info("delete all data:{}", demoMapper.delete(Wrappers.emptyWrapper()));
+            LOGGER.info("delete all data:{}", demoMapper.delete(null));
 
             Demo demo = new Demo();
             demo.setAge(12);
@@ -136,18 +135,18 @@ public class GaussdbTest {
             }
             LOGGER.info("insert data on batch:{}", demoMapper.insert(demoList));
 
-            Long count = demoMapper.selectCount(Wrappers.emptyWrapper());
+            Long count = demoMapper.selectCount(null);
             LOGGER.info("select count:{}", count);
             Assertions.assertEquals(50L, count);
 
-            Page<Demo> page = demoMapper.selectPage(new Page<>(1, 10), Wrappers.emptyWrapper());
+            Page<Demo> page = demoMapper.selectPage(new Page<>(1, 10), null);
             Assertions.assertEquals(50, page.getTotal());
             Assertions.assertEquals(10, page.getSize());
             for (Demo record : page.getRecords()) {
                 LOGGER.info("record:{}", record);
             }
             LOGGER.info("next page .");
-            page = demoMapper.selectPage(new Page<>(2, 10), Wrappers.emptyWrapper());
+            page = demoMapper.selectPage(new Page<>(2, 10), null);
             Assertions.assertEquals(50, page.getTotal());
             Assertions.assertEquals(10, page.getSize());
             for (Demo record : page.getRecords()) {

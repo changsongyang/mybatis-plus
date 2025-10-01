@@ -30,13 +30,13 @@ class WrapperTest {
     private fun logSqlSegment(explain: String, wp: KtQueryWrapper<*>) {
         println(String.format(" ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   ->(%s)<-   ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓", explain))
         println(wp.sqlSegment)
-        wp.paramNameValuePairs.forEach(::println)
+        wp.context.paramNameValuePairs.forEach(::println)
     }
 
     private fun logSqlSegmentAndSetSql(explain: String, wp: KtUpdateWrapper<*>) {
         println(String.format(" ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   ->(%s)<-   ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓", explain))
         println(wp.sqlSegment)
         println(wp.sqlSet)
-        wp.paramNameValuePairs.forEach(::println)
+        wp.context.paramNameValuePairs.forEach(::println)
     }
 }
