@@ -8,8 +8,6 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.conditions.update.UpdateChainWrapper;
-import com.baomidou.mybatisplus.extension.kotlin.KtQueryChainWrapper;
-import com.baomidou.mybatisplus.extension.kotlin.KtUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.toolkit.ChainWrappers;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 
@@ -510,7 +508,7 @@ public interface IRepository<T> {
      *
      * @return KtQueryWrapper 的包装类
      */
-    default KtQueryChainWrapper<T> ktQuery() {
+    default QueryChainWrapper<T> ktQuery() {
         return ChainWrappers.ktQueryChain(getBaseMapper(), getEntityClass());
     }
 
@@ -520,7 +518,7 @@ public interface IRepository<T> {
      *
      * @return KtQueryWrapper 的包装类
      */
-    default KtUpdateChainWrapper<T> ktUpdate() {
+    default UpdateChainWrapper<T> ktUpdate() {
         return ChainWrappers.ktUpdateChain(getBaseMapper(), getEntityClass());
     }
 

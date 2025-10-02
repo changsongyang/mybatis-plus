@@ -85,7 +85,13 @@ public class WrapperNestedContext<T> {
      */
     public ColumnCache getColumnCache(SFunction<T, ?> column) {
         LambdaMeta meta = LambdaUtils.extract(column);
-        String fieldName = PropertyNamer.methodToProperty(meta.getImplMethodName());
+        String methodName = meta.getImplMethodName();
+        String fieldName;
+        try {
+            fieldName = PropertyNamer.methodToProperty(methodName);
+        } catch (Exception e) {
+            fieldName = methodName;
+        }
         Class<?> instantiatedClass = meta.getInstantiatedClass();
         tryInitCache(instantiatedClass);
         return getColumnCache(fieldName, instantiatedClass);

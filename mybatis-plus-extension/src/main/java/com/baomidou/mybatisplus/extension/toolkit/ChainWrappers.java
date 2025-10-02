@@ -18,8 +18,6 @@ package com.baomidou.mybatisplus.extension.toolkit;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.conditions.update.UpdateChainWrapper;
-import com.baomidou.mybatisplus.extension.kotlin.KtQueryChainWrapper;
-import com.baomidou.mybatisplus.extension.kotlin.KtUpdateChainWrapper;
 
 /**
  * 快捷构造 chain 式调用的工具类
@@ -87,8 +85,8 @@ public final class ChainWrappers {
      *
      * @return KtQueryWrapper 的包装类
      */
-    public static <T> KtQueryChainWrapper<T> ktQueryChain(BaseMapper<T> mapper, Class<T> entityClass) {
-        return new KtQueryChainWrapper<>(mapper).setEntityClass(entityClass);
+    public static <T> QueryChainWrapper<T> ktQueryChain(BaseMapper<T> mapper, Class<T> entityClass) {
+        return new QueryChainWrapper<>(mapper).setEntityClass(entityClass);
     }
 
     /**
@@ -97,8 +95,8 @@ public final class ChainWrappers {
      *
      * @return KtQueryWrapper 的包装类
      */
-    public static <T> KtQueryChainWrapper<T> ktQueryChain(BaseMapper<T> mapper, T entity) {
-        return new KtQueryChainWrapper<>(mapper).setEntity(entity);
+    public static <T> QueryChainWrapper<T> ktQueryChain(BaseMapper<T> mapper, T entity) {
+        return new QueryChainWrapper<>(mapper).setEntity(entity);
     }
 
     /**
@@ -108,8 +106,8 @@ public final class ChainWrappers {
      *
      * @return KtQueryWrapper 的包装类
      */
-    public static <T> KtQueryChainWrapper<T> ktQueryChain(Class<T> entityClass) {
-        return new KtQueryChainWrapper<>(entityClass);
+    public static <T> QueryChainWrapper<T> ktQueryChain(Class<T> entityClass) {
+        return new QueryChainWrapper<>(entityClass);
     }
 
 
@@ -146,8 +144,8 @@ public final class ChainWrappers {
      *
      * @return KtQueryWrapper 的包装类
      */
-    public static <T> KtUpdateChainWrapper<T> ktUpdateChain(BaseMapper<T> mapper, Class<T> entityClass) {
-        return new KtUpdateChainWrapper<>(mapper).setEntityClass(entityClass);
+    public static <T> UpdateChainWrapper<T> ktUpdateChain(BaseMapper<T> mapper, Class<T> entityClass) {
+        return new UpdateChainWrapper<>(mapper).setEntityClass(entityClass);
     }
 
 
@@ -157,8 +155,8 @@ public final class ChainWrappers {
      *
      * @return KtQueryWrapper 的包装类
      */
-    public static <T> KtUpdateChainWrapper<T> ktUpdateChain(BaseMapper<T> mapper, T entity) {
-        return new KtUpdateChainWrapper<>(mapper).setEntity(entity);
+    public static <T> UpdateChainWrapper<T> ktUpdateChain(BaseMapper<T> mapper, T entity) {
+        return new UpdateChainWrapper<>(mapper).setEntity(entity);
     }
 
     /**
@@ -168,7 +166,7 @@ public final class ChainWrappers {
      *
      * @return KtUpdateWrapper 的包装类
      */
-    public static <T> KtUpdateChainWrapper<T> ktUpdateChain(Class<T> entityClass) {
-        return new KtUpdateChainWrapper<>(entityClass);
+    public static <T> UpdateChainWrapper<T> ktUpdateChain(Class<T> entityClass) {
+        return new UpdateChainWrapper<>(entityClass);
     }
 }

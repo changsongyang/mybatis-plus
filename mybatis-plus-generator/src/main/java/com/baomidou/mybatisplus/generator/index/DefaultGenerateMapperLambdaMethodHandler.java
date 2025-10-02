@@ -15,11 +15,11 @@
  */
 package com.baomidou.mybatisplus.generator.index;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.kotlin.KtQueryWrapper;
-import com.baomidou.mybatisplus.extension.kotlin.KtUpdateWrapper;
 import com.baomidou.mybatisplus.generator.config.GlobalConfig;
 import com.baomidou.mybatisplus.generator.config.StrategyConfig;
 import com.baomidou.mybatisplus.generator.config.builder.Entity;
@@ -178,8 +178,8 @@ public class DefaultGenerateMapperLambdaMethodHandler extends AbstractMapperMeth
             imports.add(List.class.getName());
         }
         if (globalConfig.isKotlin()) {
-            imports.add(KtQueryWrapper.class.getName());
-            imports.add(KtUpdateWrapper.class.getName());
+            imports.add(QueryWrapper.class.getName()); // todo
+            imports.add(UpdateWrapper.class.getName()); // todo
         } else {
             imports.add(Wrappers.class.getName());
         }

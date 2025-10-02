@@ -23,8 +23,6 @@ import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.conditions.update.UpdateChainWrapper;
-import com.baomidou.mybatisplus.extension.kotlin.KtQueryChainWrapper;
-import com.baomidou.mybatisplus.extension.kotlin.KtUpdateChainWrapper;
 import org.apache.ibatis.executor.BatchResult;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
@@ -319,7 +317,6 @@ public class Db {
      * 查询总记录数
      *
      * @param entityClass 实体类
-     * @see Wrappers#emptyWrapper()
      */
     public static <T> long count(Class<T> entityClass) {
         return SqlHelper.execute(entityClass, baseMapper -> SqlHelper.retCount(baseMapper.selectCount(null)));
@@ -367,7 +364,6 @@ public class Db {
      * 查询所有
      *
      * @param entityClass 实体类
-     * @see Wrappers#emptyWrapper()
      */
     public static <T> List<T> list(Class<T> entityClass) {
         return SqlHelper.execute(entityClass, baseMapper -> baseMapper.selectList(null));
@@ -389,7 +385,6 @@ public class Db {
      * 根据entity中不为空的字段进行查询
      *
      * @param entity 实体类
-     * @see Wrappers#emptyWrapper()
      */
     public static <T> List<T> list(T entity) {
         return list(Wrappers.lambdaQuery(entity));
@@ -432,7 +427,6 @@ public class Db {
      * 查询所有列表
      *
      * @param entityClass 实体类
-     * @see Wrappers#emptyWrapper()
      */
     public static <T> List<Map<String, Object>> listMaps(Class<T> entityClass) {
         return SqlHelper.execute(entityClass, baseMapper -> baseMapper.selectMaps(null));
@@ -517,7 +511,6 @@ public class Db {
      *
      * @param page        翻页对象
      * @param entityClass 实体类
-     * @see Wrappers#emptyWrapper()
      */
     public static <T, E extends IPage<Map<String, Object>>> E pageMaps(E page, Class<T> entityClass) {
         return SqlHelper.execute(entityClass, baseMapper -> baseMapper.selectMapsPage(page, null));
@@ -538,7 +531,6 @@ public class Db {
      *
      * @param page        翻页对象
      * @param entityClass 实体类
-     * @see Wrappers#emptyWrapper()
      */
     public static <T> IPage<T> page(IPage<T> page, Class<T> entityClass) {
         return SqlHelper.execute(entityClass, baseMapper -> baseMapper.selectPage(page, null));
@@ -568,7 +560,7 @@ public class Db {
      *
      * @return KtQueryWrapper 的包装类
      */
-    public static <T> KtQueryChainWrapper<T> ktQuery(Class<T> entityClass) {
+    public static <T> QueryChainWrapper<T> ktQuery(Class<T> entityClass) {
         return ChainWrappers.ktQueryChain(entityClass);
     }
 
@@ -597,7 +589,7 @@ public class Db {
      *
      * @return KtUpdateWrapper 的包装类
      */
-    public static <T> KtUpdateChainWrapper<T> ktUpdate(Class<T> entityClass) {
+    public static <T> UpdateChainWrapper<T> ktUpdate(Class<T> entityClass) {
         return ChainWrappers.ktUpdateChain(entityClass);
     }
 

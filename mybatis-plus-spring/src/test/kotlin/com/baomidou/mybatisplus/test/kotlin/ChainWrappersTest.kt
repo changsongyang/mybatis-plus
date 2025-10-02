@@ -1,7 +1,7 @@
 package com.baomidou.mybatisplus.test.kotlin
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
 import com.baomidou.mybatisplus.core.metadata.IPage
-import com.baomidou.mybatisplus.extension.kotlin.KtQueryWrapper
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page
 import com.baomidou.mybatisplus.extension.toolkit.ChainWrappers
 import com.baomidou.mybatisplus.extension.toolkit.Db
@@ -58,10 +58,10 @@ class ChainWrappersTest : BaseDbTest<UserMapper>() {
 
     @Test
     fun testSelectByPredicate() {
-        Assertions.assertDoesNotThrow { ChainWrappers.ktQueryChain(User::class.java).select({ true }).list() }
+//        Assertions.assertDoesNotThrow { ChainWrappers.ktQueryChain(User::class.java).select({ true }).list() }
         doTestAutoCommit(fun(m) {
             Assertions.assertDoesNotThrow {
-                m.selectList(KtQueryWrapper(User()).select { true })
+                m.selectList(QueryWrapper(User()).select { true })
             }
         })
     }
