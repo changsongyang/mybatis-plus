@@ -149,16 +149,16 @@ public class DefaultGenerateMapperLambdaMethodHandler extends AbstractMapperMeth
                 String selectByMethod;
                 if (returnList) {
                     selectByMethod = buildMethod("selectBy" + baseMethodName, args, "List<" + entityName + ">",
-                        "selectList(Wrappers.<" + tableInfo.getEntityName() + ">lambdaQuery()." + baseWrapper + ")");
+                        "selectList(Wrappers.<" + tableInfo.getEntityName() + ">query()." + baseWrapper + ")");
                 } else {
                     selectByMethod = buildMethod("selectBy" + baseMethodName, args, entityName,
-                        "selectOne(Wrappers.<" + tableInfo.getEntityName() + ">lambdaQuery()." + baseWrapper + ")");
+                        "selectOne(Wrappers.<" + tableInfo.getEntityName() + ">query()." + baseWrapper + ")");
                 }
                 String updateByMethod = buildMethod(
                     "updateBy" + baseMethodName, tableInfo.getEntityName() + " entity" + ", " + args,
-                    "int", "update(entity, Wrappers.<" + tableInfo.getEntityName() + ">lambdaUpdate()." + baseWrapper + ")");
+                    "int", "update(entity, Wrappers.<" + tableInfo.getEntityName() + ">update()." + baseWrapper + ")");
                 String deleteByMethod = buildMethod("deleteBy" + baseMethodName, args, "int",
-                    "delete(Wrappers.<" + tableInfo.getEntityName() + ">lambdaUpdate()." + baseWrapper + ")");
+                    "delete(Wrappers.<" + tableInfo.getEntityName() + ">update()." + baseWrapper + ")");
                 methodList.add(new MapperMethod(indexName, selectByMethod, tableFieldList));
                 methodList.add(new MapperMethod(indexName, updateByMethod, tableFieldList));
                 methodList.add(new MapperMethod(indexName, deleteByMethod, tableFieldList));

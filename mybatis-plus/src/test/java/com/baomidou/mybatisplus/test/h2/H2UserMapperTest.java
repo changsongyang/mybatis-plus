@@ -194,8 +194,8 @@ class H2UserMapperTest extends BaseTest {
         List<Long> ids = Arrays.asList(120000L, 120001L);
         MybatisBatch.Method<H2User> method = new MybatisBatch.Method<>(H2UserMapper.class);
 
-        Assertions.assertFalse(SqlHelper.retBool(MybatisBatchUtils.execute(sqlSessionFactory, ids, method.update(id -> Wrappers.<H2User>lambdaUpdate().set(H2User::getName, "updateTest").eq(H2User::getTestId, id)))));
-        Assertions.assertFalse(SqlHelper.retBool(MybatisBatchUtils.execute(sqlSessionFactory, ids, method.update(id -> new H2User().setName("updateTest2"), id -> Wrappers.<H2User>lambdaUpdate().eq(H2User::getTestId, id)))));
+        Assertions.assertFalse(SqlHelper.retBool(MybatisBatchUtils.execute(sqlSessionFactory, ids, method.update(id -> Wrappers.<H2User>update().set(H2User::getName, "updateTest").eq(H2User::getTestId, id)))));
+        Assertions.assertFalse(SqlHelper.retBool(MybatisBatchUtils.execute(sqlSessionFactory, ids, method.update(id -> new H2User().setName("updateTest2"), id -> Wrappers.<H2User>update().eq(H2User::getTestId, id)))));
 
         Assertions.assertFalse(SqlHelper.retBool(MybatisBatchUtils.execute(sqlSessionFactory, h2UserList, method.update(user -> Wrappers.<H2User>update().set("name", "updateTest3").eq("test_id", user.getTestId())))));
         Assertions.assertFalse(SqlHelper.retBool(MybatisBatchUtils.execute(sqlSessionFactory, h2UserList, method.update(user -> new H2User("updateTests4"), p -> Wrappers.<H2User>update().eq("test_id", p.getTestId())))));
@@ -502,7 +502,7 @@ class H2UserMapperTest extends BaseTest {
     void testUpdateByWrapper() {
         var h2User = new H2User();
         userMapper.insert(h2User);
-        var wrapper = Wrappers.<H2User>lambdaUpdate().set(H2User::getName, "testUpdateByWrapper").eq(H2User::getTestId, h2User.getTestId());
+        var wrapper = Wrappers.<H2User>update().set(H2User::getName, "testUpdateByWrapper").eq(H2User::getTestId, h2User.getTestId());
         Assertions.assertEquals(1, userMapper.update(wrapper));
         Assertions.assertEquals("testUpdateByWrapper", userMapper.selectById(h2User.getTestId()).getName());
     }

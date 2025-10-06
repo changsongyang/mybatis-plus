@@ -15,13 +15,12 @@
  */
 package com.baomidou.mybatisplus.core.conditions.query;
 
-import com.baomidou.mybatisplus.core.conditions.AbstractSFuncWrapper;
+import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
 import com.baomidou.mybatisplus.core.conditions.ISqlSegment;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
-import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 
 import java.util.function.Predicate;
 
@@ -32,7 +31,7 @@ import java.util.function.Predicate;
  * @since 2018-05-25
  */
 @SuppressWarnings("serial")
-public class QueryWrapper<T> extends AbstractSFuncWrapper<T, QueryWrapper<T>> implements Query<T, SFunction<T, ?>, QueryWrapper<T>> {
+public class QueryWrapper<T> extends AbstractWrapper<T, QueryWrapper<T>> implements Query<T, QueryWrapper<T>> {
 
     public QueryWrapper() {
         super();
@@ -66,7 +65,7 @@ public class QueryWrapper<T> extends AbstractSFuncWrapper<T, QueryWrapper<T>> im
     public QueryWrapper<T> select(Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
         setEntityClass(entityClass);
         selectBodyOrSetSql.add(TableInfoHelper.getTableInfo(getContext().getEntityClass()).chooseSelect(predicate));
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override

@@ -15,11 +15,10 @@
  */
 package com.baomidou.mybatisplus.core.conditions.update;
 
-import com.baomidou.mybatisplus.core.conditions.AbstractSFuncWrapper;
+import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
 import com.baomidou.mybatisplus.core.conditions.ISqlSegment;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
-import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 
 import java.math.BigDecimal;
 import java.util.function.Supplier;
@@ -30,7 +29,7 @@ import java.util.function.Supplier;
  * @author hubin miemie HCL
  * @since 2018-05-30
  */
-public class UpdateWrapper<T> extends AbstractSFuncWrapper<T, UpdateWrapper<T>> implements Update<SFunction<T, ?>, UpdateWrapper<T>> {
+public class UpdateWrapper<T> extends AbstractWrapper<T, UpdateWrapper<T>> implements Update<T, UpdateWrapper<T>> {
     private static final long serialVersionUID = -1L;
 
     public UpdateWrapper() {

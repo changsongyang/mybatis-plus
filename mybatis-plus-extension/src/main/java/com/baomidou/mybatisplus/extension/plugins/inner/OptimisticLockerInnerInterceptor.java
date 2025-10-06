@@ -18,7 +18,6 @@ package com.baomidou.mybatisplus.extension.plugins.inner;
 import com.baomidou.mybatisplus.annotation.Version;
 import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
 import com.baomidou.mybatisplus.core.conditions.ISqlSegment;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.segments.NormalSegmentList;
 import com.baomidou.mybatisplus.core.conditions.update.Update;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -143,7 +142,7 @@ public class OptimisticLockerInnerInterceptor implements InnerInterceptor {
                 Object updatedVersionVal = this.getUpdatedVersionVal(fieldInfo.getPropertyType(), originalVersionVal);
                 String methodName = msId.substring(msId.lastIndexOf(StringPool.DOT) + 1);
                 if ("update".equals(methodName)) {
-                    AbstractWrapper<?, ?, ?> aw = (AbstractWrapper<?, ?, ?>) map.getOrDefault(Constants.WRAPPER, null);
+                    AbstractWrapper<?, ?> aw = (AbstractWrapper<?, ?>) map.getOrDefault(Constants.WRAPPER, null);
                     if (aw == null) {
                         UpdateWrapper<?> uw = new UpdateWrapper<>();
                         uw.eq(versionColumn, originalVersionVal);
@@ -188,11 +187,11 @@ public class OptimisticLockerInnerInterceptor implements InnerInterceptor {
             }
 
             final String versionColumn = versionField.getColumn();
-            final FieldEqFinder fieldEqFinder = new FieldEqFinder(versionColumn, (Wrapper<?>) ew);
+            final FieldEqFinder fieldEqFinder = new FieldEqFinder(versionColumn, (AbstractWrapper<?, ?>) ew);
             if (!fieldEqFinder.isPresent()) {
                 return;
             }
-            final Map<String, Object> paramNameValuePairs = ((AbstractWrapper<?, ?, ?>) ew).getContext().getParamNameValuePairs();
+            final Map<String, Object> paramNameValuePairs = ((AbstractWrapper<?, ?>) ew).getContext().getParamNameValuePairs();
             final Object originalVersionValue = paramNameValuePairs.get(fieldEqFinder.valueKey);
             if (originalVersionValue == null) {
                 return;
@@ -236,7 +235,7 @@ public class OptimisticLockerInnerInterceptor implements InnerInterceptor {
          */
         private final String fieldName;
 
-        public FieldEqFinder(String fieldName, Wrapper<?> wrapper) {
+        public FieldEqFinder(String fieldName, AbstractWrapper<?, ?> wrapper) {
             this.fieldName = fieldName;
             state = State.INIT;
             find(wrapper);
@@ -249,7 +248,7 @@ public class OptimisticLockerInnerInterceptor implements InnerInterceptor {
             return state == State.VERSION_VALUE_PRESENT;
         }
 
-        private boolean find(Wrapper<?> wrapper) {
+        private boolean find(AbstractWrapper<?, ?> wrapper) {
             Matcher matcher;
             final NormalSegmentList segments = wrapper.getExpression().getNormal();
             for (ISqlSegment segment : segments) {
@@ -263,8 +262,8 @@ public class OptimisticLockerInnerInterceptor implements InnerInterceptor {
                     this.state = State.VERSION_VALUE_PRESENT;
                     return true;
                     // 处理嵌套
-                } else if (segment instanceof Wrapper) {
-                    if (find((Wrapper<?>) segment)) {
+                } else if (segment instanceof AbstractWrapper<?, ?>) {
+                    if (find((AbstractWrapper<?, ?>) segment)) {
                         return true;
                     }
                     // 判断字段是否是要查找字段

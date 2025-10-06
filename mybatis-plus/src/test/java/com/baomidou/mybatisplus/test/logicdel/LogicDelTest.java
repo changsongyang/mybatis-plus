@@ -31,7 +31,7 @@ public class LogicDelTest extends BaseDbTest<EntityMapper> {
             int delete = i.deleteById(1L);
             assertThat(delete).isEqualTo(1);
 
-            delete = i.delete(Wrappers.<Entity>lambdaQuery().eq(Entity::getId, 2));
+            delete = i.delete(Wrappers.<Entity>query().eq(Entity::getId, 2));
             assertThat(delete).isEqualTo(1);
         });
 

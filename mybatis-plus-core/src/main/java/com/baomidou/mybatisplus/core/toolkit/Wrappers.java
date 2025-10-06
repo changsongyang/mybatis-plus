@@ -69,7 +69,7 @@ public final class Wrappers {
      */
     @Deprecated
     public static <T> QueryWrapper<T> lambdaQuery() {
-        return new QueryWrapper<>();
+        return query();
     }
 
     /**
@@ -81,7 +81,7 @@ public final class Wrappers {
      */
     @Deprecated
     public static <T> QueryWrapper<T> lambdaQuery(T entity) {
-        return new QueryWrapper<>(entity);
+        return query(entity);
     }
 
     /**
@@ -94,7 +94,7 @@ public final class Wrappers {
      */
     @Deprecated
     public static <T> QueryWrapper<T> lambdaQuery(Class<T> entityClass) {
-        return new QueryWrapper<>(entityClass);
+        return query(entityClass);
     }
 
     /**
@@ -137,7 +137,7 @@ public final class Wrappers {
      */
     @Deprecated
     public static <T> UpdateWrapper<T> lambdaUpdate() {
-        return new UpdateWrapper<>();
+        return update();
     }
 
     /**
@@ -149,7 +149,7 @@ public final class Wrappers {
      */
     @Deprecated
     public static <T> UpdateWrapper<T> lambdaUpdate(T entity) {
-        return new UpdateWrapper<>(entity);
+        return update(entity);
     }
 
     /**
@@ -162,6 +162,6 @@ public final class Wrappers {
      */
     @Deprecated
     public static <T> UpdateWrapper<T> lambdaUpdate(Class<T> entityClass) {
-        return new UpdateWrapper<>(entityClass);
+        return update(entityClass);
     }
 }

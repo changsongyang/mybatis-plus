@@ -18,7 +18,7 @@ public class NonTest extends BaseDbTest<EntityMapper> {
     @Test
     void test() {
         doTest(i -> {
-            Entity entity = i.selectOne(Wrappers.<Entity>lambdaQuery().eq(Entity::getId, 1));
+            Entity entity = i.selectOne(Wrappers.<Entity>query().eq(Entity::getId, 1));
             assertThat(entity).isNotNull();
             assertThat(entity.getName()).isNotNull();
 

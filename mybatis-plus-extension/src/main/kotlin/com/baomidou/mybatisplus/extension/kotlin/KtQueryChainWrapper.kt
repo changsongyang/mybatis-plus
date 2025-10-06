@@ -42,11 +42,11 @@
 //
 //    override fun select(condition: Boolean, sqlSegment: ISqlSegment): KtQueryChainWrapper<T> {
 //        delegateWrapper.select(condition, sqlSegment)
-//        return selfOrChildren()
+//        return typedThis
 //    }
 //
 //    override fun select(entityClass: Class<T>, predicate: Predicate<TableFieldInfo>): KtQueryChainWrapper<T> {
 //        delegateWrapper.select(entityClass, predicate)
-//        return selfOrChildren()
+//        return typedThis
 //    }
 //}

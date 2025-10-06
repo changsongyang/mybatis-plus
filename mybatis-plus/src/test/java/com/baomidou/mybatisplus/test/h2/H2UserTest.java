@@ -108,7 +108,7 @@ class H2UserTest extends BaseTest {
     @Test
     @Order(6)
     void testSelectLambdaById() {
-        H2User h2User = userService.getOne(Wrappers.<H2User>lambdaQuery().eq(H2User::getTestId, 101));
+        H2User h2User = userService.getOne(Wrappers.<H2User>query().eq(H2User::getTestId, 101));
         Assertions.assertNotNull(h2User);
     }
 
@@ -117,7 +117,7 @@ class H2UserTest extends BaseTest {
     @Order(7)
     void testLambdaTypeHandler() {
         // 演示 json 格式 Wrapper TypeHandler 查询
-        H2User h2User = userService.getOne(Wrappers.<H2User>lambdaQuery()
+        H2User h2User = userService.getOne(Wrappers.<H2User>query()
             .apply("name={0,typeHandler=" + H2userNameJsonTypeHandler.class.getCanonicalName() + "}",
                 "{\"id\":101,\"name\":\"Tomcat\"}"));
         Assertions.assertNotNull(h2User);
@@ -196,7 +196,7 @@ class H2UserTest extends BaseTest {
         userDB.setCreatedDt(LocalDateTime.now());
         userService.updateById(userDB);
         System.out.println("===============================================");
-        userService.lambdaUpdate().set(H2User::getAge, AgeEnum.THREE).eq(H2User::getTestId, id).update();
+        userService.update().set(H2User::getAge, AgeEnum.THREE).eq(H2User::getTestId, id).update();
 
     }
 
@@ -406,7 +406,7 @@ class H2UserTest extends BaseTest {
         H2User tomcat = userService.query().eq("name", "Tomcat").one();
         Assertions.assertNotNull(tomcat, "tomcat should not be null");
         userService.query().nested(i -> i.eq("name", "Tomcat")).list();
-        userService.lambdaUpdate().set(H2User::getName, "Tom").eq(H2User::getName, "Tomcat").update();
+        userService.update().set(H2User::getName, "Tom").eq(H2User::getName, "Tomcat").update();
     }
 
 
@@ -581,7 +581,7 @@ class H2UserTest extends BaseTest {
     }
 
     private void lambdaCache() {
-        Wrappers.<H2User>lambdaQuery()
+        Wrappers.<H2User>query()
             .eq(H2User::getAge, 2)
             .eq(H2User::getName, 2)
             .eq(H2User::getPrice, 2)
@@ -628,7 +628,7 @@ class H2UserTest extends BaseTest {
         Page<H2User> page = Page.of(1, 10);
         Assertions.assertTrue(userService.page(page, Wrappers.<H2User>query().select("test_id,name")
             .orderByDesc("test_id")).getPages() > 0);
-        Assertions.assertTrue(userService.page(page, Wrappers.<H2User>lambdaQuery()
+        Assertions.assertTrue(userService.page(page, Wrappers.<H2User>query()
             .orderByDesc(H2User::getTestId)).getPages() > 0);
     }
 
@@ -679,7 +679,7 @@ class H2UserTest extends BaseTest {
     @Test
     @Order(27)
     void testServiceGetOneOpt() {
-        userService.getOneOpt(Wrappers.<H2User>lambdaQuery().eq(H2User::getName, "David"))
+        userService.getOneOpt(Wrappers.<H2User>query().eq(H2User::getName, "David"))
             .ifPresent(u -> log(u.toString()));
     }
 
@@ -693,7 +693,7 @@ class H2UserTest extends BaseTest {
             .ifPresent(u -> log(u.toString()));
 
         // 异常情况
-        Assertions.assertThrows(TooManyResultsException.class, () -> userService.getOneOpt(Wrappers.<H2User>lambdaQuery()
+        Assertions.assertThrows(TooManyResultsException.class, () -> userService.getOneOpt(Wrappers.<H2User>query()
             .like(H2User::getName, "tes")));
     }
 
@@ -834,7 +834,7 @@ class H2UserTest extends BaseTest {
 
     @Test
     void testUnchecked() {
-        Wrappers.<H2User>lambdaQuery()
+        Wrappers.<H2User>query()
             .select(H2User::getAge, H2User::getAge).select(true, H2User::getDeleted, H2User::getDeleted)
             .orderBy(true, true, H2User::getAge, H2User::getAge)
             .orderByAsc(H2User::getAge, H2User::getDeleted).orderByAsc(true, H2User::getAge, H2User::getTestType)

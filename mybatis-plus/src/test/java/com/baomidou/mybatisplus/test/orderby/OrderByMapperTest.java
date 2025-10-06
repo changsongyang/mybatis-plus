@@ -21,7 +21,7 @@ public class OrderByMapperTest extends BaseDbTest<OrderByMapper> {
         doTest(mapper -> {
             mapper.selectList(null);
 
-            mapper.selectList(Wrappers.<OrderByEntity>lambdaQuery().select(OrderByEntity::getName));
+            mapper.selectList(Wrappers.<OrderByEntity>query().select(OrderByEntity::getName));
         });
         TableInfo tableInfo = TableInfoHelper.getTableInfo(OrderByEntity.class);
         for (OrderFieldInfo orderByField : tableInfo.getOrderByFields()) {

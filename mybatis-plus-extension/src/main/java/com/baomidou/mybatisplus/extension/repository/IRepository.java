@@ -1,6 +1,7 @@
 package com.baomidou.mybatisplus.extension.repository;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
@@ -94,7 +95,7 @@ public interface IRepository<T> {
      *
      * @param queryWrapper 实体包装类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      */
-    default boolean remove(Wrapper<T> queryWrapper) {
+    default boolean remove(UpdateWrapper<T> queryWrapper) {
         return SqlHelper.retBool(getBaseMapper().delete(queryWrapper));
     }
 
@@ -136,11 +137,11 @@ public interface IRepository<T> {
 
     /**
      * 根据 UpdateWrapper 条件，更新记录 需要设置sqlset
-     * <p>此方法无法进行自动填充,如需自动填充请使用{@link #update(Object, Wrapper)}</p>
+     * <p>此方法无法进行自动填充,如需自动填充请使用{@link #update(Object, UpdateWrapper)}</p>
      *
      * @param updateWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper}
      */
-    default boolean update(Wrapper<T> updateWrapper) {
+    default boolean update(UpdateWrapper<T> updateWrapper) {
         return update(null, updateWrapper);
     }
 
@@ -150,7 +151,7 @@ public interface IRepository<T> {
      * @param entity        实体对象(当entity为空时无法进行自动填充)
      * @param updateWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper}
      */
-    default boolean update(T entity, Wrapper<T> updateWrapper) {
+    default boolean update(T entity, UpdateWrapper<T> updateWrapper) {
         return SqlHelper.retBool(getBaseMapper().update(entity, updateWrapper));
     }
 
@@ -212,7 +213,7 @@ public interface IRepository<T> {
      *
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      */
-    default T getOne(Wrapper<T> queryWrapper) {
+    default T getOne(QueryWrapper<T> queryWrapper) {
         return getOne(queryWrapper, true);
     }
 
@@ -223,7 +224,7 @@ public interface IRepository<T> {
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      * @return {@link Optional} 返回一个Optional对象
      */
-    default Optional<T> getOneOpt(Wrapper<T> queryWrapper) {
+    default Optional<T> getOneOpt(QueryWrapper<T> queryWrapper) {
         return getOneOpt(queryWrapper, true);
     }
 
@@ -233,7 +234,7 @@ public interface IRepository<T> {
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      * @param throwEx      有多个 result 是否抛出异常
      */
-    T getOne(Wrapper<T> queryWrapper, boolean throwEx);
+    T getOne(QueryWrapper<T> queryWrapper, boolean throwEx);
 
     /**
      * 根据 Wrapper，查询一条记录
@@ -242,14 +243,14 @@ public interface IRepository<T> {
      * @param throwEx      有多个 result 是否抛出异常
      * @return {@link Optional} 返回一个Optional对象
      */
-    Optional<T> getOneOpt(Wrapper<T> queryWrapper, boolean throwEx);
+    Optional<T> getOneOpt(QueryWrapper<T> queryWrapper, boolean throwEx);
 
     /**
      * 根据 Wrapper，查询一条记录
      *
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      */
-    Map<String, Object> getMap(Wrapper<T> queryWrapper);
+    Map<String, Object> getMap(QueryWrapper<T> queryWrapper);
 
     /**
      * 根据 Wrapper，查询一条记录
@@ -257,13 +258,13 @@ public interface IRepository<T> {
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      * @param mapper       转换函数
      */
-    <V> V getObj(Wrapper<T> queryWrapper, Function<? super Object, V> mapper);
+    <V> V getObj(QueryWrapper<T> queryWrapper, Function<? super Object, V> mapper);
 
     /**
      * 查询指定条件是否存在数据
      *
      */
-    default boolean exists(Wrapper<T> queryWrapper) {
+    default boolean exists(QueryWrapper<T> queryWrapper) {
         return getBaseMapper().exists(queryWrapper);
     }
 
@@ -280,7 +281,7 @@ public interface IRepository<T> {
      *
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      */
-    default long count(Wrapper<T> queryWrapper) {
+    default long count(QueryWrapper<T> queryWrapper) {
         return SqlHelper.retCount(getBaseMapper().selectCount(queryWrapper));
     }
 
@@ -289,7 +290,7 @@ public interface IRepository<T> {
      *
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      */
-    default List<T> list(Wrapper<T> queryWrapper) {
+    default List<T> list(QueryWrapper<T> queryWrapper) {
         return getBaseMapper().selectList(queryWrapper);
     }
 
@@ -301,7 +302,7 @@ public interface IRepository<T> {
      * @return 列表数据
      * @since 3.5.3.2
      */
-    default List<T> list(IPage<T> page, Wrapper<T> queryWrapper) {
+    default List<T> list(IPage<T> page, QueryWrapper<T> queryWrapper) {
         return getBaseMapper().selectList(page, queryWrapper);
     }
 
@@ -310,7 +311,7 @@ public interface IRepository<T> {
      *
      */
     default List<T> list() {
-        return list((Wrapper<T>) null);
+        return list((QueryWrapper<T>) null);
     }
 
     /**
@@ -330,7 +331,7 @@ public interface IRepository<T> {
      * @param page         翻页对象
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      */
-    default <E extends IPage<T>> E page(E page, Wrapper<T> queryWrapper) {
+    default <E extends IPage<T>> E page(E page, QueryWrapper<T> queryWrapper) {
         return getBaseMapper().selectPage(page, queryWrapper);
     }
 
@@ -348,7 +349,7 @@ public interface IRepository<T> {
      *
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      */
-    default List<Map<String, Object>> listMaps(Wrapper<T> queryWrapper) {
+    default List<Map<String, Object>> listMaps(QueryWrapper<T> queryWrapper) {
         return getBaseMapper().selectMaps(queryWrapper);
     }
 
@@ -360,7 +361,7 @@ public interface IRepository<T> {
      * @return 列表数据
      * @since 3.5.3.2
      */
-    default List<Map<String, Object>> listMaps(IPage<? extends Map<String, Object>> page, Wrapper<T> queryWrapper) {
+    default List<Map<String, Object>> listMaps(IPage<? extends Map<String, Object>> page, QueryWrapper<T> queryWrapper) {
         return getBaseMapper().selectMaps(page, queryWrapper);
     }
 
@@ -370,7 +371,7 @@ public interface IRepository<T> {
      *
      */
     default List<Map<String, Object>> listMaps() {
-        return listMaps((Wrapper<T>) null);
+        return listMaps((QueryWrapper<T>) null);
     }
 
     /**
@@ -404,7 +405,7 @@ public interface IRepository<T> {
      *
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      */
-    default <E> List<E> listObjs(Wrapper<T> queryWrapper) {
+    default <E> List<E> listObjs(QueryWrapper<T> queryWrapper) {
         return getBaseMapper().selectObjs(queryWrapper);
     }
 
@@ -414,7 +415,7 @@ public interface IRepository<T> {
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      * @param mapper       转换函数
      */
-    default <V> List<V> listObjs(Wrapper<T> queryWrapper, Function<? super Object, V> mapper) {
+    default <V> List<V> listObjs(QueryWrapper<T> queryWrapper, Function<? super Object, V> mapper) {
         return getBaseMapper().selectObjs(queryWrapper).stream().filter(Objects::nonNull).map(mapper).collect(Collectors.toList());
     }
 
@@ -424,7 +425,7 @@ public interface IRepository<T> {
      * @param page         翻页对象
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      */
-    default <E extends IPage<Map<String, Object>>> E pageMaps(E page, Wrapper<T> queryWrapper) {
+    default <E extends IPage<Map<String, Object>>> E pageMaps(E page, QueryWrapper<T> queryWrapper) {
         return getBaseMapper().selectMapsPage(page, queryWrapper);
     }
 

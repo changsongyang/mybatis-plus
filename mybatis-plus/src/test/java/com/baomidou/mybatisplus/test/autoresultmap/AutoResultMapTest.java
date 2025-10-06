@@ -27,7 +27,7 @@ public class AutoResultMapTest extends BaseDbTest<EntityMapper> {
         });
         doTest(m -> {
             Entity entity = new Entity().setName("老王");
-            m.selectOne(Wrappers.lambdaQuery(entity).ne(Entity::getId, 1));
+            m.selectOne(Wrappers.query(entity).ne(Entity::getId, 1));
         });
     }
 

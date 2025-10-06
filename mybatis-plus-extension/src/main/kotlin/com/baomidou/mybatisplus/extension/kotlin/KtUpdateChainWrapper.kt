@@ -41,21 +41,21 @@
 //
 //    override fun set(condition: Boolean, column: ISqlSegment, value: Any, mapping: Supplier<String>?): KtUpdateChainWrapper<T> {
 //        delegateWrapper.set(condition, column, value, mapping!!)
-//        return selfOrChildren()
+//        return typedThis
 //    }
 //
 //    override fun setSql(condition: Boolean, setSql: String, vararg params: Any): KtUpdateChainWrapper<T> {
 //        delegateWrapper.setSql(condition, setSql, *params)
-//        return selfOrChildren()
+//        return typedThis
 //    }
 //
 //    override fun setIncrBy(condition: Boolean, column: ISqlSegment, value: Number): KtUpdateChainWrapper<T> {
 //        delegateWrapper.setIncrBy(condition, column, value)
-//        return selfOrChildren()
+//        return typedThis
 //    }
 //
 //    override fun setDecrBy(condition: Boolean, column: ISqlSegment, value: Number): KtUpdateChainWrapper<T> {
 //        delegateWrapper.setDecrBy(condition, column, value)
-//        return selfOrChildren()
+//        return typedThis
 //    }
 //}

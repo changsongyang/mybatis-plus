@@ -17,6 +17,7 @@ package com.baomidou.mybatisplus.core.conditions.update;
 
 import com.baomidou.mybatisplus.core.conditions.ISqlSegment;
 import com.baomidou.mybatisplus.core.conditions.interfaces.WiSupport;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -26,7 +27,7 @@ import java.util.function.Supplier;
  * @author miemie
  * @since 2018-12-12
  */
-public interface Update<Mut, Children> extends WiSupport<Mut>, Serializable {
+public interface Update<T, Children> extends WiSupport<T>, Serializable {
 
     default Children set(String column, Object value) {
         return set(true, column, value);
@@ -44,19 +45,19 @@ public interface Update<Mut, Children> extends WiSupport<Mut>, Serializable {
         return set(condition, strCol2Segment(column), value, Objects.isNull(mapping) ? null : () -> mapping);
     }
 
-    default Children set(Mut column, Object value) {
+    default Children set(SFunction<T, ?> column, Object value) {
         return set(true, column, value);
     }
 
-    default Children set(boolean condition, Mut column, Object value) {
+    default Children set(boolean condition, SFunction<T, ?> column, Object value) {
         return set(condition, column, value, false);
     }
 
-    default Children set(Mut column, Object value, boolean mapping) {
+    default Children set(SFunction<T, ?> column, Object value, boolean mapping) {
         return set(true, column, value, mapping);
     }
 
-    default Children set(boolean condition, Mut column, Object value, boolean mapping) {
+    default Children set(boolean condition, SFunction<T, ?> column, Object value, boolean mapping) {
         return set(condition, convMut2ColSegment(column), value, mappingSupplier(mapping, column));
     }
 
@@ -99,11 +100,11 @@ public interface Update<Mut, Children> extends WiSupport<Mut>, Serializable {
         return setIncrBy(condition, strCol2Segment(column), value);
     }
 
-    default Children setIncrBy(Mut column, Number value) {
+    default Children setIncrBy(SFunction<T, ?> column, Number value) {
         return setIncrBy(true, column, value);
     }
 
-    default Children setIncrBy(boolean condition, Mut column, Number value) {
+    default Children setIncrBy(boolean condition, SFunction<T, ?> column, Number value) {
         return setIncrBy(condition, convMut2ColSegment(column), value);
     }
 
@@ -126,11 +127,11 @@ public interface Update<Mut, Children> extends WiSupport<Mut>, Serializable {
         return setDecrBy(condition, strCol2Segment(column), value);
     }
 
-    default Children setDecrBy(Mut column, Number value) {
+    default Children setDecrBy(SFunction<T, ?> column, Number value) {
         return setDecrBy(true, column, value);
     }
 
-    default Children setDecrBy(boolean condition, Mut column, Number value) {
+    default Children setDecrBy(boolean condition, SFunction<T, ?> column, Number value) {
         return setDecrBy(condition, convMut2ColSegment(column), value);
     }
 

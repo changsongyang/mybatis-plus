@@ -3,6 +3,7 @@ package com.baomidou.mybatisplus.core.conditions.interfaces;
 import com.baomidou.mybatisplus.core.conditions.ISqlSegment;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,21 +16,21 @@ import java.util.stream.Collectors;
  * @author miemie
  * @since 2025/9/25
  */
-public interface WiSupport<Mut> {
+public interface WiSupport<T> {
 
-    String convMut2ColInSel(Mut mutable);
+    String convMut2ColInSel(SFunction<T, ?> mutable);
 
-    default ISqlSegment convMut2ColSegment(Mut mutable) {
+    default ISqlSegment convMut2ColSegment(SFunction<T, ?> mutable) {
         return () -> convMut2Col(mutable);
     }
 
-    String convMut2Col(Mut mutable);
+    String convMut2Col(SFunction<T, ?> mutable);
 
-    default Supplier<String> mappingSupplier(boolean mapping, Mut mutable) {
+    default Supplier<String> mappingSupplier(boolean mapping, SFunction<T, ?> mutable) {
         return mapping ? () -> convMut2ColMapping(mutable) : null;
     }
 
-    String convMut2ColMapping(Mut mutable);
+    String convMut2ColMapping(SFunction<T, ?> mutable);
 
     default ISqlSegment strCol2Segment(String column) {
         return () -> checkStrCol(column);
@@ -48,7 +49,7 @@ public interface WiSupport<Mut> {
         };
     }
 
-    default ISqlSegment mutPeek(Mut column, Collection<Mut> columns) {
+    default ISqlSegment mutPeek(SFunction<T, ?> column, Collection<SFunction<T, ?>> columns) {
         return () -> {
             List<String> cs = new ArrayList<>();
             cs.add(convMut2Col(column));

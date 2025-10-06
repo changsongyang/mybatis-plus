@@ -19,8 +19,9 @@ import com.baomidou.mybatisplus.core.conditions.ISqlSegment;
 import com.baomidou.mybatisplus.core.conditions.update.Update;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
 import com.baomidou.mybatisplus.extension.conditions.AbstractChainWrapper;
+import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 
 import java.util.function.Supplier;
 
@@ -31,8 +32,8 @@ import java.util.function.Supplier;
  * @since 2018-12-19
  */
 @SuppressWarnings({"serial"})
-public class UpdateChainWrapper<T> extends AbstractChainWrapper<T, SFunction<T, ?>, UpdateChainWrapper<T>, UpdateWrapper<T>>
-    implements Update<SFunction<T, ?>, UpdateChainWrapper<T>>, ChainUpdate<T, UpdateChainWrapper<T>> {
+public class UpdateChainWrapper<T> extends AbstractChainWrapper<T, UpdateChainWrapper<T>, UpdateWrapper<T>>
+    implements Update<T, UpdateChainWrapper<T>> {
 
     public UpdateChainWrapper() {
         super();
@@ -54,24 +55,60 @@ public class UpdateChainWrapper<T> extends AbstractChainWrapper<T, SFunction<T, 
     @Override
     public UpdateChainWrapper<T> set(boolean condition, ISqlSegment column, Object value, Supplier<String> mapping) {
         delegateWrapper.set(condition, column, value, mapping);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public UpdateChainWrapper<T> setSql(boolean condition, String setSql, Object... params) {
         delegateWrapper.setSql(condition, setSql, params);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public UpdateChainWrapper<T> setIncrBy(boolean condition, ISqlSegment column, Number value) {
         delegateWrapper.setIncrBy(condition, column, value);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public UpdateChainWrapper<T> setDecrBy(boolean condition, ISqlSegment column, Number value) {
         delegateWrapper.setDecrBy(condition, column, value);
-        return selfOrChildren();
+        return typedThis;
+    }
+
+    @Override
+    public String getSqlSet() {
+        throw ExceptionUtils.mpe("can not use this method for \"%s\"", "getSqlSet");
+    }
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    /**
+     * 更新数据
+     * <p>此方法无法进行自动填充,如需自动填充请使用{@link #update(Object)}</p>
+     *
+     * @return 是否成功
+     */
+    public boolean update() {
+        return update(null);
+    }
+
+    /**
+     * 更新数据
+     *
+     * @param entity 实体类(当entity为空时无法进行自动填充)
+     * @return 是否成功
+     */
+    public boolean update(T entity) {
+        return execute(mapper -> SqlHelper.retBool(mapper.update(entity, delegateWrapper)));
+    }
+
+    /**
+     * 删除数据
+     *
+     * @return 是否成功
+     */
+    public boolean remove() {
+        return execute(mapper -> SqlHelper.retBool(mapper.delete(delegateWrapper)));
     }
 }

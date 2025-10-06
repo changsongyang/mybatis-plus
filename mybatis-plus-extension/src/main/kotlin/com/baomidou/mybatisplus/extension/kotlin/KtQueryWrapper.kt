@@ -53,7 +53,7 @@
 //    override fun select(entityClass: Class<T>, predicate: Predicate<TableFieldInfo>): KtQueryWrapper<T> {
 //        setEntityClass(entityClass)
 //        selectBodyOrSetSql.add(TableInfoHelper.getTableInfo(context.getEntityClass()).chooseSelect(predicate))
-//        return selfOrChildren()
+//        return typedThis
 //    }
 //
 //    override fun getSqlSelect(): String? {

@@ -18,6 +18,7 @@ package com.baomidou.mybatisplus.core.conditions.interfaces;
 import com.baomidou.mybatisplus.core.conditions.ISqlSegment;
 import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -36,7 +37,7 @@ import java.util.stream.Collectors;
  * @author hubin miemie HCL
  * @since 2017-05-26
  */
-public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
+public interface Compare<T, Children> extends WiSupport<T>, Serializable {
 
     /**
      * map 所有非空属性等于 =
@@ -121,27 +122,27 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return eq(condition, strCol2Segment(column), value, () -> mapping);
     }
 
-    default Children eq(Mut column, Object value) {
+    default Children eq(SFunction<T, ?> column, Object value) {
         return eq(true, column, value, false);
     }
 
-    default Children eq(Mut column, Object value, boolean mapping) {
+    default Children eq(SFunction<T, ?> column, Object value, boolean mapping) {
         return eq(true, column, value, mapping);
     }
 
-    default Children eq(Mut column, Object value, String mapping) {
+    default Children eq(SFunction<T, ?> column, Object value, String mapping) {
         return eq(true, column, value, mapping);
     }
 
-    default Children eq(boolean condition, Mut column, Object value) {
+    default Children eq(boolean condition, SFunction<T, ?> column, Object value) {
         return eq(condition, column, value, false);
     }
 
-    default Children eq(boolean condition, Mut column, Object value, boolean mapping) {
+    default Children eq(boolean condition, SFunction<T, ?> column, Object value, boolean mapping) {
         return eq(condition, convMut2ColSegment(column), value, mappingSupplier(mapping, column));
     }
 
-    default Children eq(boolean condition, Mut column, Object value, String mapping) {
+    default Children eq(boolean condition, SFunction<T, ?> column, Object value, String mapping) {
         return eq(condition, convMut2ColSegment(column), value, () -> mapping);
     }
 
@@ -166,11 +167,11 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return ne(condition, strCol2Segment(column), value);
     }
 
-    default Children ne(Mut column, Object value) {
+    default Children ne(SFunction<T, ?> column, Object value) {
         return ne(true, column, value);
     }
 
-    default Children ne(boolean condition, Mut column, Object value) {
+    default Children ne(boolean condition, SFunction<T, ?> column, Object value) {
         return ne(condition, convMut2ColSegment(column), value);
     }
 
@@ -194,11 +195,11 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return gt(condition, strCol2Segment(column), value);
     }
 
-    default Children gt(Mut column, Object value) {
+    default Children gt(SFunction<T, ?> column, Object value) {
         return gt(true, column, value);
     }
 
-    default Children gt(boolean condition, Mut column, Object value) {
+    default Children gt(boolean condition, SFunction<T, ?> column, Object value) {
         return gt(condition, convMut2ColSegment(column), value);
     }
 
@@ -222,11 +223,11 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return ge(condition, strCol2Segment(column), value);
     }
 
-    default Children ge(Mut column, Object value) {
+    default Children ge(SFunction<T, ?> column, Object value) {
         return ge(true, column, value);
     }
 
-    default Children ge(boolean condition, Mut column, Object value) {
+    default Children ge(boolean condition, SFunction<T, ?> column, Object value) {
         return ge(condition, convMut2ColSegment(column), value);
     }
 
@@ -250,11 +251,11 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return lt(condition, strCol2Segment(column), value);
     }
 
-    default Children lt(Mut column, Object value) {
+    default Children lt(SFunction<T, ?> column, Object value) {
         return lt(true, column, value);
     }
 
-    default Children lt(boolean condition, Mut column, Object value) {
+    default Children lt(boolean condition, SFunction<T, ?> column, Object value) {
         return lt(condition, convMut2ColSegment(column), value);
     }
 
@@ -278,11 +279,11 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return le(condition, strCol2Segment(column), value);
     }
 
-    default Children le(Mut column, Object value) {
+    default Children le(SFunction<T, ?> column, Object value) {
         return le(true, column, value);
     }
 
-    default Children le(boolean condition, Mut column, Object value) {
+    default Children le(boolean condition, SFunction<T, ?> column, Object value) {
         return le(condition, convMut2ColSegment(column), value);
     }
 
@@ -306,11 +307,11 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return between(condition, strCol2Segment(column), val1, val2);
     }
 
-    default Children between(Mut column, Object val1, Object val2) {
+    default Children between(SFunction<T, ?> column, Object val1, Object val2) {
         return between(true, column, val1, val2);
     }
 
-    default Children between(boolean condition, Mut column, Object val1, Object val2) {
+    default Children between(boolean condition, SFunction<T, ?> column, Object val1, Object val2) {
         return between(condition, convMut2ColSegment(column), val1, val2);
     }
 
@@ -335,11 +336,11 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return notBetween(condition, strCol2Segment(column), val1, val2);
     }
 
-    default Children notBetween(Mut column, Object val1, Object val2) {
+    default Children notBetween(SFunction<T, ?> column, Object val1, Object val2) {
         return notBetween(true, column, val1, val2);
     }
 
-    default Children notBetween(boolean condition, Mut column, Object val1, Object val2) {
+    default Children notBetween(boolean condition, SFunction<T, ?> column, Object val1, Object val2) {
         return notBetween(condition, convMut2ColSegment(column), val1, val2);
     }
 
@@ -364,11 +365,11 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return like(condition, strCol2Segment(column), value);
     }
 
-    default Children like(Mut column, Object value) {
+    default Children like(SFunction<T, ?> column, Object value) {
         return like(true, column, value);
     }
 
-    default Children like(boolean condition, Mut column, Object value) {
+    default Children like(boolean condition, SFunction<T, ?> column, Object value) {
         return like(condition, convMut2ColSegment(column), value);
     }
 
@@ -392,11 +393,11 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return notLike(condition, strCol2Segment(column), value);
     }
 
-    default Children notLike(Mut column, Object value) {
+    default Children notLike(SFunction<T, ?> column, Object value) {
         return notLike(true, column, value);
     }
 
-    default Children notLike(boolean condition, Mut column, Object value) {
+    default Children notLike(boolean condition, SFunction<T, ?> column, Object value) {
         return notLike(condition, convMut2ColSegment(column), value);
     }
 
@@ -420,11 +421,11 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return notLikeLeft(condition, strCol2Segment(column), value);
     }
 
-    default Children notLikeLeft(Mut column, Object value) {
+    default Children notLikeLeft(SFunction<T, ?> column, Object value) {
         return notLikeLeft(true, column, value);
     }
 
-    default Children notLikeLeft(boolean condition, Mut column, Object value) {
+    default Children notLikeLeft(boolean condition, SFunction<T, ?> column, Object value) {
         return notLikeLeft(condition, convMut2ColSegment(column), value);
     }
 
@@ -448,11 +449,11 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return notLikeRight(condition, strCol2Segment(column), value);
     }
 
-    default Children notLikeRight(Mut column, Object value) {
+    default Children notLikeRight(SFunction<T, ?> column, Object value) {
         return notLikeRight(true, column, value);
     }
 
-    default Children notLikeRight(boolean condition, Mut column, Object value) {
+    default Children notLikeRight(boolean condition, SFunction<T, ?> column, Object value) {
         return notLikeRight(condition, convMut2ColSegment(column), value);
     }
 
@@ -476,11 +477,11 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return likeLeft(condition, strCol2Segment(column), value);
     }
 
-    default Children likeLeft(Mut column, Object value) {
+    default Children likeLeft(SFunction<T, ?> column, Object value) {
         return likeLeft(true, column, value);
     }
 
-    default Children likeLeft(boolean condition, Mut column, Object value) {
+    default Children likeLeft(boolean condition, SFunction<T, ?> column, Object value) {
         return likeLeft(condition, convMut2ColSegment(column), value);
     }
 
@@ -504,11 +505,11 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return likeRight(condition, strCol2Segment(column), value);
     }
 
-    default Children likeRight(Mut column, Object value) {
+    default Children likeRight(SFunction<T, ?> column, Object value) {
         return likeRight(true, column, value);
     }
 
-    default Children likeRight(boolean condition, Mut column, Object value) {
+    default Children likeRight(boolean condition, SFunction<T, ?> column, Object value) {
         return likeRight(condition, convMut2ColSegment(column), value);
     }
 
@@ -532,11 +533,11 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return isNull(condition, strCol2Segment(column));
     }
 
-    default Children isNull(Mut column) {
+    default Children isNull(SFunction<T, ?> column) {
         return isNull(true, column);
     }
 
-    default Children isNull(boolean condition, Mut column) {
+    default Children isNull(boolean condition, SFunction<T, ?> column) {
         return isNull(condition, convMut2ColSegment(column));
     }
 
@@ -560,11 +561,11 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return isNotNull(condition, strCol2Segment(column));
     }
 
-    default Children isNotNull(Mut column) {
+    default Children isNotNull(SFunction<T, ?> column) {
         return isNotNull(true, column);
     }
 
-    default Children isNotNull(boolean condition, Mut column) {
+    default Children isNotNull(boolean condition, SFunction<T, ?> column) {
         return isNotNull(condition, convMut2ColSegment(column));
     }
 
@@ -588,11 +589,11 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return in(condition, strCol2Segment(column), coll);
     }
 
-    default Children in(Mut column, Collection<?> coll) {
+    default Children in(SFunction<T, ?> column, Collection<?> coll) {
         return in(true, column, coll);
     }
 
-    default Children in(boolean condition, Mut column, Collection<?> coll) {
+    default Children in(boolean condition, SFunction<T, ?> column, Collection<?> coll) {
         return in(condition, convMut2ColSegment(column), coll);
     }
 
@@ -620,11 +621,11 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return in(condition, strCol2Segment(column), values);
     }
 
-    default Children in(Mut column, Object... values) {
+    default Children in(SFunction<T, ?> column, Object... values) {
         return in(true, column, values);
     }
 
-    default Children in(boolean condition, Mut column, Object... values) {
+    default Children in(boolean condition, SFunction<T, ?> column, Object... values) {
         return in(condition, convMut2ColSegment(column), values);
     }
 
@@ -648,11 +649,11 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return notIn(true, column, coll);
     }
 
-    default Children notIn(Mut column, Collection<?> coll) {
+    default Children notIn(SFunction<T, ?> column, Collection<?> coll) {
         return notIn(true, column, coll);
     }
 
-    default Children notIn(boolean condition, Mut column, Collection<?> coll) {
+    default Children notIn(boolean condition, SFunction<T, ?> column, Collection<?> coll) {
         return notIn(condition, convMut2ColSegment(column), coll);
     }
 
@@ -684,11 +685,11 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return notIn(condition, strCol2Segment(column), values);
     }
 
-    default Children notIn(Mut column, Object... values) {
+    default Children notIn(SFunction<T, ?> column, Object... values) {
         return notIn(true, column, values);
     }
 
-    default Children notIn(boolean condition, Mut column, Object... values) {
+    default Children notIn(boolean condition, SFunction<T, ?> column, Object... values) {
         return notIn(condition, convMut2ColSegment(column), values);
     }
 
@@ -716,11 +717,11 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return eqSql(condition, strCol2Segment(column), sql);
     }
 
-    default Children eqSql(Mut column, String sql) {
+    default Children eqSql(SFunction<T, ?> column, String sql) {
         return eqSql(true, column, sql);
     }
 
-    default Children eqSql(boolean condition, Mut column, String sql) {
+    default Children eqSql(boolean condition, SFunction<T, ?> column, String sql) {
         return eqSql(condition, convMut2ColSegment(column), sql);
     }
 
@@ -748,11 +749,11 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return inSql(condition, strCol2Segment(column), sql);
     }
 
-    default Children inSql(Mut column, String sql) {
+    default Children inSql(SFunction<T, ?> column, String sql) {
         return inSql(true, column, sql);
     }
 
-    default Children inSql(boolean condition, Mut column, String sql) {
+    default Children inSql(boolean condition, SFunction<T, ?> column, String sql) {
         return inSql(condition, convMut2ColSegment(column), sql);
     }
 
@@ -779,11 +780,11 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return gtSql(condition, strCol2Segment(column), sql);
     }
 
-    default Children gtSql(Mut column, String sql) {
+    default Children gtSql(SFunction<T, ?> column, String sql) {
         return gtSql(true, column, sql);
     }
 
-    default Children gtSql(boolean condition, Mut column, String sql) {
+    default Children gtSql(boolean condition, SFunction<T, ?> column, String sql) {
         return gtSql(condition, convMut2ColSegment(column), sql);
     }
 
@@ -805,11 +806,11 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return geSql(true, column, sql);
     }
 
-    default Children geSql(Mut column, String sql) {
+    default Children geSql(SFunction<T, ?> column, String sql) {
         return geSql(true, column, sql);
     }
 
-    default Children geSql(boolean condition, Mut column, String sql) {
+    default Children geSql(boolean condition, SFunction<T, ?> column, String sql) {
         return geSql(condition, convMut2ColSegment(column), sql);
     }
 
@@ -839,11 +840,11 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return ltSql(condition, strCol2Segment(column), sql);
     }
 
-    default Children ltSql(Mut column, String sql) {
+    default Children ltSql(SFunction<T, ?> column, String sql) {
         return ltSql(true, column, sql);
     }
 
-    default Children ltSql(boolean condition, Mut column, String sql) {
+    default Children ltSql(boolean condition, SFunction<T, ?> column, String sql) {
         return ltSql(condition, convMut2ColSegment(column), sql);
     }
 
@@ -869,11 +870,11 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return leSql(condition, strCol2Segment(column), sql);
     }
 
-    default Children leSql(Mut column, String sql) {
+    default Children leSql(SFunction<T, ?> column, String sql) {
         return leSql(true, column, sql);
     }
 
-    default Children leSql(boolean condition, Mut column, String sql) {
+    default Children leSql(boolean condition, SFunction<T, ?> column, String sql) {
         return leSql(condition, convMut2ColSegment(column), sql);
     }
 
@@ -899,11 +900,11 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return notInSql(condition, strCol2Segment(column), sql);
     }
 
-    default Children notInSql(Mut column, String sql) {
+    default Children notInSql(SFunction<T, ?> column, String sql) {
         return notInSql(true, column, sql);
     }
 
-    default Children notInSql(boolean condition, Mut column, String sql) {
+    default Children notInSql(boolean condition, SFunction<T, ?> column, String sql) {
         return notInSql(condition, convMut2ColSegment(column), sql);
     }
 
@@ -948,11 +949,11 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return groupBy(condition, () -> columns.stream().filter(Objects::nonNull).collect(Collectors.joining(StringPool.COMMA)));
     }
 
-    default Children groupBy(Mut column, Mut... columns) {
+    default Children groupBy(SFunction<T, ?> column, SFunction<T, ?>... columns) {
         return groupBy(true, column, columns);
     }
 
-    default Children groupBy(boolean condition, Mut column, Mut... columns) {
+    default Children groupBy(boolean condition, SFunction<T, ?> column, SFunction<T, ?>... columns) {
         return groupBy(condition, column, ArrayUtils.isNotEmpty(columns) ? Arrays.asList(columns) : null);
     }
 
@@ -960,7 +961,7 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return groupBy(condition, strPeek(column, columns));
     }
 
-    default Children groupBy(boolean condition, Mut column, Collection<Mut> columns) {
+    default Children groupBy(boolean condition, SFunction<T, ?> column, Collection<SFunction<T, ?>> columns) {
         return groupBy(condition, mutPeek(column, columns));
     }
 
@@ -978,15 +979,7 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return orderBy(true, true, column, columns);
     }
 
-    default Children orderByAsc(Mut column, Mut... columns) {
-        return orderBy(true, true, column, columns);
-    }
-
     default Children orderByAsc(boolean condition, String column, String... columns) {
-        return orderBy(condition, true, column, columns);
-    }
-
-    default Children orderByAsc(boolean condition, Mut column, Mut... columns) {
         return orderBy(condition, true, column, columns);
     }
 
@@ -994,7 +987,15 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return orderBy(condition, true, column, columns);
     }
 
-    default Children orderByAsc(boolean condition, Mut column, Collection<Mut> columns) {
+    default Children orderByAsc(SFunction<T, ?> column, SFunction<T, ?>... columns) {
+        return orderBy(true, true, column, columns);
+    }
+
+    default Children orderByAsc(boolean condition, SFunction<T, ?> column, SFunction<T, ?>... columns) {
+        return orderBy(condition, true, column, columns);
+    }
+
+    default Children orderByAsc(boolean condition, SFunction<T, ?> column, Collection<SFunction<T, ?>> columns) {
         return orderBy(condition, true, column, columns);
     }
 
@@ -1016,19 +1017,19 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return orderBy(condition, false, column, columns);
     }
 
-    default Children orderByDesc(Mut column, Mut... columns) {
-        return orderBy(true, false, column, columns);
-    }
-
-    default Children orderByDesc(boolean condition, Mut column, Mut... columns) {
-        return orderBy(condition, false, column, columns);
-    }
-
     default Children orderByDesc(boolean condition, String column, Collection<String> columns) {
         return orderBy(condition, false, column, columns);
     }
 
-    default Children orderByDesc(boolean condition, Mut column, Collection<Mut> columns) {
+    default Children orderByDesc(SFunction<T, ?> column, SFunction<T, ?>... columns) {
+        return orderBy(true, false, column, columns);
+    }
+
+    default Children orderByDesc(boolean condition, SFunction<T, ?> column, SFunction<T, ?>... columns) {
+        return orderBy(condition, false, column, columns);
+    }
+
+    default Children orderByDesc(boolean condition, SFunction<T, ?> column, Collection<SFunction<T, ?>> columns) {
         return orderBy(condition, false, column, columns);
     }
 
@@ -1053,7 +1054,7 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return orderBy(condition, isAsc, column, ArrayUtils.isNotEmpty(columns) ? Arrays.asList(columns) : null);
     }
 
-    default Children orderBy(boolean condition, boolean isAsc, Mut column, Mut... columns) {
+    default Children orderBy(boolean condition, boolean isAsc, SFunction<T, ?> column, SFunction<T, ?>... columns) {
         return orderBy(condition, isAsc, column, ArrayUtils.isNotEmpty(columns) ? Arrays.asList(columns) : null);
     }
 
@@ -1061,7 +1062,7 @@ public interface Compare<Mut, Children> extends WiSupport<Mut>, Serializable {
         return orderBy(condition, isAsc, strPeek(column, columns));
     }
 
-    default Children orderBy(boolean condition, boolean isAsc, Mut column, Collection<Mut> columns) {
+    default Children orderBy(boolean condition, boolean isAsc, SFunction<T, ?> column, Collection<SFunction<T, ?>> columns) {
         return orderBy(condition, isAsc, mutPeek(column, columns));
     }
 

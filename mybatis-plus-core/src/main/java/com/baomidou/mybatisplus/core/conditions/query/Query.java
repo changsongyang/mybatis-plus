@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.core.conditions.interfaces.WiSupport;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ import java.util.stream.Collectors;
  * @author miemie
  * @since 2018-12-12
  */
-public interface Query<T, Mut, Children> extends WiSupport<Mut>, Serializable {
+public interface Query<T, Children> extends WiSupport<T>, Serializable {
 
     Children select(boolean condition, ISqlSegment sqlSegment);
 
@@ -41,11 +42,11 @@ public interface Query<T, Mut, Children> extends WiSupport<Mut>, Serializable {
         return select(true, column, columns);
     }
 
-    default Children select(Mut column, Mut... columns) {
+    default Children select(SFunction<T, ?> column, SFunction<T, ?>... columns) {
         return select(true, column, columns);
     }
 
-    default Children select(boolean condition, Mut column, Mut... columns) {
+    default Children select(boolean condition, SFunction<T, ?> column, SFunction<T, ?>... columns) {
         return select(condition, () -> {
             List<String> cs = new ArrayList<>();
             cs.add(convMut2ColInSel(column));

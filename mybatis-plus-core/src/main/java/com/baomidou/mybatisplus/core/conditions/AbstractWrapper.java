@@ -20,11 +20,17 @@ import com.baomidou.mybatisplus.core.conditions.interfaces.Compare;
 import com.baomidou.mybatisplus.core.conditions.interfaces.Join;
 import com.baomidou.mybatisplus.core.conditions.interfaces.Nested;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
+import com.baomidou.mybatisplus.core.conditions.segments.NormalSegmentList;
 import com.baomidou.mybatisplus.core.enums.SqlKeyword;
 import com.baomidou.mybatisplus.core.enums.SqlLike;
+import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
+import com.baomidou.mybatisplus.core.metadata.TableInfo;
+import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlScriptUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlUtils;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import lombok.Getter;
 
 import java.util.*;
 import java.util.function.BiPredicate;
@@ -44,9 +50,11 @@ import static java.util.stream.Collectors.joining;
  * @since 2017-05-26
  */
 @SuppressWarnings({"unchecked", "serial"})
-public abstract class AbstractWrapper<T, Mut, Children extends AbstractWrapper<T, Mut, Children>> extends Wrapper<T>
-    implements Compare<Mut, Children>, Nested<AbstractWrapper<T, Mut, Children>, Children>, Join<Children>, SelfChildren<Children> {
+public abstract class AbstractWrapper<T, Children extends AbstractWrapper<T, Children>> implements ISqlSegment,
+    Compare<T, Children>, Nested<AbstractWrapper<T, Children>, Children>, Join<Children> {
+    protected final Children typedThis = (Children) this;
     private WrapperNestedContext<T> context;
+    @Getter
     protected MergeSegments expression = new MergeSegments();
     protected SharedString lastSql = SharedString.emptyString();
     /**
@@ -62,32 +70,22 @@ public abstract class AbstractWrapper<T, Mut, Children extends AbstractWrapper<T
     public AbstractWrapper() {
     }
 
-    @Override
-    public Children selfOrChildren() {
-        return (Children) this;
-    }
-
-    @Override
-    public T getEntity() {
-        return getContext().getEntity();
-    }
-
     public Children setContext(WrapperNestedContext<T> context) {
         Assert.isNull(this.context, "context is initialized");
         this.context = context;
-        return selfOrChildren();
+        return typedThis;
     }
 
     public Children setEntity(T entity) {
         getContext().setEntity(entity);
-        return selfOrChildren();
+        return typedThis;
     }
 
     public Children setEntityClass(Class<T> entityClass) {
         if (entityClass != null) {
             getContext().setEntityClass(entityClass);
         }
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
@@ -103,7 +101,7 @@ public abstract class AbstractWrapper<T, Mut, Children extends AbstractWrapper<T
                 }
             });
         }
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
@@ -121,7 +119,7 @@ public abstract class AbstractWrapper<T, Mut, Children extends AbstractWrapper<T
                 }
             });
         }
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
@@ -197,22 +195,22 @@ public abstract class AbstractWrapper<T, Mut, Children extends AbstractWrapper<T
     }
 
     @Override
-    public Children and(boolean condition, Consumer<AbstractWrapper<T, Mut, Children>> consumer) {
+    public Children and(boolean condition, Consumer<AbstractWrapper<T, Children>> consumer) {
         return and(condition).addNestedCondition(condition, consumer);
     }
 
     @Override
-    public Children or(boolean condition, Consumer<AbstractWrapper<T, Mut, Children>> consumer) {
+    public Children or(boolean condition, Consumer<AbstractWrapper<T, Children>> consumer) {
         return or(condition).addNestedCondition(condition, consumer);
     }
 
     @Override
-    public Children nested(boolean condition, Consumer<AbstractWrapper<T, Mut, Children>> consumer) {
+    public Children nested(boolean condition, Consumer<AbstractWrapper<T, Children>> consumer) {
         return addNestedCondition(condition, consumer);
     }
 
     @Override
-    public Children not(boolean condition, Consumer<AbstractWrapper<T, Mut, Children>> consumer) {
+    public Children not(boolean condition, Consumer<AbstractWrapper<T, Children>> consumer) {
         return not(condition).addNestedCondition(condition, consumer);
     }
 
@@ -231,7 +229,7 @@ public abstract class AbstractWrapper<T, Mut, Children extends AbstractWrapper<T
         if (condition) {
             this.lastSql.setStringValue(StringPool.SPACE + lastSql);
         }
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
@@ -239,7 +237,7 @@ public abstract class AbstractWrapper<T, Mut, Children extends AbstractWrapper<T
         if (condition) {
             this.sqlComment.setStringValue(comment);
         }
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
@@ -247,7 +245,7 @@ public abstract class AbstractWrapper<T, Mut, Children extends AbstractWrapper<T
         if (condition) {
             this.sqlFirst.setStringValue(firstSql);
         }
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
@@ -339,9 +337,45 @@ public abstract class AbstractWrapper<T, Mut, Children extends AbstractWrapper<T
     }
 
     @Override
+    @SafeVarargs
+    public final Children groupBy(SFunction<T, ?> column, SFunction<T, ?>... columns) {
+        return Compare.super.groupBy(column, columns);
+    }
+
+    @Override
+    @SafeVarargs
+    public final Children groupBy(boolean condition, SFunction<T, ?> column, SFunction<T, ?>... columns) {
+        return Compare.super.groupBy(condition, column, columns);
+    }
+
+    @Override
     public Children orderBy(boolean condition, boolean isAsc, ISqlSegment column) {
         return maybeDo(condition, () -> Arrays.asList(column.getSqlSegment().split(StringPool.COMMA))
             .forEach(j -> appendSqlSegments(ORDER_BY, () -> j, isAsc ? ASC : DESC)));
+    }
+
+    @Override
+    @SafeVarargs
+    public final Children orderByAsc(SFunction<T, ?> column, SFunction<T, ?>... columns) {
+        return Compare.super.orderByAsc(column, columns);
+    }
+
+    @Override
+    @SafeVarargs
+    public final Children orderByAsc(boolean condition, SFunction<T, ?> column, SFunction<T, ?>... columns) {
+        return Compare.super.orderByAsc(condition, column, columns);
+    }
+
+    @Override
+    @SafeVarargs
+    public final Children orderByDesc(SFunction<T, ?> column, SFunction<T, ?>... columns) {
+        return Compare.super.orderByDesc(column, columns);
+    }
+
+    @Override
+    @SafeVarargs
+    public final Children orderByDesc(boolean condition, SFunction<T, ?> column, SFunction<T, ?>... columns) {
+        return Compare.super.orderByDesc(condition, column, columns);
     }
 
     @Override
@@ -351,7 +385,7 @@ public abstract class AbstractWrapper<T, Mut, Children extends AbstractWrapper<T
 
     @Override
     public Children func(boolean condition, Consumer<Children> consumer) {
-        return maybeDo(condition, () -> consumer.accept(selfOrChildren()));
+        return maybeDo(condition, () -> consumer.accept(typedThis));
     }
 
     /**
@@ -396,9 +430,9 @@ public abstract class AbstractWrapper<T, Mut, Children extends AbstractWrapper<T
      *
      * @param condition 查询条件值
      */
-    protected Children addNestedCondition(boolean condition, Consumer<AbstractWrapper<T, Mut, Children>> consumer) {
+    protected Children addNestedCondition(boolean condition, Consumer<AbstractWrapper<T, Children>> consumer) {
         return maybeDo(condition, () -> {
-            final AbstractWrapper<T, Mut, Children> instance = instance();
+            final AbstractWrapper<T, Children> instance = instance();
             consumer.accept(instance);
             appendSqlSegments(APPLY, instance);
         });
@@ -407,7 +441,7 @@ public abstract class AbstractWrapper<T, Mut, Children extends AbstractWrapper<T
     /**
      * 子类返回一个自己的新对象,必须无参构造函数,用于嵌套sql
      */
-    private AbstractWrapper<T, Mut, Children> instance() {
+    private AbstractWrapper<T, Children> instance() {
         try {
             return getClass().getDeclaredConstructor().newInstance().setContext(getContext());
         } catch (Exception e) {
@@ -471,7 +505,7 @@ public abstract class AbstractWrapper<T, Mut, Children extends AbstractWrapper<T
         if (condition) {
             runnable.run();
         }
-        return selfOrChildren();
+        return typedThis;
     }
 
     /**
@@ -507,7 +541,6 @@ public abstract class AbstractWrapper<T, Mut, Children extends AbstractWrapper<T
         return context;
     }
 
-    @Override
     public void clear() {
         getContext().clear();
         lastSql.toEmpty();
@@ -541,11 +574,39 @@ public abstract class AbstractWrapper<T, Mut, Children extends AbstractWrapper<T
     }
 
     @Override
-    public String getSqlSegment() {
-        return getExpression().getSqlSegment() + lastSql.getStringValue();
+    @SuppressWarnings("all")
+    public Children clone() {
+        return SerializationUtils.clone(typedThis);
     }
 
     @Override
+    public String convMut2ColInSel(SFunction<T, ?> mutable) {
+        return getContext().getColumnCache(mutable).getColumnSelect();
+    }
+
+    @Override
+    public String convMut2Col(SFunction<T, ?> mutable) {
+        return getContext().getColumnCache(mutable).getColumn();
+    }
+
+    @Override
+    public String convMut2ColMapping(SFunction<T, ?> mutable) {
+        return getContext().getColumnCache(mutable).getMapping();
+    }
+
+    @Override
+    public String checkStrCol(String column) {
+        getContext().checkStringColumn(column);
+        return column;
+    }
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    @Override
+    public String getSqlSegment() {
+        return expression.getSqlSegment() + lastSql.getStringValue();
+    }
+
     public String getSqlComment() {
         if (StringUtils.isNotBlank(sqlComment.getStringValue())) {
             return "/*" + sqlComment.getStringValue() + "*/";
@@ -553,7 +614,6 @@ public abstract class AbstractWrapper<T, Mut, Children extends AbstractWrapper<T
         return null;
     }
 
-    @Override
     public String getSqlFirst() {
         if (StringUtils.isNotBlank(sqlFirst.getStringValue())) {
             return sqlFirst.getStringValue();
@@ -561,20 +621,122 @@ public abstract class AbstractWrapper<T, Mut, Children extends AbstractWrapper<T
         return null;
     }
 
-    @Override
-    public MergeSegments getExpression() {
-        return expression;
+    /**
+     * 获取自定义SQL 简化自定义XML复杂情况
+     * <p>
+     * 使用方法: `select xxx from table` + ${ew.customSqlSegment}
+     * <p>
+     * 注意事项:
+     * 1. 逻辑删除需要自己拼接条件 (之前自定义也同样)
+     * 2. 不支持wrapper中附带实体的情况 (wrapper自带实体会更麻烦)
+     * 3. 用法 ${ew.customSqlSegment} (不需要where标签包裹,切记!)
+     * 4. ew是wrapper定义别名,不能使用其他的替换
+     */
+    public String getCustomSqlSegment() {
+        NormalSegmentList normal = expression.getNormal();
+        String sqlSegment = getSqlSegment();
+        if (StringUtils.isNotBlank(sqlSegment)) {
+            if (normal.isEmpty()) {
+                return sqlSegment;
+            } else {
+                return Constants.WHERE + StringPool.SPACE + sqlSegment;
+            }
+        }
+        return StringPool.EMPTY;
     }
 
-    @Override
-    @SuppressWarnings("all")
-    public Children clone() {
-        return SerializationUtils.clone(selfOrChildren());
+    /**
+     * 查询条件为空(包含entity)
+     */
+    public boolean isEmptyOfWhere() {
+        return isEmptyOfNormal() && isEmptyOfEntity();
     }
 
-    @Override
-    public String checkStrCol(String column) {
-        getContext().checkStringColumn(column);
-        return column;
+    /**
+     * 查询条件不为空(包含entity)
+     */
+    public boolean isNonEmptyOfWhere() {
+        return !isEmptyOfWhere();
+    }
+
+    @Deprecated
+    public boolean nonEmptyOfWhere() {
+        return isNonEmptyOfWhere();
+    }
+
+    /**
+     * 查询条件为空(不包含entity)
+     */
+    public boolean isEmptyOfNormal() {
+        return CollectionUtils.isEmpty(expression.getNormal());
+    }
+
+    /**
+     * 查询条件为空(不包含entity)
+     */
+    public boolean isNonEmptyOfNormal() {
+        return !isEmptyOfNormal();
+    }
+
+    @Deprecated
+    public boolean nonEmptyOfNormal() {
+        return isNonEmptyOfNormal();
+    }
+
+    /**
+     * 深层实体判断属性
+     *
+     * @return true 不为空
+     */
+    public boolean isNonEmptyOfEntity() {
+        T entity = getContext().getEntity();
+        if (entity == null) {
+            return false;
+        }
+        TableInfo tableInfo = TableInfoHelper.getTableInfo(entity.getClass());
+        if (tableInfo == null) {
+            return false;
+        }
+        if (tableInfo.getFieldList().stream().anyMatch(e -> fieldStrategyMatch(tableInfo, entity, e))) {
+            return true;
+        }
+        return StringUtils.isNotBlank(tableInfo.getKeyProperty()) ? Objects.nonNull(tableInfo.getPropertyValue(entity, tableInfo.getKeyProperty())) : false;
+    }
+
+    /**
+     * 根据实体FieldStrategy属性来决定判断逻辑
+     */
+    private boolean fieldStrategyMatch(TableInfo tableInfo, T entity, TableFieldInfo e) {
+        switch (e.getWhereStrategy()) {
+            case NOT_NULL:
+                return Objects.nonNull(tableInfo.getPropertyValue(entity, e.getProperty()));
+            case ALWAYS:
+                return true;
+            case NOT_EMPTY:
+                return StringUtils.checkValNotNull(tableInfo.getPropertyValue(entity, e.getProperty()));
+            case NEVER:
+                return false;
+            default:
+                return Objects.nonNull(tableInfo.getPropertyValue(entity, e.getProperty()));
+        }
+    }
+
+    /**
+     * 深层实体判断属性
+     *
+     * @return true 为空
+     */
+    public boolean isEmptyOfEntity() {
+        return !isNonEmptyOfEntity();
+    }
+
+    /**
+     * 获取格式化后的执行sql
+     *
+     * @return sql
+     * @since 3.3.1
+     */
+    public String getTargetSql() {
+        return getSqlSegment().replaceAll("#\\{.+?}", "?");
     }
 }

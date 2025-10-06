@@ -22,7 +22,7 @@ public class SqlHelperTest extends BaseDbTest<EntityMapper> {
     @Test
     public void testGetMapperAndExecute() {
 
-        List<Entity> entityList = SqlHelper.execute(Entity.class, m -> m.selectList(Wrappers.lambdaQuery()));
+        List<Entity> entityList = SqlHelper.execute(Entity.class, m -> m.selectList(Wrappers.query()));
 
         Entity ruben = new Entity();
         ruben.setId(1L);

@@ -19,10 +19,14 @@ import com.baomidou.mybatisplus.core.conditions.ISqlSegment;
 import com.baomidou.mybatisplus.core.conditions.query.Query;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
-import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
 import com.baomidou.mybatisplus.extension.conditions.AbstractChainWrapper;
+import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
@@ -32,8 +36,8 @@ import java.util.function.Predicate;
  * @since 2018-12-19
  */
 @SuppressWarnings({"serial"})
-public class QueryChainWrapper<T> extends AbstractChainWrapper<T, SFunction<T, ?>, QueryChainWrapper<T>, QueryWrapper<T>>
-    implements Query<T, SFunction<T, ?>, QueryChainWrapper<T>>, ChainQuery<T, QueryChainWrapper<T>> {
+public class QueryChainWrapper<T> extends AbstractChainWrapper<T, QueryChainWrapper<T>, QueryWrapper<T>>
+    implements Query<T, QueryChainWrapper<T>> {
 
     public QueryChainWrapper() {
         super();
@@ -55,12 +59,86 @@ public class QueryChainWrapper<T> extends AbstractChainWrapper<T, SFunction<T, ?
     @Override
     public QueryChainWrapper<T> select(boolean condition, ISqlSegment sqlSegment) {
         delegateWrapper.select(condition, sqlSegment);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public QueryChainWrapper<T> select(Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
         delegateWrapper.select(entityClass, predicate);
-        return selfOrChildren();
+        return typedThis;
+    }
+
+    @Override
+    public String getSqlSelect() {
+        throw ExceptionUtils.mpe("can not use this method for \"%s\"", "getSqlSelect");
+    }
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    /**
+     * 获取集合
+     *
+     * @return 集合
+     */
+    public List<T> list() {
+        return execute(mapper -> mapper.selectList(delegateWrapper));
+    }
+
+    /**
+     * 获取集合
+     *
+     * @param page 分页条件
+     * @return 集合记录
+     * @since 3.5.3.2
+     */
+    public List<T> list(IPage<T> page) {
+        return execute(mapper -> mapper.selectList(page, delegateWrapper));
+    }
+
+    /**
+     * 获取单个
+     *
+     * @return 单个
+     */
+    public T one() {
+        return execute(mapper -> mapper.selectOne(delegateWrapper));
+    }
+
+    /**
+     * 获取单个
+     *
+     * @return 单个
+     * @since 3.3.0
+     */
+    public Optional<T> oneOpt() {
+        return Optional.ofNullable(one());
+    }
+
+    /**
+     * 获取 count
+     *
+     * @return count
+     */
+    public Long count() {
+        return typedThis.execute(mapper -> SqlHelper.retCount(mapper.selectCount(delegateWrapper)));
+    }
+
+    /**
+     * 判断数据是否存在
+     *
+     * @return true 存在 false 不存在
+     */
+    public boolean exists() {
+        return this.count() > 0;
+    }
+
+    /**
+     * 获取分页数据
+     *
+     * @param page 分页条件
+     * @return 分页数据
+     */
+    public <E extends IPage<T>> E page(E page) {
+        return typedThis.execute(mapper -> mapper.selectPage(page, delegateWrapper));
     }
 }

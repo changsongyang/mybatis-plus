@@ -15,13 +15,14 @@
  */
 package com.baomidou.mybatisplus.extension.activerecord;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.enums.SqlMethod;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
-import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.spi.CompatibleHelper;
+import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.session.SqlSession;
@@ -99,7 +100,7 @@ public abstract class AbstractModel<T extends AbstractModel<?>> implements Seria
      *
      * @param queryWrapper 实体对象封装操作类（可以为 null）
      */
-    public boolean delete(Wrapper<T> queryWrapper) {
+    public boolean delete(UpdateWrapper<T> queryWrapper) {
         Map<String, Object> map = CollectionUtils.newHashMapWithExpectedSize(1);
         map.put(Constants.WRAPPER, queryWrapper);
         SqlSession sqlSession = sqlSession();
@@ -130,7 +131,7 @@ public abstract class AbstractModel<T extends AbstractModel<?>> implements Seria
      *
      * @param updateWrapper 实体对象封装操作类（可以为 null,里面的 entity 用于生成 where 语句）
      */
-    public boolean update(Wrapper<T> updateWrapper) {
+    public boolean update(UpdateWrapper<T> updateWrapper) {
         Map<String, Object> map = CollectionUtils.newHashMapWithExpectedSize(2);
         map.put(Constants.ENTITY, this);
         map.put(Constants.WRAPPER, updateWrapper);
@@ -181,7 +182,7 @@ public abstract class AbstractModel<T extends AbstractModel<?>> implements Seria
      *
      * @param queryWrapper 实体对象封装操作类（可以为 null）
      */
-    public List<T> selectList(Wrapper<T> queryWrapper) {
+    public List<T> selectList(QueryWrapper<T> queryWrapper) {
         Map<String, Object> map = CollectionUtils.newHashMapWithExpectedSize(1);
         map.put(Constants.WRAPPER, queryWrapper);
         SqlSession sqlSession = sqlSession();
@@ -197,7 +198,7 @@ public abstract class AbstractModel<T extends AbstractModel<?>> implements Seria
      *
      * @param queryWrapper 实体对象封装操作类（可以为 null）
      */
-    public T selectOne(Wrapper<T> queryWrapper) {
+    public T selectOne(QueryWrapper<T> queryWrapper) {
         return SqlHelper.getObject(() -> LogFactory.getLog(this.entityClass), selectList(queryWrapper));
     }
 
@@ -207,7 +208,7 @@ public abstract class AbstractModel<T extends AbstractModel<?>> implements Seria
      * @param page         翻页查询条件
      * @param queryWrapper 实体对象封装操作类（可以为 null）
      */
-    public <E extends IPage<T>> E selectPage(E page, Wrapper<T> queryWrapper) {
+    public <E extends IPage<T>> E selectPage(E page, QueryWrapper<T> queryWrapper) {
         Map<String, Object> map = CollectionUtils.newHashMapWithExpectedSize(2);
         map.put(Constants.WRAPPER, queryWrapper);
         map.put("page", page);
@@ -225,7 +226,7 @@ public abstract class AbstractModel<T extends AbstractModel<?>> implements Seria
      *
      * @param queryWrapper 实体对象封装操作类（可以为 null）
      */
-    public long selectCount(Wrapper<T> queryWrapper) {
+    public long selectCount(QueryWrapper<T> queryWrapper) {
         Map<String, Object> map = CollectionUtils.newHashMapWithExpectedSize(1);
         map.put(Constants.WRAPPER, queryWrapper);
         SqlSession sqlSession = sqlSession();

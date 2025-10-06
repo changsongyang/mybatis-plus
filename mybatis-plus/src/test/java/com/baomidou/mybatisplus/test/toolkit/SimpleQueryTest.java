@@ -1,11 +1,5 @@
 package com.baomidou.mybatisplus.test.toolkit;
 
-import static com.baomidou.mybatisplus.core.toolkit.Wrappers.lambdaQuery;
-import static java.util.stream.Collectors.*;
-import static java.util.stream.Collectors.mapping;
-import static org.apache.ibatis.util.MapUtil.entry;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.toolkit.SimpleQuery;
@@ -15,6 +9,11 @@ import com.baomidou.mybatisplus.test.rewrite.EntityMapper;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
+
+import static com.baomidou.mybatisplus.core.toolkit.Wrappers.lambdaQuery;
+import static java.util.stream.Collectors.*;
+import static org.apache.ibatis.util.MapUtil.entry;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * 简单查询工具类测试
@@ -42,7 +41,7 @@ class SimpleQueryTest extends BaseDbTest<EntityMapper> {
     void testMap() {
         // 我要这个表里对应条件的用户，用id作为key给我一个map
         Map<Long, Entity> idEntityMap = SimpleQuery.keyMap(
-            Wrappers.<Entity>lambdaQuery().eq(Entity::getId, 1L), Entity::getId);
+            Wrappers.<Entity>query().eq(Entity::getId, 1L), Entity::getId);
         // 校验结果
         Entity entity = new Entity();
         entity.setId(1L);

@@ -15,7 +15,7 @@
  */
 package com.baomidou.mybatisplus.core.batch;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.enums.SqlMethod;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
@@ -26,11 +26,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
@@ -280,13 +276,13 @@ public class MybatisBatch<T> {
         }
 
         /**
-         * 更新方法 {@link com.baomidou.mybatisplus.core.mapper.BaseMapper#update(java.lang.Object, com.baomidou.mybatisplus.core.conditions.Wrapper)}
+         * 更新方法 {@link com.baomidou.mybatisplus.core.mapper.BaseMapper#update(java.lang.Object, com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper)}
          *
          * @param wrapperFunction 更新条件(不能为null)
          * @param <E>             实体
          * @return 更新方法
          */
-        public <E> BatchMethod<E> update(Function<E, Wrapper<T>> wrapperFunction) {
+        public <E> BatchMethod<E> update(Function<E, UpdateWrapper<T>> wrapperFunction) {
             return new BatchMethod<>(namespace + StringPool.DOT + SqlMethod.UPDATE.getMethod(), (parameter) -> {
                 Map<String, Object> param = new HashMap<>();
                 param.put(Constants.WRAPPER, wrapperFunction.apply(parameter));
@@ -295,14 +291,14 @@ public class MybatisBatch<T> {
         }
 
         /**
-         * 更新方法 {@link com.baomidou.mybatisplus.core.mapper.BaseMapper#update(java.lang.Object, com.baomidou.mybatisplus.core.conditions.Wrapper)}
+         * 更新方法 {@link com.baomidou.mybatisplus.core.mapper.BaseMapper#update(java.lang.Object, com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper)}
          *
          * @param entityFunction  实体参数
          * @param wrapperFunction wrapper参数
          * @param <E>             实体
          * @return 更新方法
          */
-        public <E> BatchMethod<E> update(Function<E, T> entityFunction, Function<E, Wrapper<T>> wrapperFunction) {
+        public <E> BatchMethod<E> update(Function<E, T> entityFunction, Function<E, UpdateWrapper<T>> wrapperFunction) {
             return new BatchMethod<>(namespace + StringPool.DOT + SqlMethod.UPDATE.getMethod(), (parameter) -> {
                 Map<String, Object> param = new HashMap<>();
                 param.put(Constants.ENTITY, entityFunction.apply(parameter));

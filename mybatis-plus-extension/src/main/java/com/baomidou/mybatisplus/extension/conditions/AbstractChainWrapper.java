@@ -15,13 +15,15 @@
  */
 package com.baomidou.mybatisplus.extension.conditions;
 
-import com.baomidou.mybatisplus.core.conditions.*;
+import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
+import com.baomidou.mybatisplus.core.conditions.ISqlSegment;
+import com.baomidou.mybatisplus.core.conditions.WrapperNestedContext;
 import com.baomidou.mybatisplus.core.conditions.interfaces.Compare;
 import com.baomidou.mybatisplus.core.conditions.interfaces.Join;
 import com.baomidou.mybatisplus.core.conditions.interfaces.Nested;
-import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 
 import java.util.Collection;
@@ -40,9 +42,10 @@ import java.util.function.Supplier;
  * @since 2018-12-19
  */
 @SuppressWarnings({"unchecked", "serial"})
-public abstract class AbstractChainWrapper<T, Mut, Children extends AbstractChainWrapper<T, Mut, Children, Param>,
-    Param extends AbstractWrapper<T, Mut, Param>> extends Wrapper<T> implements Compare<Mut, Children>, Join<Children>,
-    Nested<AbstractWrapper<T, Mut, Param>, Children>, SelfChildren<Children> {
+public abstract class AbstractChainWrapper<T, Children extends AbstractChainWrapper<T, Children, Param>,
+    Param extends AbstractWrapper<T, Param>> implements Compare<T, Children>, Join<Children>,
+    Nested<AbstractWrapper<T, Param>, Children> {
+    protected final Children typedThis = (Children) this;
     /**
      * 子类所包装的具体 Wrapper 类型 delegate
      */
@@ -63,351 +66,328 @@ public abstract class AbstractChainWrapper<T, Mut, Children extends AbstractChai
         setEntityClass(entityClass);
     }
 
-    @Override
-    public Children selfOrChildren() {
-        return (Children) this;
-    }
-
-    public Param delegate() {
-        return delegateWrapper;
-    }
-
     protected abstract Param instanceDelegate();
 
     public Children setBaseMapper(BaseMapper<T> baseMapper) {
         this.baseMapper = baseMapper;
-        return selfOrChildren();
+        return typedThis;
     }
 
     public Children setContext(WrapperNestedContext<T> context) {
         delegateWrapper.setContext(context);
-        return selfOrChildren();
+        return typedThis;
     }
 
     public Children setEntity(T entity) {
         delegateWrapper.setEntity(entity);
-        return selfOrChildren();
+        return typedThis;
     }
 
     public Children setEntityClass(Class<T> entityClass) {
         delegateWrapper.setEntityClass(entityClass);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public <V> Children allEq(boolean condition, Map<String, V> params, boolean null2IsNull) {
         delegateWrapper.allEq(condition, params, null2IsNull);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public <V> Children allEq(boolean condition, BiPredicate<String, V> filter, Map<String, V> params, boolean null2IsNull) {
         delegateWrapper.allEq(condition, filter, params, null2IsNull);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children eq(boolean condition, ISqlSegment column, Object val, Supplier<String> mapping) {
         delegateWrapper.eq(condition, column, val, mapping);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children ne(boolean condition, ISqlSegment column, Object val) {
         delegateWrapper.ne(condition, column, val);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children gt(boolean condition, ISqlSegment column, Object val) {
         delegateWrapper.gt(condition, column, val);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children ge(boolean condition, ISqlSegment column, Object val) {
         delegateWrapper.ge(condition, column, val);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children lt(boolean condition, ISqlSegment column, Object val) {
         delegateWrapper.lt(condition, column, val);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children le(boolean condition, ISqlSegment column, Object val) {
         delegateWrapper.le(condition, column, val);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children between(boolean condition, ISqlSegment column, Object val1, Object val2) {
         delegateWrapper.between(condition, column, val1, val2);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children notBetween(boolean condition, ISqlSegment column, Object val1, Object val2) {
         delegateWrapper.notBetween(condition, column, val1, val2);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children like(boolean condition, ISqlSegment column, Object val) {
         delegateWrapper.like(condition, column, val);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children notLike(boolean condition, ISqlSegment column, Object val) {
         delegateWrapper.notLike(condition, column, val);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children notLikeLeft(boolean condition, ISqlSegment column, Object val) {
         delegateWrapper.notLikeLeft(condition, column, val);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children notLikeRight(boolean condition, ISqlSegment column, Object val) {
         delegateWrapper.notLikeRight(condition, column, val);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children likeLeft(boolean condition, ISqlSegment column, Object val) {
         delegateWrapper.likeLeft(condition, column, val);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children likeRight(boolean condition, ISqlSegment column, Object val) {
         delegateWrapper.likeRight(condition, column, val);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children isNull(boolean condition, ISqlSegment column) {
         delegateWrapper.isNull(condition, column);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children isNotNull(boolean condition, ISqlSegment column) {
         delegateWrapper.isNotNull(condition, column);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children in(boolean condition, ISqlSegment column, Collection<?> coll) {
         delegateWrapper.in(condition, column, coll);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children in(boolean condition, ISqlSegment column, Object... values) {
         delegateWrapper.in(condition, column, values);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children notIn(boolean condition, ISqlSegment column, Collection<?> coll) {
         delegateWrapper.notIn(condition, column, coll);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children notIn(boolean condition, ISqlSegment column, Object... values) {
         delegateWrapper.notIn(condition, column, values);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children eqSql(boolean condition, ISqlSegment column, String sql) {
         delegateWrapper.eqSql(condition, column, sql);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children inSql(boolean condition, ISqlSegment column, String sql) {
         delegateWrapper.inSql(condition, column, sql);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children gtSql(boolean condition, ISqlSegment column, String sql) {
         delegateWrapper.gtSql(condition, column, sql);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children geSql(boolean condition, ISqlSegment column, String sql) {
         delegateWrapper.geSql(condition, column, sql);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children ltSql(boolean condition, ISqlSegment column, String sql) {
         delegateWrapper.ltSql(condition, column, sql);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children leSql(boolean condition, ISqlSegment column, String sql) {
         delegateWrapper.leSql(condition, column, sql);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children notInSql(boolean condition, ISqlSegment column, String sql) {
         delegateWrapper.notInSql(condition, column, sql);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children groupBy(boolean condition, ISqlSegment column) {
         delegateWrapper.groupBy(condition, column);
-        return selfOrChildren();
+        return typedThis;
+    }
+
+    @Override
+    @SafeVarargs
+    public final Children groupBy(SFunction<T, ?> column, SFunction<T, ?>... columns) {
+        return Compare.super.groupBy(column, columns);
+    }
+
+    @Override
+    @SafeVarargs
+    public final Children groupBy(boolean condition, SFunction<T, ?> column, SFunction<T, ?>... columns) {
+        return Compare.super.groupBy(condition, column, columns);
     }
 
     @Override
     public Children orderBy(boolean condition, boolean isAsc, ISqlSegment column) {
         delegateWrapper.orderBy(condition, isAsc, column);
-        return selfOrChildren();
+        return typedThis;
+    }
+
+    @Override
+    @SafeVarargs
+    public final Children orderByAsc(SFunction<T, ?> column, SFunction<T, ?>... columns) {
+        return Compare.super.orderByAsc(column, columns);
+    }
+
+    @Override
+    @SafeVarargs
+    public final Children orderByAsc(boolean condition, SFunction<T, ?> column, SFunction<T, ?>... columns) {
+        return Compare.super.orderByAsc(condition, column, columns);
+    }
+
+    @Override
+    @SafeVarargs
+    public final Children orderByDesc(SFunction<T, ?> column, SFunction<T, ?>... columns) {
+        return Compare.super.orderByDesc(column, columns);
+    }
+
+    @Override
+    @SafeVarargs
+    public final Children orderByDesc(boolean condition, SFunction<T, ?> column, SFunction<T, ?>... columns) {
+        return Compare.super.orderByDesc(condition, column, columns);
     }
 
     @Override
     public Children having(boolean condition, String sqlHaving, Object... params) {
         delegateWrapper.having(condition, sqlHaving, params);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children func(boolean condition, Consumer<Children> consumer) {
         if (condition) {
-            consumer.accept(selfOrChildren());
+            consumer.accept(typedThis);
         }
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children or(boolean condition) {
         delegateWrapper.or(condition);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children apply(boolean condition, String applySql, Object... values) {
         delegateWrapper.apply(condition, applySql, values);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children last(boolean condition, String lastSql) {
         delegateWrapper.last(condition, lastSql);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children comment(boolean condition, String comment) {
         delegateWrapper.comment(condition, comment);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children first(boolean condition, String firstSql) {
         delegateWrapper.first(condition, firstSql);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children exists(boolean condition, String existsSql, Object... values) {
         delegateWrapper.exists(condition, existsSql, values);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
     public Children notExists(boolean condition, String existsSql, Object... values) {
         delegateWrapper.notExists(condition, existsSql, values);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
-    public Children and(boolean condition, Consumer<AbstractWrapper<T, Mut, Param>> consumer) {
+    public Children and(boolean condition, Consumer<AbstractWrapper<T, Param>> consumer) {
         delegateWrapper.and(condition, consumer);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
-    public Children or(boolean condition, Consumer<AbstractWrapper<T, Mut, Param>> consumer) {
+    public Children or(boolean condition, Consumer<AbstractWrapper<T, Param>> consumer) {
         delegateWrapper.or(condition, consumer);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
-    public Children nested(boolean condition, Consumer<AbstractWrapper<T, Mut, Param>> consumer) {
+    public Children nested(boolean condition, Consumer<AbstractWrapper<T, Param>> consumer) {
         delegateWrapper.nested(condition, consumer);
-        return selfOrChildren();
+        return typedThis;
     }
 
     @Override
-    public Children not(boolean condition, Consumer<AbstractWrapper<T, Mut, Param>> consumer) {
+    public Children not(boolean condition, Consumer<AbstractWrapper<T, Param>> consumer) {
         delegateWrapper.not(condition, consumer);
-        return selfOrChildren();
-    }
-
-    @Override
-    public String getSqlSegment() {
-        throw ExceptionUtils.mpe("can not use this method for \"%s\"", "getSqlSegment");
-    }
-
-    @Override
-    public String getSqlFirst() {
-        throw ExceptionUtils.mpe("can not use this method for \"%s\"", "getSqlFirst");
-    }
-
-    @Override
-    public String getSqlSelect() {
-        throw ExceptionUtils.mpe("can not use this method for \"%s\"", "getSqlSelect");
-    }
-
-    @Override
-    public String getSqlSet() {
-        throw ExceptionUtils.mpe("can not use this method for \"%s\"", "getSqlSet");
-    }
-
-    @Override
-    public String getSqlComment() {
-        throw ExceptionUtils.mpe("can not use this method for \"%s\"", "getSqlComment");
-    }
-
-    @Override
-    public String getTargetSql() {
-        throw ExceptionUtils.mpe("can not use this method for \"%s\"", "getTargetSql");
-    }
-
-    @Override
-    public T getEntity() {
-        throw ExceptionUtils.mpe("can not use this method for \"%s\"", "getEntity");
-    }
-
-    @Override
-    public MergeSegments getExpression() {
-        throw ExceptionUtils.mpe("can not use this method for \"%s\"", "getExpression");
-    }
-
-    @Override
-    public String getCustomSqlSegment() {
-        throw ExceptionUtils.mpe("can not use this method for \"%s\"", "getCustomSqlSegment");
-    }
-
-    @Override
-    public void clear() {
-        throw ExceptionUtils.mpe("can not use this method for \"%s\"", "clear");
+        return typedThis;
     }
 
     @Override
@@ -416,17 +396,17 @@ public abstract class AbstractChainWrapper<T, Mut, Children extends AbstractChai
     }
 
     @Override
-    public String convMut2ColInSel(Mut mutable) {
+    public String convMut2ColInSel(SFunction<T, ?> mutable) {
         throw ExceptionUtils.mpe("can not use this method for \"%s\"", "convMut2ColInSel");
     }
 
     @Override
-    public String convMut2Col(Mut mutable) {
+    public String convMut2Col(SFunction<T, ?> mutable) {
         throw ExceptionUtils.mpe("can not use this method for \"%s\"", "convMut2Col");
     }
 
     @Override
-    public String convMut2ColMapping(Mut mutable) {
+    public String convMut2ColMapping(SFunction<T, ?> mutable) {
         throw ExceptionUtils.mpe("can not use this method for \"%s\"", "convMut2ColMapping");
     }
 
