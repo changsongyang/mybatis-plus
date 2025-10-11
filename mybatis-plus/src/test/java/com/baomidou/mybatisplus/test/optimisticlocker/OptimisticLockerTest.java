@@ -1,9 +1,9 @@
 package com.baomidou.mybatisplus.test.optimisticlocker;
 
+import com.baomidou.mybatisplus.core.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.core.toolkit.SqlHelper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
-import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import com.baomidou.mybatisplus.test.BaseDbTest;
 import org.apache.ibatis.plugin.Interceptor;
 import org.junit.jupiter.api.Assertions;
@@ -40,13 +40,13 @@ public class OptimisticLockerTest extends BaseDbTest<EntityMapper> {
 
 
         doTestAutoCommit(m -> {
-            int update = m.update(new Entity().setName("老王"), Wrappers.<Entity>query().eq("id", 2));
+            int update = m.update(new Entity().setName("老王"), Wrappers.<Entity>update().eq("id", 2));
             assertThat(update).as("更新成功").isEqualTo(1);
 
             Entity entity = m.selectById(2L);
             assertThat(entity.getVersion()).as("因为没给version赋值就没走插件").isEqualTo(0);
 
-            update = m.update(new Entity().setName("老王").setVersion(0), Wrappers.<Entity>query().eq("id", 2));
+            update = m.update(new Entity().setName("老王").setVersion(0), Wrappers.<Entity>update().eq("id", 2));
             assertThat(update).as("更新成功").isEqualTo(1);
 
             entity = m.selectById(2L);

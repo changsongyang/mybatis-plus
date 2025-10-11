@@ -1,7 +1,7 @@
 package com.baomidou.mybatisplus.test.puginsome;
 
-import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
-import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
+import com.baomidou.mybatisplus.core.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.core.plugins.inner.InnerInterceptor;
 import com.baomidou.mybatisplus.test.BaseDbTest;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.executor.statement.StatementHandler;

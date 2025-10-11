@@ -1,11 +1,11 @@
 package com.baomidou.mybatisplus.extension.repository;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.MapperProxyMetadata;
 import com.baomidou.mybatisplus.core.toolkit.MybatisUtils;
+import com.baomidou.mybatisplus.core.toolkit.SqlHelper;
 import com.baomidou.mybatisplus.core.toolkit.reflect.GenericTypeUtils;
-import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.session.SqlSession;
@@ -74,22 +74,22 @@ public abstract class AbstractRepository<M extends BaseMapper<T>, T>  implements
     }
 
     @Override
-    public T getOne(Wrapper<T> queryWrapper, boolean throwEx) {
+    public T getOne(QueryWrapper<T> queryWrapper, boolean throwEx) {
         return getBaseMapper().selectOne(queryWrapper, throwEx);
     }
 
     @Override
-    public Optional<T> getOneOpt(Wrapper<T> queryWrapper, boolean throwEx) {
+    public Optional<T> getOneOpt(QueryWrapper<T> queryWrapper, boolean throwEx) {
         return Optional.ofNullable(getBaseMapper().selectOne(queryWrapper, throwEx));
     }
 
     @Override
-    public Map<String, Object> getMap(Wrapper<T> queryWrapper) {
+    public Map<String, Object> getMap(QueryWrapper<T> queryWrapper) {
         return SqlHelper.getObject(log, getBaseMapper().selectMaps(queryWrapper));
     }
 
     @Override
-    public <V> V getObj(Wrapper<T> queryWrapper, Function<? super Object, V> mapper) {
+    public <V> V getObj(QueryWrapper<T> queryWrapper, Function<? super Object, V> mapper) {
         return SqlHelper.getObject(log, listObjs(queryWrapper, mapper));
     }
 

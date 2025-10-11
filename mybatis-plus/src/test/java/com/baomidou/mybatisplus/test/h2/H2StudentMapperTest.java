@@ -1,11 +1,10 @@
 package com.baomidou.mybatisplus.test.h2;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.test.h2.entity.H2Student;
 import com.baomidou.mybatisplus.test.h2.enums.GenderEnum;
 import com.baomidou.mybatisplus.test.h2.enums.GradeEnum;
@@ -81,8 +80,8 @@ class H2StudentMapperTest extends BaseTest {
      */
     @Test
     void groupByOrderBy() {
-        LambdaQueryWrapper<H2Student> wrapper = Wrappers.<H2Student>lambdaQuery().groupBy(H2Student::getAge);
-        LambdaQueryWrapper<H2Student> wrapper2 = Wrappers.<H2Student>lambdaQuery().orderByAsc(H2Student::getAge);
+        QueryWrapper<H2Student> wrapper = Wrappers.<H2Student>query().groupBy(H2Student::getAge);
+        QueryWrapper<H2Student> wrapper2 = Wrappers.<H2Student>query().orderByAsc(H2Student::getAge);
         System.out.println(wrapper.getSqlSegment());
         Assertions.assertEquals(" GROUP BY age", wrapper.getSqlSegment());
         Assertions.assertEquals(" ORDER BY age ASC", wrapper2.getSqlSegment());
@@ -97,7 +96,7 @@ class H2StudentMapperTest extends BaseTest {
 
     @Test
     void testIn() {
-        LambdaQueryWrapper<H2Student> wrapper = Wrappers.<H2Student>lambdaQuery().in(H2Student::getName, Arrays.asList("a", "b"));
+        QueryWrapper<H2Student> wrapper = Wrappers.<H2Student>query().in(H2Student::getName, Arrays.asList("a", "b"));
         studentMapper.selectList(wrapper);
     }
 

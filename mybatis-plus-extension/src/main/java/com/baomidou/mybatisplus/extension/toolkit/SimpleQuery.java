@@ -15,27 +15,17 @@
  */
 package com.baomidou.mybatisplus.extension.toolkit;
 
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.LambdaUtils;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+
+import java.util.*;
+import java.util.function.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.baomidou.mybatisplus.core.toolkit.LambdaUtils;
-import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 
 /**
  * simple-query 让简单的查询更简单
@@ -64,7 +54,7 @@ public class SimpleQuery {
      * ignore
      */
     @SafeVarargs
-    public static <E, A> Map<A, E> keyMap(LambdaQueryWrapper<E> wrapper, SFunction<E, A> sFunction, Consumer<E>... peeks) {
+    public static <E, A> Map<A, E> keyMap(QueryWrapper<E> wrapper, SFunction<E, A> sFunction, Consumer<E>... peeks) {
         return list2Map(Db.list(wrapper.setEntityClass(getType(sFunction))), sFunction, Function.identity(), peeks);
     }
 
@@ -80,7 +70,7 @@ public class SimpleQuery {
      * @return Map<实体中的属性, 实体>
      */
     @SafeVarargs
-    public static <E, A> Map<A, E> keyMap(LambdaQueryWrapper<E> wrapper, SFunction<E, A> sFunction, boolean isParallel, Consumer<E>... peeks) {
+    public static <E, A> Map<A, E> keyMap(QueryWrapper<E> wrapper, SFunction<E, A> sFunction, boolean isParallel, Consumer<E>... peeks) {
         return list2Map(Db.list(wrapper.setEntityClass(getType(sFunction))), sFunction, Function.identity(), isParallel, peeks);
     }
 
@@ -88,7 +78,7 @@ public class SimpleQuery {
      * ignore
      */
     @SafeVarargs
-    public static <E, A, P> Map<A, P> map(LambdaQueryWrapper<E> wrapper, SFunction<E, A> keyFunc, SFunction<E, P> valueFunc, Consumer<E>... peeks) {
+    public static <E, A, P> Map<A, P> map(QueryWrapper<E> wrapper, SFunction<E, A> keyFunc, SFunction<E, P> valueFunc, Consumer<E>... peeks) {
         return list2Map(Db.list(wrapper.setEntityClass(getType(keyFunc))), keyFunc, valueFunc, peeks);
     }
 
@@ -106,7 +96,7 @@ public class SimpleQuery {
      * @return Map<实体中的属性, 实体>
      */
     @SafeVarargs
-    public static <E, A, P> Map<A, P> map(LambdaQueryWrapper<E> wrapper, SFunction<E, A> keyFunc, SFunction<E, P> valueFunc, boolean isParallel, Consumer<E>... peeks) {
+    public static <E, A, P> Map<A, P> map(QueryWrapper<E> wrapper, SFunction<E, A> keyFunc, SFunction<E, P> valueFunc, boolean isParallel, Consumer<E>... peeks) {
         return list2Map(Db.list(wrapper.setEntityClass(getType(keyFunc))), keyFunc, valueFunc, isParallel, peeks);
     }
 
@@ -114,7 +104,7 @@ public class SimpleQuery {
      * ignore
      */
     @SafeVarargs
-    public static <E, A> Map<A, List<E>> group(LambdaQueryWrapper<E> wrapper, SFunction<E, A> sFunction, Consumer<E>... peeks) {
+    public static <E, A> Map<A, List<E>> group(QueryWrapper<E> wrapper, SFunction<E, A> sFunction, Consumer<E>... peeks) {
         return listGroupBy(Db.list(wrapper.setEntityClass(getType(sFunction))), sFunction, peeks);
     }
 
@@ -122,7 +112,7 @@ public class SimpleQuery {
      * ignore
      */
     @SafeVarargs
-    public static <T, K> Map<K, List<T>> group(LambdaQueryWrapper<T> wrapper, SFunction<T, K> sFunction, boolean isParallel, Consumer<T>... peeks) {
+    public static <T, K> Map<K, List<T>> group(QueryWrapper<T> wrapper, SFunction<T, K> sFunction, boolean isParallel, Consumer<T>... peeks) {
         return listGroupBy(Db.list(wrapper.setEntityClass(getType(sFunction))), sFunction, isParallel, peeks);
     }
 
@@ -130,7 +120,7 @@ public class SimpleQuery {
      * ignore
      */
     @SafeVarargs
-    public static <T, K, D, A> Map<K, D> group(LambdaQueryWrapper<T> wrapper, SFunction<T, K> sFunction, Collector<T, A, D> downstream, Consumer<T>... peeks) {
+    public static <T, K, D, A> Map<K, D> group(QueryWrapper<T> wrapper, SFunction<T, K> sFunction, Collector<T, A, D> downstream, Consumer<T>... peeks) {
         return listGroupBy(Db.list(wrapper.setEntityClass(getType(sFunction))), sFunction, downstream, false, peeks);
     }
 
@@ -149,7 +139,7 @@ public class SimpleQuery {
      * @return Map<实体中的属性, List < 实体>>
      */
     @SafeVarargs
-    public static <T, K, D, A> Map<K, D> group(LambdaQueryWrapper<T> wrapper, SFunction<T, K> sFunction, Collector<T, A, D> downstream, boolean isParallel, Consumer<T>... peeks) {
+    public static <T, K, D, A> Map<K, D> group(QueryWrapper<T> wrapper, SFunction<T, K> sFunction, Collector<T, A, D> downstream, boolean isParallel, Consumer<T>... peeks) {
         return listGroupBy(Db.list(wrapper.setEntityClass(getType(sFunction))), sFunction, downstream, isParallel, peeks);
     }
 
@@ -157,7 +147,7 @@ public class SimpleQuery {
      * ignore
      */
     @SafeVarargs
-    public static <E, A> List<A> list(LambdaQueryWrapper<E> wrapper, SFunction<E, A> sFunction, Consumer<E>... peeks) {
+    public static <E, A> List<A> list(QueryWrapper<E> wrapper, SFunction<E, A> sFunction, Consumer<E>... peeks) {
         return list2List(Db.list(wrapper.setEntityClass(getType(sFunction))), sFunction, peeks);
     }
 
@@ -172,7 +162,7 @@ public class SimpleQuery {
      * @since 2021/11/9 17:59
      */
     @SafeVarargs
-    public static <E, A> List<A> list(LambdaQueryWrapper<E> wrapper, SFunction<E, A> sFunction, boolean isParallel, Consumer<E>... peeks) {
+    public static <E, A> List<A> list(QueryWrapper<E> wrapper, SFunction<E, A> sFunction, boolean isParallel, Consumer<E>... peeks) {
         return list2List(Db.list(wrapper.setEntityClass(getType(sFunction))), sFunction, isParallel, peeks);
     }
 

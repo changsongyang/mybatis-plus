@@ -1,16 +1,11 @@
 package com.baomidou.mybatisplus.test.h2;
 
 import com.baomidou.mybatisplus.core.batch.MybatisBatch;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.baomidou.mybatisplus.core.toolkit.IdWorker;
-import com.baomidou.mybatisplus.core.toolkit.MybatisBatchUtils;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
+import com.baomidou.mybatisplus.core.plugins.pagination.Page;
+import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.test.h2.entity.H2User;
 import com.baomidou.mybatisplus.test.h2.entity.SuperEntity;
 import com.baomidou.mybatisplus.test.h2.enums.AgeEnum;
@@ -26,12 +21,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
@@ -200,8 +190,8 @@ class H2UserMapperTest extends BaseTest {
         List<Long> ids = Arrays.asList(120000L, 120001L);
         MybatisBatch.Method<H2User> method = new MybatisBatch.Method<>(H2UserMapper.class);
 
-        Assertions.assertFalse(SqlHelper.retBool(MybatisBatchUtils.execute(sqlSessionFactory, ids, method.update(id -> Wrappers.<H2User>lambdaUpdate().set(H2User::getName, "updateTest").eq(H2User::getTestId, id)))));
-        Assertions.assertFalse(SqlHelper.retBool(MybatisBatchUtils.execute(sqlSessionFactory, ids, method.update(id -> new H2User().setName("updateTest2"), id -> Wrappers.<H2User>lambdaUpdate().eq(H2User::getTestId, id)))));
+        Assertions.assertFalse(SqlHelper.retBool(MybatisBatchUtils.execute(sqlSessionFactory, ids, method.update(id -> Wrappers.<H2User>update().set(H2User::getName, "updateTest").eq(H2User::getTestId, id)))));
+        Assertions.assertFalse(SqlHelper.retBool(MybatisBatchUtils.execute(sqlSessionFactory, ids, method.update(id -> new H2User().setName("updateTest2"), id -> Wrappers.<H2User>update().eq(H2User::getTestId, id)))));
 
         Assertions.assertFalse(SqlHelper.retBool(MybatisBatchUtils.execute(sqlSessionFactory, h2UserList, method.update(user -> Wrappers.<H2User>update().set("name", "updateTest3").eq("test_id", user.getTestId())))));
         Assertions.assertFalse(SqlHelper.retBool(MybatisBatchUtils.execute(sqlSessionFactory, h2UserList, method.update(user -> new H2User("updateTests4"), p -> Wrappers.<H2User>update().eq("test_id", p.getTestId())))));
@@ -375,7 +365,7 @@ class H2UserMapperTest extends BaseTest {
         Assertions.assertEquals(1, userMapper.deleteByMap(map));
 
         // 查询列表
-        LambdaQueryWrapper<H2User> wrapper = new QueryWrapper<H2User>().lambda().like(H2User::getName, "mp");
+        QueryWrapper<H2User> wrapper = new QueryWrapper<H2User>().like(H2User::getName, "mp");
         log(wrapper.getSqlSegment());
 
         List<H2User> h2UserList = userMapper.selectList(wrapper);
@@ -392,14 +382,14 @@ class H2UserMapperTest extends BaseTest {
         h2User = new H2User();
         h2User.setAge(AgeEnum.TWO);
         h2User.setDesc("测试置空");
-        Assertions.assertEquals(1, userMapper.update(h2User, new QueryWrapper<H2User>().eq("name", NQQ)));
+        Assertions.assertEquals(1, userMapper.update(h2User, new UpdateWrapper<H2User>().eq("name", NQQ)));
 
         log(userMapper.selectOne(new QueryWrapper<>(new H2User().setName(NQQ).setAge(AgeEnum.TWO))));
 
         h2User.setAge(AgeEnum.THREE);
         h2User.setDesc(null);
         Assertions.assertTrue(userMapper.update(h2User,
-                new UpdateWrapper<H2User>().lambda()
+            new UpdateWrapper<H2User>()
                         .set(H2User::getDesc, "")
                         .eq(H2User::getName, "Jerry")) > 0);
 
@@ -430,7 +420,7 @@ class H2UserMapperTest extends BaseTest {
 
         // 查询结果集，测试 lambda 对象后 QueryWrapper 是否参数继续传递
         QueryWrapper<H2User> qw = new QueryWrapper<>();
-        qw.lambda().eq(H2User::getName, NQQ);
+        qw.eq(H2User::getName, NQQ);
         List<Map<String, Object>> mapList = userMapper.selectMaps(qw);
         if (CollectionUtils.isNotEmpty(mapList)) {
             for (Map<String, Object> m : mapList) {
@@ -454,29 +444,29 @@ class H2UserMapperTest extends BaseTest {
     @Test
     @Order(Integer.MAX_VALUE)
     void delete() {
-        userMapper.delete(new QueryWrapper<>(new H2User().setAge(AgeEnum.TWO))
+        userMapper.delete(new UpdateWrapper<>(new H2User().setAge(AgeEnum.TWO))
                 .eq("name", "Tony"));
     }
 
     @Test
     @Order(Integer.MAX_VALUE)
     void sqlCommentTest() {
-        userMapper.delete(new QueryWrapper<H2User>().comment("deleteAllUsers"));
+        userMapper.delete(new UpdateWrapper<H2User>().comment("deleteAllUsers"));
         String name = "name1", nameNew = "name1New";
         int insertCount = userMapper.insert(new H2User().setName(name).setAge(AgeEnum.ONE));
         Assertions.assertEquals(1, insertCount);
         int updateCount = userMapper.update(new H2User(),
-                new UpdateWrapper<H2User>().comment("updateUserName1").lambda()
+            new UpdateWrapper<H2User>().comment("updateUserName1")
                         .set(H2User::getName, nameNew)
                         .eq(H2User::getName, name)
         );
         Assertions.assertEquals(1, updateCount);
         H2User h2User = userMapper.selectOne(
-                new QueryWrapper<H2User>().lambda().comment("getUserByUniqueName")
+            new QueryWrapper<H2User>().comment("getUserByUniqueName")
                         .eq(H2User::getName, nameNew)
         );
         Assertions.assertNotNull(h2User);
-        LambdaQueryWrapper<H2User> queryWrapper = new QueryWrapper<H2User>().lambda().ge(H2User::getAge, 1);
+        QueryWrapper<H2User> queryWrapper = new QueryWrapper<H2User>().ge(H2User::getAge, 1);
         long userCount = userMapper.selectCount(queryWrapper.comment("getUserCount"));
         Assertions.assertEquals(1, userCount);
         List<H2User> h2UserList = userMapper.selectList(queryWrapper.comment("getUserList"));
@@ -508,7 +498,7 @@ class H2UserMapperTest extends BaseTest {
     void testUpdateByWrapper() {
         var h2User = new H2User();
         userMapper.insert(h2User);
-        var wrapper = Wrappers.<H2User>lambdaUpdate().set(H2User::getName, "testUpdateByWrapper").eq(H2User::getTestId, h2User.getTestId());
+        var wrapper = Wrappers.<H2User>update().set(H2User::getName, "testUpdateByWrapper").eq(H2User::getTestId, h2User.getTestId());
         Assertions.assertEquals(1, userMapper.update(wrapper));
         Assertions.assertEquals("testUpdateByWrapper", userMapper.selectById(h2User.getTestId()).getName());
     }

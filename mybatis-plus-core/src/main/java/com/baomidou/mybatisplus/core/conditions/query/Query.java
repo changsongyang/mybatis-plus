@@ -15,60 +15,67 @@
  */
 package com.baomidou.mybatisplus.core.conditions.query;
 
+import com.baomidou.mybatisplus.core.conditions.ISqlSegment;
+import com.baomidou.mybatisplus.core.conditions.interfaces.SfSupport;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
+import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * @author miemie
  * @since 2018-12-12
  */
-public interface Query<Children, T, R> extends Serializable {
+public interface Query<T, Children> extends SfSupport<T>, Serializable {
 
-    /**
-     * 指定查询字段
-     *
-     * @param columns 字段列表
-     * @return children
-     */
-    @SuppressWarnings("unchecked")
-    default Children select(R... columns) {
+    Children select(boolean condition, ISqlSegment sqlSegment);
+
+    default Children select(String column, String... columns) {
+        return select(true, column, columns);
+    }
+
+    default Children select(SFunction<T, ?> column, SFunction<T, ?>... columns) {
+        return select(true, column, columns);
+    }
+
+    default Children select(boolean condition, SFunction<T, ?> column, SFunction<T, ?>... columns) {
+        return select(condition, () -> {
+            List<String> cs = new ArrayList<>();
+            cs.add(convSf2ColInSel(column));
+            if (ArrayUtils.isNotEmpty(columns)) {
+                cs.addAll(Arrays.stream(columns).filter(Objects::nonNull).map(this::convSf2ColInSel)
+                    .collect(Collectors.toList()));
+            }
+            return String.join(StringPool.COMMA, cs);
+        });
+    }
+
+    default Children select(boolean condition, String column, String... columns) {
+        return select(condition, () -> {
+            List<String> cs = new ArrayList<>();
+            cs.add(column);
+            if (ArrayUtils.isNotEmpty(columns)) {
+                cs.addAll(Arrays.stream(columns).filter(Objects::nonNull).collect(Collectors.toList()));
+            }
+            return String.join(StringPool.COMMA, cs);
+        });
+    }
+
+    default Children select(List<String> columns) {
         return select(true, columns);
     }
 
-    /**
-     * 指定查询字段
-     *
-     * @param condition 执行条件
-     * @param columns   字段列表
-     * @return children
-     */
-    @SuppressWarnings("unchecked")
-    default Children select(boolean condition, R... columns) {
-        return select(condition, Arrays.asList(columns));
+    default Children select(boolean condition, List<String> columns) {
+        return select(condition, () -> String.join(StringPool.COMMA, columns));
     }
-
-    /**
-     * 指定查询字段
-     *
-     * @param columns   字段列表
-     * @return children
-     */
-    default Children select(List<R> columns) {
-        return select(true, columns);
-    }
-
-    /**
-     * 指定查询字段
-     *
-     * @param condition 执行条件
-     * @param columns   字段列表
-     * @return children
-     */
-    Children select(boolean condition, List<R> columns);
 
     /**
      * 过滤查询的字段信息(主键除外!)

@@ -17,6 +17,7 @@ package com.baomidou.mybatisplus.extension.plugins.inner;
 
 import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
 import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
+import com.baomidou.mybatisplus.core.plugins.inner.InnerInterceptor;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.EncryptUtils;
 import com.baomidou.mybatisplus.core.toolkit.PluginUtils;
@@ -35,11 +36,7 @@ import net.sf.jsqlparser.expression.operators.relational.ParenthesedExpressionLi
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.delete.Delete;
-import net.sf.jsqlparser.statement.select.FromItem;
-import net.sf.jsqlparser.statement.select.Join;
-import net.sf.jsqlparser.statement.select.ParenthesedSelect;
-import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.statement.update.Update;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
@@ -50,13 +47,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**

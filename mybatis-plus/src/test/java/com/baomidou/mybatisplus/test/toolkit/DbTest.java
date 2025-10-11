@@ -1,18 +1,16 @@
 package com.baomidou.mybatisplus.test.toolkit;
 
 import com.baomidou.mybatisplus.annotation.DbType;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryChainWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateChainWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.core.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.spi.CompatibleHelper;
 import com.baomidou.mybatisplus.core.spi.CompatibleSet;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
-import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
-import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
-import com.baomidou.mybatisplus.extension.conditions.update.UpdateChainWrapper;
-import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.toolkit.Db;
 import com.baomidou.mybatisplus.test.BaseDbTest;
 import com.baomidou.mybatisplus.test.sqlrunner.Entity;
@@ -91,14 +89,14 @@ class DbTest extends BaseDbTest<EntityMapper> {
 
     @Test
     void testUpdate() {
-        boolean isSuccess = Db.update(Wrappers.lambdaUpdate(Entity.class).eq(Entity::getId, 1L).set(Entity::getName, "be better"));
+        boolean isSuccess = Db.update(Wrappers.update(Entity.class).eq(Entity::getId, 1L).set(Entity::getName, "be better"));
         Assertions.assertTrue(isSuccess);
         assertEquals("be better", Db.getById(1L, Entity.class).getName());
 
         Entity entity = new Entity();
         entity.setId(1L);
         entity.setName("bee bee I'm a sheep");
-        isSuccess = Db.update(entity, Wrappers.lambdaQuery(Entity.class).eq(Entity::getId, 1L));
+        isSuccess = Db.update(entity, Wrappers.update(Entity.class).eq(Entity::getId, 1L));
         Assertions.assertTrue(isSuccess);
         assertEquals("bee bee I'm a sheep", Db.getById(1L, Entity.class).getName());
     }
@@ -120,7 +118,7 @@ class DbTest extends BaseDbTest<EntityMapper> {
 
     @Test
     void testRemove() {
-        boolean isSuccess = Db.remove(Wrappers.lambdaQuery(Entity.class).eq(Entity::getId, 1L));
+        boolean isSuccess = Db.remove(Wrappers.update(Entity.class).eq(Entity::getId, 1L));
         Assertions.assertTrue(isSuccess);
         assertEquals(1, Db.count(Entity.class));
     }
@@ -149,14 +147,14 @@ class DbTest extends BaseDbTest<EntityMapper> {
         assertEquals("bee bee I'm a sheep", Db.getById(entity.getId(), Entity.class).getName());
 
         entity.setName("be better");
-        isSuccess = Db.saveOrUpdate(entity, Wrappers.lambdaQuery(Entity.class).eq(Entity::getId, entity.getId()));
+        isSuccess = Db.saveOrUpdate(entity, Wrappers.update(Entity.class).eq(Entity::getId, entity.getId()));
         Assertions.assertTrue(isSuccess);
         assertEquals("be better", Db.getById(entity.getId(), Entity.class).getName());
     }
 
     @Test
     void testGetOne() {
-        LambdaQueryWrapper<Entity> wrapper = Wrappers.lambdaQuery(Entity.class);
+        QueryWrapper<Entity> wrapper = Wrappers.query(Entity.class);
         Assertions.assertThrows(TooManyResultsException.class, () -> Db.getOne(wrapper));
         Entity one = Db.getOne(wrapper, false);
         Assertions.assertNotNull(one);
@@ -183,7 +181,7 @@ class DbTest extends BaseDbTest<EntityMapper> {
 
     @Test
     void testGetMap() {
-        Map<String, Object> map = Db.getMap(Wrappers.lambdaQuery(Entity.class));
+        Map<String, Object> map = Db.getMap(Wrappers.query(Entity.class));
         Assertions.assertNotNull(map);
 
         Entity entity = new Entity();
@@ -194,7 +192,7 @@ class DbTest extends BaseDbTest<EntityMapper> {
 
     @Test
     void testList() {
-        List<Entity> list = Db.list(Wrappers.lambdaQuery(Entity.class));
+        List<Entity> list = Db.list(Wrappers.query(Entity.class));
         assertEquals(2, list.size());
 
         list = Db.list(Entity.class);
@@ -208,7 +206,7 @@ class DbTest extends BaseDbTest<EntityMapper> {
 
     @Test
     void testListMaps() {
-        List<Map<String, Object>> list = Db.listMaps(Wrappers.lambdaQuery(Entity.class));
+        List<Map<String, Object>> list = Db.listMaps(Wrappers.query(Entity.class));
         assertEquals(2, list.size());
 
         list = Db.listMaps(Entity.class);
@@ -225,7 +223,7 @@ class DbTest extends BaseDbTest<EntityMapper> {
         List<Entity> list = Db.listObjs(Entity.class);
         assertEquals(2, list.size());
 
-        List<Long> objectList = Db.listObjs(Wrappers.lambdaQuery(Entity.class), Entity::getId);
+        List<Long> objectList = Db.listObjs(Wrappers.query(Entity.class), Entity::getId);
         assertEquals(2, objectList.size());
 
         List<String> names = Db.listObjs(Entity.class, Entity::getName);
@@ -246,10 +244,10 @@ class DbTest extends BaseDbTest<EntityMapper> {
 
         assertEquals(Db.listMaps(new Page<>(1, 1, false), Entity.class).size(), page.getRecords().size());
 
-        page = Db.pageMaps(new Page<>(1, 1), Wrappers.lambdaQuery(Entity.class));
+        page = Db.pageMaps(new Page<>(1, 1), Wrappers.query(Entity.class));
         assertEquals(1, page.getRecords().size());
 
-        assertEquals(Db.listMaps(new Page<>(1, 1, false), Wrappers.lambdaQuery(Entity.class)).size(), page.getRecords().size());
+        assertEquals(Db.listMaps(new Page<>(1, 1, false), Wrappers.query(Entity.class)).size(), page.getRecords().size());
     }
 
     @Test
@@ -258,10 +256,10 @@ class DbTest extends BaseDbTest<EntityMapper> {
         assertEquals(2, page.getTotal());
         assertEquals(Db.list(new Page<Entity>(1, 1), Entity.class).size(), page.getRecords().size());
 
-        page = Db.page(new Page<>(1, 1), Wrappers.lambdaQuery(Entity.class));
+        page = Db.page(new Page<>(1, 1), Wrappers.query(Entity.class));
         assertEquals(1, page.getRecords().size());
 
-        assertEquals(Db.list(new Page<Entity>(1, 1), Wrappers.lambdaQuery(Entity.class)).size(), page.getRecords().size());
+        assertEquals(Db.list(new Page<Entity>(1, 1), Wrappers.query(Entity.class)).size(), page.getRecords().size());
     }
 
     @Test
@@ -270,7 +268,7 @@ class DbTest extends BaseDbTest<EntityMapper> {
         List<Entity> list = query.eq("id", 1L).list();
         assertEquals(1, list.size());
 
-        LambdaQueryChainWrapper<Entity> lambdaQuery = Db.lambdaQuery(Entity.class);
+        QueryChainWrapper<Entity> lambdaQuery = Db.lambdaQuery(Entity.class);
         list = lambdaQuery.eq(Entity::getId, 1L).list();
         assertEquals(1, list.size());
 
@@ -278,14 +276,14 @@ class DbTest extends BaseDbTest<EntityMapper> {
         update.eq("id", 1L).set("name", "bee bee I'm a sheep").update();
         assertEquals("bee bee I'm a sheep", lambdaQuery.eq(Entity::getId, 1L).one().getName());
 
-        LambdaUpdateChainWrapper<Entity> lambdaUpdate = Db.lambdaUpdate(Entity.class);
+        UpdateChainWrapper<Entity> lambdaUpdate = Db.update(Entity.class);
         lambdaUpdate.eq(Entity::getId, 1L).set(Entity::getName, "be better").update();
         assertEquals("be better", lambdaQuery.eq(Entity::getId, 1L).one().getName());
     }
 
     @Test
     void testGetObj() {
-        String name = Db.getObj(Wrappers.lambdaQuery(Entity.class).eq(Entity::getId, 1L), Entity::getName);
+        String name = Db.getObj(Wrappers.query(Entity.class).eq(Entity::getId, 1L), Entity::getName);
         assertEquals("ruben", name);
     }
 
@@ -307,8 +305,8 @@ class DbTest extends BaseDbTest<EntityMapper> {
             compatibleHelperMockedStatic.when(CompatibleHelper::getCompatibleSet).thenReturn(compatibleSet);
             assertEquals(expected, Db.count(Entity.class));
             assertEquals(expected, Db.count(new Entity()));
-            assertEquals(expected, Db.count(Wrappers.lambdaQuery(new Entity())));
-            assertEquals(expected, Db.count(Wrappers.lambdaQuery(Entity.class)));
+            assertEquals(expected, Db.count(Wrappers.query(new Entity())));
+            assertEquals(expected, Db.count(Wrappers.query(Entity.class)));
         }
     }
 

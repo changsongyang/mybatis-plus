@@ -8,7 +8,6 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils
 import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils
 import com.baomidou.mybatisplus.core.toolkit.GlobalConfigUtils
 import com.baomidou.mybatisplus.core.toolkit.StringUtils
-import com.baomidou.mybatisplus.extension.toolkit.SqlRunner
 import org.apache.ibatis.io.Resources
 import org.apache.ibatis.logging.slf4j.Slf4jImpl
 import org.apache.ibatis.mapping.Environment
@@ -48,12 +47,12 @@ abstract class BaseDbTest<T> : TypeReference<T>() {
         if (CollectionUtils.isNotEmpty(tableSql)) {
             for (sql in tableSql!!) {
                 if (StringUtils.isNotBlank(sql)) {
-                    jdbcTemplate.execute(sql)
+                    sql?.let { jdbcTemplate.execute(it) }
                 }
             }
         }
         if (StringUtils.isNotBlank(tableDataSql)) {
-            jdbcTemplate.execute(tableDataSql)
+            tableDataSql?.let { jdbcTemplate.execute(it) }
         }
         val builder = MybatisSqlSessionFactoryBuilder()
         val environment = Environment("test", ManagedTransactionFactory(), ds)

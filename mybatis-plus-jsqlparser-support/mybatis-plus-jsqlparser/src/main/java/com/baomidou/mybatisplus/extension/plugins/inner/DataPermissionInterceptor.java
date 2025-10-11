@@ -15,29 +15,13 @@
  */
 package com.baomidou.mybatisplus.extension.plugins.inner;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.List;
-
-import com.baomidou.mybatisplus.extension.plugins.handler.DataPermissionHandler;
-import com.baomidou.mybatisplus.extension.plugins.handler.MultiDataPermissionHandler;
-import org.apache.ibatis.executor.Executor;
-import org.apache.ibatis.executor.statement.StatementHandler;
-import org.apache.ibatis.mapping.BoundSql;
-import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.mapping.SqlCommandType;
-import org.apache.ibatis.session.ResultHandler;
-import org.apache.ibatis.session.RowBounds;
-
 import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
+import com.baomidou.mybatisplus.core.plugins.inner.InnerInterceptor;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.PluginUtils;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import com.baomidou.mybatisplus.extension.plugins.handler.DataPermissionHandler;
+import com.baomidou.mybatisplus.extension.plugins.handler.MultiDataPermissionHandler;
+import lombok.*;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.delete.Delete;
@@ -46,6 +30,17 @@ import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SetOperationList;
 import net.sf.jsqlparser.statement.select.WithItem;
 import net.sf.jsqlparser.statement.update.Update;
+import org.apache.ibatis.executor.Executor;
+import org.apache.ibatis.executor.statement.StatementHandler;
+import org.apache.ibatis.mapping.BoundSql;
+import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.mapping.SqlCommandType;
+import org.apache.ibatis.session.ResultHandler;
+import org.apache.ibatis.session.RowBounds;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * 数据权限处理器

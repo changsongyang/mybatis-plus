@@ -16,19 +16,12 @@
 package com.baomidou.mybatisplus.core.conditions.update;
 
 import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
-import com.baomidou.mybatisplus.core.conditions.SharedString;
-import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
-import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
+import com.baomidou.mybatisplus.core.conditions.ISqlSegment;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import com.baomidou.mybatisplus.core.toolkit.sql.SqlInjectionUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 /**
  * Update 条件封装
@@ -36,115 +29,56 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author hubin miemie HCL
  * @since 2018-05-30
  */
-public class UpdateWrapper<T> extends AbstractWrapper<T, String, UpdateWrapper<T>>
-    implements Update<UpdateWrapper<T>, String> {
-
-    /**
-     * SQL 更新字段内容，例如：name='1', age=2
-     */
-    private final List<String> sqlSet;
+public class UpdateWrapper<T> extends AbstractWrapper<T, UpdateWrapper<T>> implements Update<T, UpdateWrapper<T>> {
+    private static final long serialVersionUID = -1L;
 
     public UpdateWrapper() {
         // 如果无参构造函数，请注意实体 NULL 情况 SET 必须有否则 SQL 异常
-        this(null);
+        super();
     }
 
     public UpdateWrapper(T entity) {
-        super.setEntity(entity);
-        super.initNeed();
-        this.sqlSet = new ArrayList<>();
+        setEntity(entity);
     }
 
-    private UpdateWrapper(T entity, List<String> sqlSet, AtomicInteger paramNameSeq,
-                          Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments, SharedString paramAlias,
-                          SharedString lastSql, SharedString sqlComment, SharedString sqlFirst) {
-        super.setEntity(entity);
-        this.sqlSet = sqlSet;
-        this.paramNameSeq = paramNameSeq;
-        this.paramNameValuePairs = paramNameValuePairs;
-        this.expression = mergeSegments;
-        this.paramAlias = paramAlias;
-        this.lastSql = lastSql;
-        this.sqlComment = sqlComment;
-        this.sqlFirst = sqlFirst;
-    }
-
-
-    /**
-     * 检查 SQL 注入过滤
-     */
-    private boolean checkSqlInjection;
-
-    /**
-     * 开启检查 SQL 注入
-     */
-    public UpdateWrapper<T> checkSqlInjection() {
-        this.checkSqlInjection = true;
-        return this;
-    }
-
-    @Override
-    protected String columnToString(String column) {
-        if (checkSqlInjection && SqlInjectionUtils.check(column)) {
-            throw new MybatisPlusException("Discovering SQL injection column: " + column);
-        }
-        return column;
+    public UpdateWrapper(Class<T> entityClass) {
+        setEntityClass(entityClass);
     }
 
     @Override
     public String getSqlSet() {
-        if (CollectionUtils.isEmpty(sqlSet)) {
+        if (CollectionUtils.isEmpty(selectBodyOrSetSql)) {
             return null;
         }
-        return String.join(Constants.COMMA, sqlSet);
+        return String.join(Constants.COMMA, selectBodyOrSetSql);
     }
 
     @Override
-    public UpdateWrapper<T> set(boolean condition, String column, Object val, String mapping) {
+    public UpdateWrapper<T> set(boolean condition, ISqlSegment column, Object value, Supplier<String> mapping) {
         return maybeDo(condition, () -> {
-            String sql = formatParam(mapping, val);
-            sqlSet.add(column + Constants.EQUALS + sql);
+            String sql = formatParam(value, mapping);
+            selectBodyOrSetSql.add(column.getSqlSegment() + Constants.EQUALS + sql);
         });
     }
 
     @Override
     public UpdateWrapper<T> setSql(boolean condition, String setSql, Object... params) {
-        return maybeDo(condition && StringUtils.isNotBlank(setSql), () -> {
-            sqlSet.add(formatSqlMaybeWithParam(setSql, params));
-        });
+        return maybeDo(condition, () -> selectBodyOrSetSql.add(formatSqlMaybeWithParam(setSql, params)));
     }
 
     @Override
-    public UpdateWrapper<T> setIncrBy(boolean condition, String column, Number val) {
+    public UpdateWrapper<T> setIncrBy(boolean condition, ISqlSegment column, Number value) {
         return maybeDo(condition, () -> {
-            sqlSet.add(String.format("%s=%s + %s", column, column, val instanceof BigDecimal ? ((BigDecimal) val).toPlainString() : val));
+            String tc = column.getSqlSegment();
+            selectBodyOrSetSql.add(String.format("%s=%s + %s", tc, tc, value instanceof BigDecimal ? ((BigDecimal) value).toPlainString() : value));
         });
     }
 
     @Override
-    public UpdateWrapper<T> setDecrBy(boolean condition, String column, Number val) {
+    public UpdateWrapper<T> setDecrBy(boolean condition, ISqlSegment column, Number value) {
         return maybeDo(condition, () -> {
-            sqlSet.add(String.format("%s=%s - %s", column, column, val instanceof BigDecimal ? ((BigDecimal) val).toPlainString() : val));
+            String tc = column.getSqlSegment();
+            selectBodyOrSetSql.add(String.format("%s=%s - %s", tc, tc, value instanceof BigDecimal ? ((BigDecimal) value).toPlainString() : value));
         });
-    }
-
-    /**
-     * 返回一个支持 lambda 函数写法的 wrapper
-     */
-    public LambdaUpdateWrapper<T> lambda() {
-        return new LambdaUpdateWrapper<>(getEntity(), getEntityClass(), sqlSet, paramNameSeq, paramNameValuePairs,
-            expression, paramAlias, lastSql, sqlComment, sqlFirst);
-    }
-
-    @Override
-    protected UpdateWrapper<T> instance() {
-        return new UpdateWrapper<>(getEntity(), null, paramNameSeq, paramNameValuePairs, new MergeSegments(),
-            paramAlias, SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString());
-    }
-
-    @Override
-    public void clear() {
-        super.clear();
-        sqlSet.clear();
     }
 }

@@ -17,8 +17,7 @@ package com.baomidou.mybatisplus.core.mapper;
 
 import com.baomidou.mybatisplus.core.batch.BatchSqlSession;
 import com.baomidou.mybatisplus.core.batch.MybatisBatch;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.enums.SqlMethod;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -35,11 +34,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.BiPredicate;
 
 /*
@@ -155,7 +150,7 @@ public interface BaseMapper<T> extends Mapper<T> {
      * @param columnMap 表字段 map 对象
      */
     default int deleteByMap(Map<String, Object> columnMap) {
-        return this.delete(Wrappers.<T>query().allEq(columnMap));
+        return this.delete(Wrappers.<T>update().allEq(columnMap));
     }
 
     /**
@@ -163,7 +158,7 @@ public interface BaseMapper<T> extends Mapper<T> {
      *
      * @param queryWrapper 实体对象封装操作类（可以为 null,里面的 entity 用于生成 where 语句）
      */
-    int delete(@Param(Constants.WRAPPER) Wrapper<T> queryWrapper);
+    int delete(@Param(Constants.WRAPPER) UpdateWrapper<T> queryWrapper);
 
 
     /**
@@ -237,16 +232,16 @@ public interface BaseMapper<T> extends Mapper<T> {
      * @param entity        实体对象 (set 条件值,可以为 null,当entity为null时,无法进行自动填充)
      * @param updateWrapper 实体对象封装操作类（可以为 null,里面的 entity 用于生成 where 语句）
      */
-    int update(@Param(Constants.ENTITY) T entity, @Param(Constants.WRAPPER) Wrapper<T> updateWrapper);
+    int update(@Param(Constants.ENTITY) T entity, @Param(Constants.WRAPPER) UpdateWrapper<T> updateWrapper);
 
     /**
      * 根据 Wrapper 更新记录
-     * <p>此方法无法进行自动填充,如需自动填充请使用{@link #update(Object, Wrapper)}</p>
+     * <p>此方法无法进行自动填充,如需自动填充请使用{@link #update(Object, UpdateWrapper)}</p>
      *
-     * @param updateWrapper {@link UpdateWrapper} or {@link LambdaUpdateWrapper}
+     * @param updateWrapper UpdateWrapper
      * @since 3.5.4
      */
-    default int update(@Param(Constants.WRAPPER) Wrapper<T> updateWrapper) {
+    default int update(@Param(Constants.WRAPPER) UpdateWrapper<T> updateWrapper) {
         return update(null, updateWrapper);
     }
 
@@ -322,7 +317,7 @@ public interface BaseMapper<T> extends Mapper<T> {
      *
      * @param queryWrapper 实体对象封装操作类（可以为 null）
      */
-    default T selectOne(@Param(Constants.WRAPPER) Wrapper<T> queryWrapper) {
+    default T selectOne(@Param(Constants.WRAPPER) QueryWrapper<T> queryWrapper) {
         return this.selectOne(queryWrapper, true);
     }
 
@@ -333,7 +328,7 @@ public interface BaseMapper<T> extends Mapper<T> {
      * @param queryWrapper 实体对象封装操作类（可以为 null）
      * @param throwEx      boolean 参数，为true如果存在多个结果直接抛出异常
      */
-    default T selectOne(@Param(Constants.WRAPPER) Wrapper<T> queryWrapper, boolean throwEx) {
+    default T selectOne(@Param(Constants.WRAPPER) QueryWrapper<T> queryWrapper, boolean throwEx) {
         List<T> list = this.selectList(queryWrapper);
         int size = list.size();
         if (size == 1) {
@@ -353,7 +348,7 @@ public interface BaseMapper<T> extends Mapper<T> {
      * @param queryWrapper 实体对象封装操作类
      * @return 是否存在记录
      */
-    default boolean exists(Wrapper<T> queryWrapper) {
+    default boolean exists(QueryWrapper<T> queryWrapper) {
         Long count = this.selectCount(queryWrapper);
         return null != count && count > 0;
     }
@@ -363,14 +358,14 @@ public interface BaseMapper<T> extends Mapper<T> {
      *
      * @param queryWrapper 实体对象封装操作类（可以为 null）
      */
-    Long selectCount(@Param(Constants.WRAPPER) Wrapper<T> queryWrapper);
+    Long selectCount(@Param(Constants.WRAPPER) QueryWrapper<T> queryWrapper);
 
     /**
      * 根据 entity 条件，查询全部记录
      *
      * @param queryWrapper 实体对象封装操作类（可以为 null）
      */
-    List<T> selectList(@Param(Constants.WRAPPER) Wrapper<T> queryWrapper);
+    List<T> selectList(@Param(Constants.WRAPPER) QueryWrapper<T> queryWrapper);
 
     /**
      * 根据 entity 条件，查询全部记录
@@ -379,7 +374,7 @@ public interface BaseMapper<T> extends Mapper<T> {
      * @param resultHandler 结果处理器 {@link ResultHandler}
      * @since 3.5.4
      */
-    void selectList(@Param(Constants.WRAPPER) Wrapper<T> queryWrapper, ResultHandler<T> resultHandler);
+    void selectList(@Param(Constants.WRAPPER) QueryWrapper<T> queryWrapper, ResultHandler<T> resultHandler);
 
     /**
      * 根据 entity 条件，查询全部记录（并翻页）
@@ -388,7 +383,7 @@ public interface BaseMapper<T> extends Mapper<T> {
      * @param queryWrapper 实体对象封装操作类（可以为 null）
      * @since 3.5.3.2
      */
-    List<T> selectList(IPage<T> page, @Param(Constants.WRAPPER) Wrapper<T> queryWrapper);
+    List<T> selectList(IPage<T> page, @Param(Constants.WRAPPER) QueryWrapper<T> queryWrapper);
 
     /**
      * 根据 entity 条件，查询全部记录（并翻页）
@@ -397,7 +392,7 @@ public interface BaseMapper<T> extends Mapper<T> {
      * @param resultHandler 结果处理器 {@link ResultHandler}
      * @since 3.5.4
      */
-    void selectList(IPage<T> page, @Param(Constants.WRAPPER) Wrapper<T> queryWrapper, ResultHandler<T> resultHandler);
+    void selectList(IPage<T> page, @Param(Constants.WRAPPER) QueryWrapper<T> queryWrapper, ResultHandler<T> resultHandler);
 
 
     /**
@@ -405,7 +400,7 @@ public interface BaseMapper<T> extends Mapper<T> {
      *
      * @param queryWrapper 实体对象封装操作类
      */
-    List<Map<String, Object>> selectMaps(@Param(Constants.WRAPPER) Wrapper<T> queryWrapper);
+    List<Map<String, Object>> selectMaps(@Param(Constants.WRAPPER) QueryWrapper<T> queryWrapper);
 
     /**
      * 根据 Wrapper 条件，查询全部记录
@@ -414,7 +409,7 @@ public interface BaseMapper<T> extends Mapper<T> {
      * @param resultHandler 结果处理器 {@link ResultHandler}
      * @since 3.5.4
      */
-    void selectMaps(@Param(Constants.WRAPPER) Wrapper<T> queryWrapper, ResultHandler<Map<String, Object>> resultHandler);
+    void selectMaps(@Param(Constants.WRAPPER) QueryWrapper<T> queryWrapper, ResultHandler<Map<String, Object>> resultHandler);
 
     /**
      * 根据 Wrapper 条件，查询全部记录（并翻页）
@@ -423,7 +418,7 @@ public interface BaseMapper<T> extends Mapper<T> {
      * @param queryWrapper 实体对象封装操作类
      * @since 3.5.3.2
      */
-    List<Map<String, Object>> selectMaps(IPage<? extends Map<String, Object>> page, @Param(Constants.WRAPPER) Wrapper<T> queryWrapper);
+    List<Map<String, Object>> selectMaps(IPage<? extends Map<String, Object>> page, @Param(Constants.WRAPPER) QueryWrapper<T> queryWrapper);
 
     /**
      * 根据 Wrapper 条件，查询全部记录（并翻页）
@@ -433,7 +428,7 @@ public interface BaseMapper<T> extends Mapper<T> {
      * @param resultHandler 结果处理器 {@link ResultHandler}
      * @since 3.5.4
      */
-    void selectMaps(IPage<? extends Map<String, Object>> page, @Param(Constants.WRAPPER) Wrapper<T> queryWrapper, ResultHandler<Map<String, Object>> resultHandler);
+    void selectMaps(IPage<? extends Map<String, Object>> page, @Param(Constants.WRAPPER) QueryWrapper<T> queryWrapper, ResultHandler<Map<String, Object>> resultHandler);
 
     /**
      * 根据 Wrapper 条件，查询全部记录
@@ -441,7 +436,7 @@ public interface BaseMapper<T> extends Mapper<T> {
      *
      * @param queryWrapper 实体对象封装操作类（可以为 null）
      */
-    <E> List<E> selectObjs(@Param(Constants.WRAPPER) Wrapper<T> queryWrapper);
+    <E> List<E> selectObjs(@Param(Constants.WRAPPER) QueryWrapper<T> queryWrapper);
 
     /**
      * 根据 Wrapper 条件，查询全部记录
@@ -451,7 +446,7 @@ public interface BaseMapper<T> extends Mapper<T> {
      * @param resultHandler 结果处理器 {@link ResultHandler}
      * @since 3.5.4
      */
-    <E> void selectObjs(@Param(Constants.WRAPPER) Wrapper<T> queryWrapper, ResultHandler<E> resultHandler);
+    <E> void selectObjs(@Param(Constants.WRAPPER) QueryWrapper<T> queryWrapper, ResultHandler<E> resultHandler);
 
     /**
      * 根据 entity 条件，查询全部记录（并翻页）
@@ -459,7 +454,7 @@ public interface BaseMapper<T> extends Mapper<T> {
      * @param page         分页查询条件
      * @param queryWrapper 实体对象封装操作类（可以为 null）
      */
-    default <P extends IPage<T>> P selectPage(P page, @Param(Constants.WRAPPER) Wrapper<T> queryWrapper) {
+    default <P extends IPage<T>> P selectPage(P page, @Param(Constants.WRAPPER) QueryWrapper<T> queryWrapper) {
         page.setRecords(selectList(page, queryWrapper));
         return page;
     }
@@ -470,7 +465,7 @@ public interface BaseMapper<T> extends Mapper<T> {
      * @param page         分页查询条件
      * @param queryWrapper 实体对象封装操作类
      */
-    default <P extends IPage<Map<String, Object>>> P selectMapsPage(P page, @Param(Constants.WRAPPER) Wrapper<T> queryWrapper) {
+    default <P extends IPage<Map<String, Object>>> P selectMapsPage(P page, @Param(Constants.WRAPPER) QueryWrapper<T> queryWrapper) {
         page.setRecords(selectMaps(page, queryWrapper));
         return page;
     }

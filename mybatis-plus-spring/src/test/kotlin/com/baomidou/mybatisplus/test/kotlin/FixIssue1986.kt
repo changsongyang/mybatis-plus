@@ -1,6 +1,7 @@
 package com.baomidou.mybatisplus.test.kotlin
 
-import com.baomidou.mybatisplus.extension.kotlin.KtQueryWrapper
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper
 import com.baomidou.mybatisplus.test.initTableInfo
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -26,6 +27,7 @@ class FixIssue1986 {
         val wrapper = fillQueryWrapper(OpportunityWebPageQuery())
         print(wrapper.targetSql)
         // (valid = ? AND district_id = ? AND name LIKE ? OR phone LIKE ? AND (valid = ? AND district_id = ?))
+        UpdateWrapper(CustomerEntity::class.java).set(CustomerEntity::name, null).targetSql
     }
 
 }
@@ -33,8 +35,8 @@ class FixIssue1986 {
 /**
  * 用户代码
  */
-private fun fillQueryWrapper(query: OpportunityWebPageQuery): KtQueryWrapper<CustomerEntity> {
-    return KtQueryWrapper(CustomerEntity::class.java)
+private fun fillQueryWrapper(query: OpportunityWebPageQuery): QueryWrapper<CustomerEntity> {
+    return QueryWrapper(CustomerEntity::class.java)
         .eq(CustomerEntity::valid, query.valid)
         .eq(!query.districtId.isNullOrEmpty(), CustomerEntity::districtId, query.districtId)
         .eq(!query.cityId.isNullOrEmpty(), CustomerEntity::cityId, query.cityId)

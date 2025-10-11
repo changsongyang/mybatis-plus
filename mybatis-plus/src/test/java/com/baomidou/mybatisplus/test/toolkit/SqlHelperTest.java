@@ -1,8 +1,8 @@
 package com.baomidou.mybatisplus.test.toolkit;
 
 import com.baomidou.mybatisplus.core.toolkit.Assert;
+import com.baomidou.mybatisplus.core.toolkit.SqlHelper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import com.baomidou.mybatisplus.test.BaseDbTest;
 import com.baomidou.mybatisplus.test.rewrite.Entity;
 import com.baomidou.mybatisplus.test.rewrite.EntityMapper;
@@ -22,7 +22,7 @@ public class SqlHelperTest extends BaseDbTest<EntityMapper> {
     @Test
     public void testGetMapperAndExecute() {
 
-        List<Entity> entityList = SqlHelper.execute(Entity.class, m -> m.selectList(Wrappers.lambdaQuery()));
+        List<Entity> entityList = SqlHelper.execute(Entity.class, m -> m.selectList(Wrappers.query()));
 
         Entity ruben = new Entity();
         ruben.setId(1L);

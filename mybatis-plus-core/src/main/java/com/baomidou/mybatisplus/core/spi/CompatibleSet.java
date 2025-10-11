@@ -15,11 +15,18 @@
  */
 package com.baomidou.mybatisplus.core.spi;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.TableInfo;
+import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
+import com.baomidou.mybatisplus.core.toolkit.Assert;
+import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
+import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 
 import java.io.InputStream;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -53,6 +60,17 @@ public interface CompatibleSet {
     }
 
     /**
+     * 获取容器bean实例
+     */
+    default <T, M extends BaseMapper<T>> M getContextBaseMapper(Class<T> entityClass) {
+        Assert.notNull(entityClass, "entityClass can't be null!");
+        TableInfo tableInfo = Optional.ofNullable(TableInfoHelper.getTableInfo(entityClass))
+            .orElseThrow(() -> ExceptionUtils.mpe("Can not find TableInfo from Class: \"%s\".", entityClass.getName()));
+        Class<?> mapperClass = ClassUtils.toClassConfident(tableInfo.getCurrentNamespace());
+        return (M) getBean(mapperClass);
+    }
+
+    /**
      * 获取真实被代理的对象 (如果没有被代理,请返回原始对象)
      *
      * @param mapper Mapper对象
@@ -65,6 +83,7 @@ public interface CompatibleSet {
 
     /**
      * 传递上下文对象
+     *
      * @param context 容器上下文
      * @since 3.5.13
      */

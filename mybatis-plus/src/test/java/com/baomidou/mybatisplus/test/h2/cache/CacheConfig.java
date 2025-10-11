@@ -1,7 +1,7 @@
 package com.baomidou.mybatisplus.test.h2.cache;
 
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
-import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.core.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import org.apache.ibatis.session.ExecutorType;

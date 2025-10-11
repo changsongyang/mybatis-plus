@@ -16,6 +16,7 @@
 package com.baomidou.mybatisplus.extension.plugins.inner;
 
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
+import com.baomidou.mybatisplus.core.plugins.inner.InnerInterceptor;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.PluginUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlUtils;

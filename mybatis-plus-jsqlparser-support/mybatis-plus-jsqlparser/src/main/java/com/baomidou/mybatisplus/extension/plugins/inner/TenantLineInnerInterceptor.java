@@ -16,9 +16,9 @@
 package com.baomidou.mybatisplus.extension.plugins.inner;
 
 import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
+import com.baomidou.mybatisplus.core.plugins.inner.InnerInterceptor;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.extension.plugins.handler.TenantLineHandler;
-import com.baomidou.mybatisplus.extension.toolkit.PropertyMapper;
 import lombok.*;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;

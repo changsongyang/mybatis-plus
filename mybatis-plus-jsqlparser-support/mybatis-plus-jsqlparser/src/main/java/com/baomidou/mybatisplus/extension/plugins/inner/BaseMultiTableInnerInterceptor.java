@@ -15,6 +15,7 @@
  */
 package com.baomidou.mybatisplus.extension.plugins.inner;
 
+import com.baomidou.mybatisplus.core.plugins.inner.InnerInterceptor;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.parser.JsqlParserSupport;
 import com.baomidou.mybatisplus.jsqlparser.enums.ExpressionAppendMode;
@@ -22,14 +23,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.expression.BinaryExpression;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.Function;
+import net.sf.jsqlparser.expression.NotExpression;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
-import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
-import net.sf.jsqlparser.expression.operators.relational.ExistsExpression;
-import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
-import net.sf.jsqlparser.expression.operators.relational.InExpression;
-import net.sf.jsqlparser.expression.operators.relational.ParenthesedExpressionList;
+import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.*;
 

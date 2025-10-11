@@ -8,8 +8,8 @@ import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.core.handlers.AnnotationHandler;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
+import com.baomidou.mybatisplus.core.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.core.toolkit.GlobalConfigUtils;
-import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import com.baomidou.mybatisplus.test.h2.customfill.annotation.InsertUpdateFill;
@@ -87,7 +87,7 @@ public class CustomFillConfig {
             }
         };
     }
-    
+
     @Bean
     public AnnotationHandler annotationHandler() {
         return new AnnotationHandler() {

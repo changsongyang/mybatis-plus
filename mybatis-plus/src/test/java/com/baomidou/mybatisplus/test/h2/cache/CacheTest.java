@@ -3,7 +3,7 @@ package com.baomidou.mybatisplus.test.h2.cache;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.core.plugins.pagination.Page;
 import com.baomidou.mybatisplus.test.h2.cache.mapper.CacheMapper;
 import com.baomidou.mybatisplus.test.h2.cache.model.CacheModel;
 import com.baomidou.mybatisplus.test.h2.cache.service.ICacheService;

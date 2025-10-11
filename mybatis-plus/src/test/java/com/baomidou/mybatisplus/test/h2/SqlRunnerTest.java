@@ -2,8 +2,8 @@ package com.baomidou.mybatisplus.test.h2;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import com.baomidou.mybatisplus.test.h2.entity.H2Student;
 import com.baomidou.mybatisplus.test.h2.enums.AgeEnum;

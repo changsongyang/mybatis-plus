@@ -18,6 +18,7 @@ package com.baomidou.mybatisplus.extension.toolkit;
 import com.baomidou.mybatisplus.core.assist.AbstractSqlRunner;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.GlobalConfigUtils;
+import com.baomidou.mybatisplus.core.toolkit.SqlHelper;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;

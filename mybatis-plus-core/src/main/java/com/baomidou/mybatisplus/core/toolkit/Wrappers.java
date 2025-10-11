@@ -15,30 +15,18 @@
  */
 package com.baomidou.mybatisplus.core.toolkit;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateChainWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-
-import java.util.Collections;
-import java.util.Map;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * Wrapper 条件构造
  *
  * @author Caratacus
  */
-public final class Wrappers {
-
-    /**
-     * 空的 EmptyWrapper
-     */
-    private static final QueryWrapper<?> emptyWrapper = new EmptyWrapper<>();
-
-    private Wrappers() {
-        // ignore
-    }
+public abstract class Wrappers {
 
     /**
      * 获取 QueryWrapper&lt;T&gt;
@@ -65,44 +53,11 @@ public final class Wrappers {
      * 获取 QueryWrapper&lt;T&gt;
      *
      * @param entityClass 实体类class
-     * @param <T>    实体类泛型
+     * @param <T>         实体类泛型
      * @return QueryWrapper&lt;T&gt;
      */
     public static <T> QueryWrapper<T> query(Class<T> entityClass) {
         return new QueryWrapper<>(entityClass);
-    }
-
-    /**
-     * 获取 LambdaQueryWrapper&lt;T&gt;
-     *
-     * @param <T> 实体类泛型
-     * @return LambdaQueryWrapper&lt;T&gt;
-     */
-    public static <T> LambdaQueryWrapper<T> lambdaQuery() {
-        return new LambdaQueryWrapper<>();
-    }
-
-    /**
-     * 获取 LambdaQueryWrapper&lt;T&gt;
-     *
-     * @param entity 实体类
-     * @param <T>    实体类泛型
-     * @return LambdaQueryWrapper&lt;T&gt;
-     */
-    public static <T> LambdaQueryWrapper<T> lambdaQuery(T entity) {
-        return new LambdaQueryWrapper<>(entity);
-    }
-
-    /**
-     * 获取 LambdaQueryWrapper&lt;T&gt;
-     *
-     * @param entityClass 实体类class
-     * @param <T>         实体类泛型
-     * @return LambdaQueryWrapper&lt;T&gt;
-     * @since 3.3.1
-     */
-    public static <T> LambdaQueryWrapper<T> lambdaQuery(Class<T> entityClass) {
-        return new LambdaQueryWrapper<>(entityClass);
     }
 
     /**
@@ -127,147 +82,57 @@ public final class Wrappers {
     }
 
     /**
-     * 获取 LambdaUpdateWrapper&lt;T&gt;
-     *
-     * @param <T> 实体类泛型
-     * @return LambdaUpdateWrapper&lt;T&gt;
-     */
-    public static <T> LambdaUpdateWrapper<T> lambdaUpdate() {
-        return new LambdaUpdateWrapper<>();
-    }
-
-    /**
-     * 获取 LambdaUpdateWrapper&lt;T&gt;
-     *
-     * @param entity 实体类
-     * @param <T>    实体类泛型
-     * @return LambdaUpdateWrapper&lt;T&gt;
-     */
-    public static <T> LambdaUpdateWrapper<T> lambdaUpdate(T entity) {
-        return new LambdaUpdateWrapper<>(entity);
-    }
-
-    /**
-     * 获取 LambdaUpdateWrapper&lt;T&gt;
+     * 获取 UpdateWrapper&lt;T&gt;
      *
      * @param entityClass 实体类class
      * @param <T>         实体类泛型
-     * @return LambdaUpdateWrapper&lt;T&gt;
-     * @since 3.3.1
+     * @return UpdateWrapper&lt;T&gt;
      */
-    public static <T> LambdaUpdateWrapper<T> lambdaUpdate(Class<T> entityClass) {
-        return new LambdaUpdateWrapper<>(entityClass);
+    public static <T> UpdateWrapper<T> update(Class<T> entityClass) {
+        return new UpdateWrapper<>(entityClass);
+    }
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    /**
+     * 链式查询 普通
+     *
+     * @return QueryWrapper 的包装类
+     */
+    public static <T> QueryChainWrapper<T> queryChain(BaseMapper<T> mapper) {
+        return new QueryChainWrapper<>(mapper);
+    }
+
+    public static <T> QueryChainWrapper<T> queryChain(Class<T> entityClass) {
+        return new QueryChainWrapper<>(entityClass);
+    }
+
+    public static <T> QueryChainWrapper<T> queryChain(BaseMapper<T> mapper, Class<T> entityClass) {
+        return new QueryChainWrapper<>(mapper).setEntityClass(entityClass);
+    }
+
+    public static <T> QueryChainWrapper<T> queryChain(BaseMapper<T> mapper, T entity) {
+        return new QueryChainWrapper<>(mapper).setEntity(entity);
     }
 
     /**
-     * 获取 EmptyWrapper&lt;T&gt;
+     * 链式更改 普通
      *
-     * @param <T> 任意泛型
-     * @return EmptyWrapper&lt;T&gt;
-     * @see EmptyWrapper
+     * @return UpdateWrapper 的包装类
      */
-    @SuppressWarnings("unchecked")
-    public static <T> QueryWrapper<T> emptyWrapper() {
-        return (QueryWrapper<T>) emptyWrapper;
+    public static <T> UpdateChainWrapper<T> updateChain(BaseMapper<T> mapper) {
+        return new UpdateChainWrapper<>(mapper);
     }
 
-    /**
-     * 一个空的QueryWrapper子类该类不包含任何条件
-     *
-     * @param <T>
-     * @see com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
-     */
-    private static class EmptyWrapper<T> extends QueryWrapper<T> {
+    public static <T> UpdateChainWrapper<T> updateChain(Class<T> entityClass) {
+        return new UpdateChainWrapper<>(entityClass);
+    }
 
-        private static final long serialVersionUID = -2515957613998092272L;
+    public static <T> UpdateChainWrapper<T> updateChain(BaseMapper<T> mapper, Class<T> entityClass) {
+        return new UpdateChainWrapper<>(mapper).setEntityClass(entityClass);
+    }
 
-        @Override
-        public T getEntity() {
-            return null;
-        }
-
-        @Override
-        public EmptyWrapper<T> setEntity(T entity) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public QueryWrapper<T> setEntityClass(Class<T> entityClass) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Class<T> getEntityClass() {
-            return null;
-        }
-
-        @Override
-        public String getSqlSelect() {
-            return null;
-        }
-
-        @Override
-        public MergeSegments getExpression() {
-            return null;
-        }
-
-        @Override
-        public boolean isEmptyOfWhere() {
-            return true;
-        }
-
-        @Override
-        public boolean isEmptyOfNormal() {
-            return true;
-        }
-
-        @Override
-        public boolean isNonEmptyOfEntity() {
-            return !isEmptyOfEntity();
-        }
-
-        @Override
-        public boolean isEmptyOfEntity() {
-            return true;
-        }
-
-        @Override
-        protected void initNeed() {
-        }
-
-        @Override
-        public EmptyWrapper<T> last(boolean condition, String lastSql) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public String getSqlSegment() {
-            return null;
-        }
-
-        @Override
-        public Map<String, Object> getParamNameValuePairs() {
-            return Collections.emptyMap();
-        }
-
-        @Override
-        protected String columnsToString(String... columns) {
-            return null;
-        }
-
-        @Override
-        protected String columnToString(String column) {
-            return null;
-        }
-
-        @Override
-        protected EmptyWrapper<T> instance() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void clear() {
-            throw new UnsupportedOperationException();
-        }
+    public static <T> UpdateChainWrapper<T> updateChain(BaseMapper<T> mapper, T entity) {
+        return new UpdateChainWrapper<>(mapper).setEntity(entity);
     }
 }

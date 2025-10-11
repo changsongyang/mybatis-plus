@@ -1,7 +1,7 @@
 package com.baomidou.mybatisplus.test.cache.page;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.core.plugins.pagination.Page;
 import org.apache.ibatis.annotations.CacheNamespace;
 import org.apache.ibatis.annotations.ResultType;
 import org.apache.ibatis.annotations.Select;

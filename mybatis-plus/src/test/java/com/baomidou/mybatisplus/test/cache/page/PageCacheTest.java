@@ -2,9 +2,9 @@ package com.baomidou.mybatisplus.test.cache.page;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
-import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.core.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.core.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.test.BaseDbTest;
 import lombok.Data;
 import org.apache.ibatis.cache.Cache;

@@ -19,7 +19,7 @@ import com.baomidou.mybatisplus.core.*;
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.core.spi.CompatibleHelper;
 import com.baomidou.mybatisplus.core.toolkit.GlobalConfigUtils;
-import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
+import com.baomidou.mybatisplus.core.toolkit.SqlHelper;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.ibatis.cache.Cache;

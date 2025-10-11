@@ -1,11 +1,11 @@
 package com.baomidou.mybatisplus.test.plugins.pagination;
 
 import com.baomidou.mybatisplus.annotation.DbType;
-import com.baomidou.mybatisplus.extension.plugins.pagination.DialectFactory;
-import com.baomidou.mybatisplus.extension.plugins.pagination.dialects.GaussDBDialect;
-import com.baomidou.mybatisplus.extension.plugins.pagination.dialects.MySqlDialect;
-import com.baomidou.mybatisplus.extension.plugins.pagination.dialects.OracleDialect;
-import com.baomidou.mybatisplus.extension.plugins.pagination.dialects.PostgreDialect;
+import com.baomidou.mybatisplus.core.plugins.pagination.DialectFactory;
+import com.baomidou.mybatisplus.core.plugins.pagination.dialects.GaussDBDialect;
+import com.baomidou.mybatisplus.core.plugins.pagination.dialects.MySqlDialect;
+import com.baomidou.mybatisplus.core.plugins.pagination.dialects.OracleDialect;
+import com.baomidou.mybatisplus.core.plugins.pagination.dialects.PostgreDialect;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

@@ -3,7 +3,7 @@ package com.baomidou.mybatisplus.test.h2.fillperformance;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
-import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.core.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import org.apache.ibatis.reflection.MetaObject;

@@ -1,7 +1,7 @@
 package com.baomidou.mybatisplus.test.extension.plugins.pagination.dialects;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.DialectModel;
-import com.baomidou.mybatisplus.extension.plugins.pagination.dialects.IDialect;
+import com.baomidou.mybatisplus.core.plugins.pagination.DialectModel;
+import com.baomidou.mybatisplus.core.plugins.pagination.dialects.IDialect;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.util.ReflectionUtils;
@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author miemie

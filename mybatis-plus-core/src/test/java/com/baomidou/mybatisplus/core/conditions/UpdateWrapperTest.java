@@ -14,7 +14,7 @@ class UpdateWrapperTest extends BaseWrapperTest {
 
     @Test
     void test1() {
-        UpdateWrapper<User> wrapper = new UpdateWrapper<User>().checkSqlInjection().eq("hi=1 or a", 123)
+        UpdateWrapper<User> wrapper = new UpdateWrapper<User>().eq("hi=1 or a", 123)
             .set("name", "a", "typeHandler=org.apache.ibatis.type.StringTypeHandler")
             .set("name", "a", "typeHandler=org.apache.ibatis.type.StringTypeHandler,jdbcType=VARCHAR")
             .set("name", "a", "typeHandler=org.apache.ibatis.type.StringTypeHandler,jdbcType=VARCHAR,numericScale=2");

@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -15,7 +15,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
- * LambdaQueryWrapper 测试
+ * QueryWrapper 测试
  *
  * @author miemie
  * @since 2021-01-27
@@ -30,14 +30,14 @@ class LambdaQueryWrapperTest extends BaseWrapperTest {
 
     @Test
     void testLambdaOrderBySqlSegment() {
-        LambdaQueryWrapper<?> lqw = Wrappers.<Table>lambdaQuery().orderByDesc(Table::getId);
+
+        QueryWrapper<?> lqw = Wrappers.<Table>query().orderByDesc(Table::getId);
         Assertions.assertEquals(" ORDER BY `id` DESC", lqw.getSqlSegment());
         lqw.clear();
         Assertions.assertEquals("", lqw.getSqlSegment());
-        lqw = Wrappers.<Table>lambdaQuery().eq(Table::getId, 1).nested(false, x -> x.eq(Table::getName, "李白"));
+        lqw = Wrappers.<Table>query().eq(Table::getId, 1).nested(false, x -> x.eq(Table::getName, "李白"));
         Assertions.assertEquals("(`id` = #{ew.paramNameValuePairs.MPGENVAL1})", lqw.getSqlSegment());
     }
-
 
     @Data
     @TableName("xxx")

@@ -15,6 +15,7 @@
  */
 package com.baomidou.mybatisplus.extension.spi;
 
+import com.baomidou.mybatisplus.core.spi.CompatibleSet;
 import com.baomidou.mybatisplus.core.toolkit.AopUtils;
 import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
 import lombok.SneakyThrows;

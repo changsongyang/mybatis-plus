@@ -1,9 +1,10 @@
 package com.baomidou.mybatisplus.test.version;
 
+import com.baomidou.mybatisplus.core.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.test.BaseDbTest;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.plugin.Interceptor;
 import org.junit.jupiter.api.Test;
 
@@ -12,8 +13,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author miemie

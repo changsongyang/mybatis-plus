@@ -15,23 +15,50 @@
  */
 package com.baomidou.mybatisplus.core.conditions.update;
 
+import com.baomidou.mybatisplus.core.conditions.ISqlSegment;
+import com.baomidou.mybatisplus.core.conditions.interfaces.SfSupport;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+
 import java.io.Serializable;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * @author miemie
  * @since 2018-12-12
  */
-public interface Update<Children, R> extends Serializable {
+public interface Update<T, Children> extends SfSupport<T>, Serializable {
 
-    /**
-     * 设置 更新 SQL 的 SET 片段
-     *
-     * @param column 字段
-     * @param val    值
-     * @return children
-     */
-    default Children set(R column, Object val) {
-        return set(true, column, val);
+    default Children set(String column, Object value) {
+        return set(true, column, value);
+    }
+
+    default Children set(String column, Object value, String mapping) {
+        return set(true, column, value, mapping);
+    }
+
+    default Children set(boolean condition, String column, Object value) {
+        return set(condition, column, value, null);
+    }
+
+    default Children set(boolean condition, String column, Object value, String mapping) {
+        return set(condition, strCol2Segment(column), value, Objects.isNull(mapping) ? null : () -> mapping);
+    }
+
+    default Children set(SFunction<T, ?> column, Object value) {
+        return set(true, column, value);
+    }
+
+    default Children set(boolean condition, SFunction<T, ?> column, Object value) {
+        return set(condition, column, value, false);
+    }
+
+    default Children set(SFunction<T, ?> column, Object value, boolean mapping) {
+        return set(true, column, value, mapping);
+    }
+
+    default Children set(boolean condition, SFunction<T, ?> column, Object value, boolean mapping) {
+        return set(condition, convSf2ColSegment(column), value, mappingSupplier(mapping, column));
     }
 
     /**
@@ -39,45 +66,14 @@ public interface Update<Children, R> extends Serializable {
      *
      * @param condition 是否加入 set
      * @param column    字段
-     * @param val       值
-     * @return children
-     */
-    default Children set(boolean condition, R column, Object val) {
-        return set(condition, column, val, null);
-    }
-
-    /**
-     * 设置 更新 SQL 的 SET 片段
-     *
-     * @param column  字段
-     * @param val     值
-     * @param mapping 例: javaType=int,jdbcType=NUMERIC,typeHandler=xxx.xxx.MyTypeHandler
-     * @return children
-     */
-    default Children set(R column, Object val, String mapping) {
-        return set(true, column, val, mapping);
-    }
-
-    /**
-     * 设置 更新 SQL 的 SET 片段
-     *
-     * @param condition 是否加入 set
-     * @param column    字段
-     * @param val       值
+     * @param value     值
      * @param mapping   例: javaType=int,jdbcType=NUMERIC,typeHandler=xxx.xxx.MyTypeHandler
      * @return children
      */
-    Children set(boolean condition, R column, Object val, String mapping);
+    Children set(boolean condition, ISqlSegment column, Object value, Supplier<String> mapping);
 
-    /**
-     * 设置 更新 SQL 的 SET 片段
-     *
-     * @param setSql set sql
-     *               例1: setSql("id=1")
-     *               例2: setSql("dateColumn={0}", LocalDate.now())
-     *               例4: setSql("type={0,javaType=int,jdbcType=NUMERIC,typeHandler=xxx.xxx.MyTypeHandler}", "待处理字符串")
-     * @return children
-     */
+    /*----------------------------------------------------------------------------------------------------------------*/
+
     default Children setSql(String setSql, Object... params) {
         return setSql(true, setSql, params);
     }
@@ -94,43 +90,61 @@ public interface Update<Children, R> extends Serializable {
      */
     Children setSql(boolean condition, String setSql, Object... params);
 
-    /**
-     * 字段自增变量 val 值
-     *
-     * @param column 字段
-     * @param val    变量值 1 字段自增 + 1
-     */
-    default Children setIncrBy(R column, Number val) {
-        return setIncrBy(true, column, val);
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children setIncrBy(String column, Number value) {
+        return setIncrBy(true, column, value);
+    }
+
+    default Children setIncrBy(boolean condition, String column, Number value) {
+        return setIncrBy(condition, strCol2Segment(column), value);
+    }
+
+    default Children setIncrBy(SFunction<T, ?> column, Number value) {
+        return setIncrBy(true, column, value);
+    }
+
+    default Children setIncrBy(boolean condition, SFunction<T, ?> column, Number value) {
+        return setIncrBy(condition, convSf2ColSegment(column), value);
     }
 
     /**
-     * 字段自增变量 val 值
+     * 字段自增变量 value 值
      *
      * @param condition 是否加入 set
      * @param column    字段
-     * @param val       变量值 1 字段自增 + 1
+     * @param value     变量值 1 字段自增 + 1
      */
-    Children setIncrBy(boolean condition, R column, Number val);
+    Children setIncrBy(boolean condition, ISqlSegment column, Number value);
 
-    /**
-     * 字段自减变量 val 值
-     *
-     * @param column 字段
-     * @param val    变量值 1 字段自减 - 1
-     */
-    default Children setDecrBy(R column, Number val) {
-        return setDecrBy(true, column, val);
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    default Children setDecrBy(String column, Number value) {
+        return setDecrBy(true, column, value);
+    }
+
+    default Children setDecrBy(boolean condition, String column, Number value) {
+        return setDecrBy(condition, strCol2Segment(column), value);
+    }
+
+    default Children setDecrBy(SFunction<T, ?> column, Number value) {
+        return setDecrBy(true, column, value);
+    }
+
+    default Children setDecrBy(boolean condition, SFunction<T, ?> column, Number value) {
+        return setDecrBy(condition, convSf2ColSegment(column), value);
     }
 
     /**
-     * 字段自减变量 val 值
+     * 字段自减变量 value 值
      *
      * @param condition 是否加入 set
      * @param column    字段
-     * @param val       变量值 1 字段自减 - 1
+     * @param value     变量值 1 字段自减 - 1
      */
-    Children setDecrBy(boolean condition, R column, Number val);
+    Children setDecrBy(boolean condition, ISqlSegment column, Number value);
+
+    /*----------------------------------------------------------------------------------------------------------------*/
 
     /**
      * 获取 更新 SQL 的 SET 片段

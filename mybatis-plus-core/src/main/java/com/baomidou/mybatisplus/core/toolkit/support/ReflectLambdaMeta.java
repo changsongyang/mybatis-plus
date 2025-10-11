@@ -28,7 +28,6 @@ import java.lang.invoke.SerializedLambda;
 @Slf4j
 public class ReflectLambdaMeta implements LambdaMeta {
     private final SerializedLambda lambda;
-
     private final ClassLoader classLoader;
 
     public ReflectLambdaMeta(SerializedLambda lambda, ClassLoader classLoader) {
@@ -38,6 +37,15 @@ public class ReflectLambdaMeta implements LambdaMeta {
 
     @Override
     public String getImplMethodName() {
+        if (lambda.getImplMethodSignature().contains("kotlin/reflect")) {
+            // kotlin
+            try {
+                Object arg = lambda.getCapturedArg(0);
+                return (String) arg.getClass().getMethod("getName").invoke(arg);
+            } catch (Exception e) {
+                // ignore
+            }
+        }
         return lambda.getImplMethodName();
     }
 
@@ -47,5 +55,4 @@ public class ReflectLambdaMeta implements LambdaMeta {
         String instantiatedType = instantiatedMethodType.substring(2, instantiatedMethodType.indexOf(StringPool.SEMICOLON)).replace(StringPool.SLASH, StringPool.DOT);
         return ClassUtils.toClassConfident(instantiatedType, this.classLoader);
     }
-
 }

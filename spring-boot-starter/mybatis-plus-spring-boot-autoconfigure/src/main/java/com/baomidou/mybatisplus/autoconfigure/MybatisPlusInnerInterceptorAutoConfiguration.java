@@ -15,8 +15,8 @@
  */
 package com.baomidou.mybatisplus.autoconfigure;
 
-import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
-import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
+import com.baomidou.mybatisplus.core.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.core.plugins.inner.InnerInterceptor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;

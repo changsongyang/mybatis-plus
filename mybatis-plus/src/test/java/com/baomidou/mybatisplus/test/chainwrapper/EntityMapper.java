@@ -1,8 +1,8 @@
 package com.baomidou.mybatisplus.test.chainwrapper;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
-import com.baomidou.mybatisplus.extension.toolkit.ChainWrappers;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 
 /**
  * @author miemie
@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.extension.toolkit.ChainWrappers;
 public interface EntityMapper extends BaseMapper<Entity> {
 
     default QueryChainWrapper<Entity> queryChain() {
-        return ChainWrappers.queryChain(this);
+        return Wrappers.queryChain(this);
     }
 }

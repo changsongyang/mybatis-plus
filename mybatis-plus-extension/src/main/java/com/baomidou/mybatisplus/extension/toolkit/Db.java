@@ -16,21 +16,15 @@
 package com.baomidou.mybatisplus.extension.toolkit;
 
 import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryChainWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateChainWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
-import com.baomidou.mybatisplus.core.toolkit.Assert;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.baomidou.mybatisplus.core.toolkit.Constants;
-import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
-import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
-import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
-import com.baomidou.mybatisplus.extension.conditions.update.UpdateChainWrapper;
-import com.baomidou.mybatisplus.extension.kotlin.KtQueryChainWrapper;
-import com.baomidou.mybatisplus.extension.kotlin.KtUpdateChainWrapper;
 import org.apache.ibatis.executor.BatchResult;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
@@ -141,7 +135,7 @@ public class Db {
      *
      * @param queryWrapper 实体包装类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      */
-    public static <T> boolean remove(AbstractWrapper<T, ?, ?> queryWrapper) {
+    public static <T> boolean remove(UpdateWrapper<T> queryWrapper) {
         return SqlHelper.execute(getEntityClass(queryWrapper), baseMapper -> SqlHelper.retBool(baseMapper.delete(queryWrapper)));
     }
 
@@ -162,7 +156,7 @@ public class Db {
      *
      * @param updateWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper}
      */
-    public static <T> boolean update(AbstractWrapper<T, ?, ?> updateWrapper) {
+    public static <T> boolean update(UpdateWrapper<T> updateWrapper) {
         return update(null, updateWrapper);
     }
 
@@ -172,7 +166,7 @@ public class Db {
      * @param entity        实体对象
      * @param updateWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper}
      */
-    public static <T> boolean update(T entity, AbstractWrapper<T, ?, ?> updateWrapper) {
+    public static <T> boolean update(T entity, UpdateWrapper<T> updateWrapper) {
         return SqlHelper.execute(getEntityClass(updateWrapper), baseMapper -> SqlHelper.retBool(baseMapper.update(entity, updateWrapper)));
     }
 
@@ -245,7 +239,7 @@ public class Db {
      *
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      */
-    public static <T> T getOne(AbstractWrapper<T, ?, ?> queryWrapper) {
+    public static <T> T getOne(QueryWrapper<T> queryWrapper) {
         return getOne(queryWrapper, true);
     }
 
@@ -256,7 +250,7 @@ public class Db {
      * @param entity 实体对象
      */
     public static <T> T getOne(T entity) {
-        return getOne(Wrappers.lambdaQuery(entity), true);
+        return getOne(Wrappers.query(entity), true);
     }
 
     /**
@@ -266,7 +260,7 @@ public class Db {
      * @param throwEx 有多个 result 是否抛出异常
      */
     public static <T> T getOne(T entity, boolean throwEx) {
-        return getOne(Wrappers.lambdaQuery(entity), throwEx);
+        return getOne(Wrappers.query(entity), throwEx);
     }
 
     /**
@@ -275,7 +269,7 @@ public class Db {
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      * @param throwEx      有多个 result 是否抛出异常
      */
-    public static <T> T getOne(AbstractWrapper<T, ?, ?> queryWrapper, boolean throwEx) {
+    public static <T> T getOne(QueryWrapper<T> queryWrapper, boolean throwEx) {
         Class<T> entityClass = getEntityClass(queryWrapper);
         if (throwEx) {
             return SqlHelper.execute(entityClass, baseMapper -> baseMapper.selectOne(queryWrapper));
@@ -308,7 +302,7 @@ public class Db {
      *
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      */
-    public static <T> Map<String, Object> getMap(AbstractWrapper<T, ?, ?> queryWrapper) {
+    public static <T> Map<String, Object> getMap(QueryWrapper<T> queryWrapper) {
         return SqlHelper.execute(getEntityClass(queryWrapper), baseMapper -> SqlHelper.getObject(log, baseMapper.selectMaps(queryWrapper)));
     }
 
@@ -318,14 +312,13 @@ public class Db {
      * @param entity 实体对象
      */
     public static <T> Map<String, Object> getMap(T entity) {
-        return getMap(Wrappers.lambdaQuery(entity));
+        return getMap(Wrappers.query(entity));
     }
 
     /**
      * 查询总记录数
      *
      * @param entityClass 实体类
-     * @see Wrappers#emptyWrapper()
      */
     public static <T> long count(Class<T> entityClass) {
         return SqlHelper.execute(entityClass, baseMapper -> SqlHelper.retCount(baseMapper.selectCount(null)));
@@ -337,7 +330,7 @@ public class Db {
      * @param entity 实体类
      */
     public static <T> long count(T entity) {
-        return count(Wrappers.lambdaQuery(entity));
+        return count(Wrappers.query(entity));
     }
 
     /**
@@ -345,7 +338,7 @@ public class Db {
      *
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      */
-    public static <T> long count(AbstractWrapper<T, ?, ?> queryWrapper) {
+    public static <T> long count(QueryWrapper<T> queryWrapper) {
         return SqlHelper.execute(getEntityClass(queryWrapper), baseMapper -> SqlHelper.retCount(baseMapper.selectCount(queryWrapper)));
     }
 
@@ -354,7 +347,7 @@ public class Db {
      *
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      */
-    public static <T> List<T> list(AbstractWrapper<T, ?, ?> queryWrapper) {
+    public static <T> List<T> list(QueryWrapper<T> queryWrapper) {
         return SqlHelper.execute(getEntityClass(queryWrapper), baseMapper -> baseMapper.selectList(queryWrapper));
     }
 
@@ -364,7 +357,7 @@ public class Db {
      * @param <T>          entity
      * @return 列表数据
      */
-    public static <T> List<T> list(IPage<T> page, AbstractWrapper<T, ?, ?> queryWrapper) {
+    public static <T> List<T> list(IPage<T> page, QueryWrapper<T> queryWrapper) {
         return SqlHelper.execute(getEntityClass(queryWrapper), baseMapper -> baseMapper.selectList(page, queryWrapper));
     }
 
@@ -373,7 +366,6 @@ public class Db {
      * 查询所有
      *
      * @param entityClass 实体类
-     * @see Wrappers#emptyWrapper()
      */
     public static <T> List<T> list(Class<T> entityClass) {
         return SqlHelper.execute(entityClass, baseMapper -> baseMapper.selectList(null));
@@ -395,10 +387,9 @@ public class Db {
      * 根据entity中不为空的字段进行查询
      *
      * @param entity 实体类
-     * @see Wrappers#emptyWrapper()
      */
     public static <T> List<T> list(T entity) {
-        return list(Wrappers.lambdaQuery(entity));
+        return list(Wrappers.query(entity));
     }
 
     /**
@@ -411,7 +402,7 @@ public class Db {
      * @since 3.5.3.2
      */
     public static <T> List<T> list(IPage<T> page, T entity) {
-        return list(page, Wrappers.lambdaQuery(entity));
+        return list(page, Wrappers.query(entity));
     }
 
     /**
@@ -419,7 +410,7 @@ public class Db {
      *
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      */
-    public static <T> List<Map<String, Object>> listMaps(AbstractWrapper<T, ?, ?> queryWrapper) {
+    public static <T> List<Map<String, Object>> listMaps(QueryWrapper<T> queryWrapper) {
         return SqlHelper.execute(getEntityClass(queryWrapper), baseMapper -> baseMapper.selectMaps(queryWrapper));
     }
 
@@ -430,7 +421,7 @@ public class Db {
      * @return 列表数据
      * @param <T> entity
      */
-    public static <T> List<Map<String, Object>> listMaps(IPage<? extends Map<String, Object>> page, AbstractWrapper<T, ?, ?> queryWrapper) {
+    public static <T> List<Map<String, Object>> listMaps(IPage<? extends Map<String, Object>> page, QueryWrapper<T> queryWrapper) {
         return SqlHelper.execute(getEntityClass(queryWrapper), baseMapper -> baseMapper.selectMaps(page, queryWrapper));
     }
 
@@ -438,7 +429,6 @@ public class Db {
      * 查询所有列表
      *
      * @param entityClass 实体类
-     * @see Wrappers#emptyWrapper()
      */
     public static <T> List<Map<String, Object>> listMaps(Class<T> entityClass) {
         return SqlHelper.execute(entityClass, baseMapper -> baseMapper.selectMaps(null));
@@ -464,7 +454,7 @@ public class Db {
      * @param entity 实体类
      */
     public static <T> List<Map<String, Object>> listMaps(T entity) {
-        return listMaps(Wrappers.lambdaQuery(entity));
+        return listMaps(Wrappers.query(entity));
     }
 
     /**
@@ -477,7 +467,7 @@ public class Db {
      * @since 3.5.3.2
      */
     public static <T> List<Map<String, Object>> listMaps(IPage<? extends Map<String, Object>> page, T entity) {
-        return listMaps(page, Wrappers.lambdaQuery(entity));
+        return listMaps(page, Wrappers.query(entity));
     }
 
     /**
@@ -494,7 +484,7 @@ public class Db {
      *
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      */
-    public static <E, T> List<E> listObjs(AbstractWrapper<T, ?, ?> queryWrapper) {
+    public static <E, T> List<E> listObjs(QueryWrapper<T> queryWrapper) {
         return SqlHelper.execute(getEntityClass(queryWrapper), baseMapper -> baseMapper.selectObjs(queryWrapper));
     }
 
@@ -504,7 +494,7 @@ public class Db {
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      * @param mapper       转换函数
      */
-    public static <T, V> List<V> listObjs(AbstractWrapper<T, ?, ?> queryWrapper, SFunction<? super T, V> mapper) {
+    public static <T, V> List<V> listObjs(QueryWrapper<T> queryWrapper, SFunction<? super T, V> mapper) {
         return SqlHelper.execute(getEntityClass(queryWrapper), baseMapper -> baseMapper.selectList(queryWrapper).stream().map(mapper).collect(Collectors.toList()));
     }
 
@@ -523,7 +513,6 @@ public class Db {
      *
      * @param page        翻页对象
      * @param entityClass 实体类
-     * @see Wrappers#emptyWrapper()
      */
     public static <T, E extends IPage<Map<String, Object>>> E pageMaps(E page, Class<T> entityClass) {
         return SqlHelper.execute(entityClass, baseMapper -> baseMapper.selectMapsPage(page, null));
@@ -535,7 +524,7 @@ public class Db {
      * @param page         翻页对象
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      */
-    public static <T, E extends IPage<Map<String, Object>>> E pageMaps(E page, AbstractWrapper<T, ?, ?> queryWrapper) {
+    public static <T, E extends IPage<Map<String, Object>>> E pageMaps(E page, QueryWrapper<T> queryWrapper) {
         return SqlHelper.execute(getEntityClass(queryWrapper), baseMapper -> baseMapper.selectMapsPage(page, queryWrapper));
     }
 
@@ -544,7 +533,6 @@ public class Db {
      *
      * @param page        翻页对象
      * @param entityClass 实体类
-     * @see Wrappers#emptyWrapper()
      */
     public static <T> IPage<T> page(IPage<T> page, Class<T> entityClass) {
         return SqlHelper.execute(entityClass, baseMapper -> baseMapper.selectPage(page, null));
@@ -556,7 +544,7 @@ public class Db {
      * @param page         翻页对象
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      */
-    public static <T> IPage<T> page(IPage<T> page, AbstractWrapper<T, ?, ?> queryWrapper) {
+    public static <T> IPage<T> page(IPage<T> page, QueryWrapper<T> queryWrapper) {
         return SqlHelper.execute(getEntityClass(queryWrapper), baseMapper -> baseMapper.selectPage(page, queryWrapper));
     }
 
@@ -566,7 +554,7 @@ public class Db {
      * @return QueryWrapper 的包装类
      */
     public static <T> QueryChainWrapper<T> query(Class<T> entityClass) {
-        return ChainWrappers.queryChain(entityClass);
+        return Wrappers.queryChain(entityClass);
     }
 
     /**
@@ -574,8 +562,8 @@ public class Db {
      *
      * @return KtQueryWrapper 的包装类
      */
-    public static <T> KtQueryChainWrapper<T> ktQuery(Class<T> entityClass) {
-        return ChainWrappers.ktQueryChain(entityClass);
+    public static <T> QueryChainWrapper<T> ktQuery(Class<T> entityClass) {
+        return Wrappers.queryChain(entityClass);
     }
 
 
@@ -583,10 +571,10 @@ public class Db {
      * 链式查询 lambda 式
      * <p>注意：不支持 Kotlin </p>
      *
-     * @return LambdaQueryWrapper 的包装类
+     * @return QueryWrapper 的包装类
      */
-    public static <T> LambdaQueryChainWrapper<T> lambdaQuery(Class<T> entityClass) {
-        return ChainWrappers.lambdaQueryChain(entityClass);
+    public static <T> QueryChainWrapper<T> lambdaQuery(Class<T> entityClass) {
+        return Wrappers.queryChain(entityClass);
     }
 
     /**
@@ -595,7 +583,7 @@ public class Db {
      * @return UpdateWrapper 的包装类
      */
     public static <T> UpdateChainWrapper<T> update(Class<T> entityClass) {
-        return ChainWrappers.updateChain(entityClass);
+        return Wrappers.updateChain(entityClass);
     }
 
     /**
@@ -603,18 +591,18 @@ public class Db {
      *
      * @return KtUpdateWrapper 的包装类
      */
-    public static <T> KtUpdateChainWrapper<T> ktUpdate(Class<T> entityClass) {
-        return ChainWrappers.ktUpdateChain(entityClass);
+    public static <T> UpdateChainWrapper<T> ktUpdate(Class<T> entityClass) {
+        return Wrappers.updateChain(entityClass);
     }
 
     /**
      * 链式更改 lambda 式
      * <p>注意：不支持 Kotlin </p>
      *
-     * @return LambdaUpdateWrapper 的包装类
+     * @return UpdateWrapper 的包装类
      */
-    public static <T> LambdaUpdateChainWrapper<T> lambdaUpdate(Class<T> entityClass) {
-        return ChainWrappers.lambdaUpdateChain(entityClass);
+    public static <T> UpdateChainWrapper<T> lambdaUpdate(Class<T> entityClass) {
+        return Wrappers.updateChain(entityClass);
     }
 
     /**
@@ -625,7 +613,7 @@ public class Db {
      *
      * @param entity 实体对象
      */
-    public static <T> boolean saveOrUpdate(T entity, AbstractWrapper<T, ?, ?> updateWrapper) {
+    public static <T> boolean saveOrUpdate(T entity, UpdateWrapper<T> updateWrapper) {
         return update(entity, updateWrapper) || saveOrUpdate(entity);
     }
 
@@ -635,7 +623,7 @@ public class Db {
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      * @param mapper       转换函数
      */
-    public static <T, V> V getObj(AbstractWrapper<T, ?, ?> queryWrapper, SFunction<? super T, V> mapper) {
+    public static <T, V> V getObj(QueryWrapper<T> queryWrapper, SFunction<? super T, V> mapper) {
         return SqlHelper.execute(getEntityClass(queryWrapper), baseMapper -> mapper.apply(baseMapper.selectOne(queryWrapper)));
     }
 
@@ -665,14 +653,8 @@ public class Db {
      * @param <T>          实体类型
      * @return 实体类型
      */
-    protected static <T> Class<T> getEntityClass(AbstractWrapper<T, ?, ?> queryWrapper) {
-        Class<T> entityClass = queryWrapper.getEntityClass();
-        if (entityClass == null) {
-            T entity = queryWrapper.getEntity();
-            if (entity != null) {
-                entityClass = getEntityClass(entity);
-            }
-        }
+    protected static <T> Class<T> getEntityClass(AbstractWrapper<T, ?> queryWrapper) {
+        Class<T> entityClass = queryWrapper.getContext().getEntityClass();
         Assert.notNull(entityClass, "error: can not get entityClass from wrapper");
         return entityClass;
     }

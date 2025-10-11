@@ -18,13 +18,13 @@ package com.baomidou.mybatisplus.extension.plugins.inner;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
+import com.baomidou.mybatisplus.core.plugins.inner.InnerInterceptor;
+import com.baomidou.mybatisplus.core.plugins.pagination.DialectFactory;
+import com.baomidou.mybatisplus.core.plugins.pagination.DialectModel;
+import com.baomidou.mybatisplus.core.plugins.pagination.dialects.IDialect;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.extension.parser.JsqlParserGlobal;
-import com.baomidou.mybatisplus.extension.plugins.pagination.DialectFactory;
-import com.baomidou.mybatisplus.extension.plugins.pagination.DialectModel;
-import com.baomidou.mybatisplus.extension.plugins.pagination.dialects.IDialect;
 import com.baomidou.mybatisplus.extension.toolkit.JdbcUtils;
-import com.baomidou.mybatisplus.extension.toolkit.PropertyMapper;
 import com.baomidou.mybatisplus.extension.toolkit.SqlParserUtils;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -174,7 +174,7 @@ public class PaginationInnerInterceptor implements InnerInterceptor {
         IDialect dialect = findIDialect(executor);
 
         final Configuration configuration = ms.getConfiguration();
-        DialectModel model = dialect.buildPaginationSql(buildSql, page.offset(), page.getSize());
+        DialectModel model = dialect.buildPaginationSql(buildSql, page);
         PluginUtils.MPBoundSql mpBoundSql = PluginUtils.mpBoundSql(boundSql);
 
         List<ParameterMapping> mappings = mpBoundSql.parameterMappings();

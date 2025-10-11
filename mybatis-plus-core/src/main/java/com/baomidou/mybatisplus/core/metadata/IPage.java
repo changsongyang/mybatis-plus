@@ -46,7 +46,7 @@ public interface IPage<T> extends Serializable {
     }
 
     /**
-     * {@link com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor#isOptimizeJoin()}
+     * {@link com.baomidou.mybatisplus.core.plugins.inner.PaginationInnerInterceptor#isOptimizeJoin()}
      * 两个参数都为 true 才会进行sql处理
      *
      * @return true 是 / false 否

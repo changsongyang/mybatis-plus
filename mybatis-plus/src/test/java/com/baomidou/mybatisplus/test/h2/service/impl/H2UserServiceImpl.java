@@ -1,12 +1,12 @@
 package com.baomidou.mybatisplus.test.h2.service.impl;
 
 import com.baomidou.mybatisplus.core.batch.MybatisBatch;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
+import com.baomidou.mybatisplus.core.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.toolkit.MybatisBatchUtils;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.test.h2.entity.H2User;
 import com.baomidou.mybatisplus.test.h2.mapper.H2UserMapper;
@@ -124,7 +124,7 @@ public class H2UserServiceImpl extends ServiceImpl<H2UserMapper, H2User> impleme
     }
 
     @Override
-    public List<H2User> testCustomSqlSegment(Wrapper wrapper) {
+    public List<H2User> testCustomSqlSegment(QueryWrapper wrapper) {
         return baseMapper.selectTestCustomSqlSegment(wrapper);
     }
 

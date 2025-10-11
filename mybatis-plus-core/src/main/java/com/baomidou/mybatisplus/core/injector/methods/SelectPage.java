@@ -15,7 +15,6 @@
  */
 package com.baomidou.mybatisplus.core.injector.methods;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.enums.SqlMethod;
 import com.baomidou.mybatisplus.core.injector.AbstractMethod;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -29,7 +28,7 @@ import org.apache.ibatis.mapping.SqlSource;
  *
  * @author hubin
  * @since 2018-04-06
- * @deprecated 3.5.3.2 {@link BaseMapper#selectList(IPage, Wrapper)}
+ * @deprecated 3.5.3.2 {@link BaseMapper#selectList(IPage, com.baomidou.mybatisplus.core.conditions.query.QueryWrapper)}
  */
 @Deprecated
 public class SelectPage extends AbstractMethod {

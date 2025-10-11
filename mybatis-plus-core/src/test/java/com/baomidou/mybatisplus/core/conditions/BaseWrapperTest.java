@@ -1,6 +1,7 @@
 package com.baomidou.mybatisplus.core.conditions;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import lombok.Data;
@@ -14,20 +15,20 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class BaseWrapperTest {
 
-    void logParams(AbstractWrapper<?, ?, ?> wrapper) {
-        wrapper.getParamNameValuePairs().forEach((k, v) -> {
+    void logParams(AbstractWrapper<?, ?> wrapper) {
+        wrapper.getContext().getParamNameValuePairs().forEach((k, v) -> {
             System.out.println("key: '" + k + "'\t\tvalue: '" + v + StringPool.SINGLE_QUOTE);
             assertThat(k).startsWith(Constants.WRAPPER_PARAM);
         });
     }
 
-    void logSqlSet(String explain, AbstractWrapper<?, ?, ?> wrapper, String targetSql) {
+    void logSqlSet(String explain, UpdateWrapper<?> wrapper, String targetSql) {
         System.out.printf(" ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   ->(%s)<-   ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓%n", explain);
         System.out.println(wrapper.getSqlSet());
         Assertions.assertThat(wrapper.getSqlSet().trim()).isEqualTo(targetSql);
     }
 
-    void logSqlWhere(String explain, AbstractWrapper<?, ?, ?> wrapper, String targetSql) {
+    void logSqlWhere(String explain, AbstractWrapper<?, ?> wrapper, String targetSql) {
         System.out.printf(" ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓   ->(%s)<-   ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓%n", explain);
         System.out.println(wrapper.getSqlSegment());
         assertThat(wrapper.getTargetSql().trim()).isEqualTo(targetSql);

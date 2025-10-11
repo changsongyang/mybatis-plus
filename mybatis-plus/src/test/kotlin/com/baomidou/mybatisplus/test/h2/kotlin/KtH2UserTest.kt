@@ -1,9 +1,10 @@
 package com.baomidou.mybatisplus.test.h2.kotlin
 
 import com.baomidou.mybatisplus.test.h2.KtTestConfig
-import com.baomidou.mybatisplus.test.h2.kotlin.entity.KtH2User
 import com.baomidou.mybatisplus.test.h2.enums.AgeEnum
+import com.baomidou.mybatisplus.test.h2.kotlin.entity.KtH2User
 import com.baomidou.mybatisplus.test.h2.kotlin.service.KtH2UserService
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -31,7 +32,7 @@ class KtH2UserTest {
         user.age = AgeEnum.ONE
         user.name = "Demo"
         userService.save(user)
-        Assertions.assertNotNull(user.createdDt)
+        assertThat(user.createdDt).isNotNull()
     }
 
     @Test
@@ -42,7 +43,7 @@ class KtH2UserTest {
         userService.save(user)
         user.name = "Update"
         userService.updateById(user)
-        Assertions.assertNotNull(user.lastUpdatedDt)
+        assertThat(user.lastUpdatedDt).isNotNull()
     }
 
     @Test
@@ -60,7 +61,7 @@ class KtH2UserTest {
     fun testServiceImplInnerKtChain() {
         var tomcat = userService.ktQuery().eq(KtH2User::name, "Tomcat").one()
         Assertions.assertNotNull(tomcat)
-        Assertions.assertNotEquals(0, userService.ktQuery().like(KtH2User::name, "a").count())
+        assertThat(userService.ktQuery().like(KtH2User::name, "a").count()).isNotEqualTo(0)
 
         val users = userService.ktQuery()
             .like(KtH2User::age, AgeEnum.TWO)

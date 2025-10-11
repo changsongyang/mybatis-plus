@@ -1,11 +1,9 @@
 package com.baomidou.mybatisplus.test.h2;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.core.plugins.pagination.Page;
 import com.baomidou.mybatisplus.test.h2.entity.H2Student;
 import com.baomidou.mybatisplus.test.h2.mapper.H2StudentMapper;
 import org.junit.jupiter.api.*;
@@ -33,28 +31,28 @@ public class LastSqlTest {
     @Test
     @Order(1)
     public void delete() {
-        int res = mapper.delete(new LambdaUpdateWrapper<H2Student>().last(" and 1 = 2 ").eq(H2Student::getId, 0));
+        int res = mapper.delete(new UpdateWrapper<H2Student>().last(" and 1 = 2 ").eq(H2Student::getId, 0));
         Assertions.assertTrue(res <= 0);
     }
 
     @Test
     @Order(2)
     public void selectCount() {
-        long result = mapper.selectCount(new LambdaQueryWrapper<H2Student>().last("where 1 =2"));
+        long result = mapper.selectCount(new QueryWrapper<H2Student>().last("where 1 =2"));
         Assertions.assertTrue(result <= 0);
     }
 
     @Test
     @Order(3)
     public void selectList() {
-        List<H2Student> h2Students = mapper.selectList(new LambdaQueryWrapper<H2Student>().last("limit 1"));
+        List<H2Student> h2Students = mapper.selectList(new QueryWrapper<H2Student>().last("limit 1"));
         Assertions.assertEquals(1, h2Students.size());
     }
 
     @Test
     @Order(4)
     public void selectMaps() {
-        List<Map<String, Object>> maps = mapper.selectMaps(new LambdaQueryWrapper<H2Student>().last("limit 1"));
+        List<Map<String, Object>> maps = mapper.selectMaps(new QueryWrapper<H2Student>().last("limit 1"));
         Assertions.assertEquals(1, maps.size());
     }
 
@@ -98,7 +96,7 @@ public class LastSqlTest {
     public void selectListOrderBy() {
         List<H2Student> h2Students = mapper.selectList(null);
         Assertions.assertEquals(6, h2Students.size());
-        Assertions.assertEquals(6, mapper.selectList(new LambdaQueryWrapper<H2Student>()
+        Assertions.assertEquals(6, mapper.selectList(new QueryWrapper<H2Student>()
             .eq(H2Student::getAge, 1)).size());
         Assertions.assertEquals(6, mapper.selectList(new QueryWrapper<H2Student>()
             .orderByAsc("age")).size());

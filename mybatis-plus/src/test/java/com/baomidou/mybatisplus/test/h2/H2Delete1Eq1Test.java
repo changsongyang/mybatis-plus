@@ -1,6 +1,7 @@
 package com.baomidou.mybatisplus.test.h2;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.test.h2.entity.H2Student;
 import com.baomidou.mybatisplus.test.h2.entity.H2User;
 import com.baomidou.mybatisplus.test.h2.enums.AgeEnum;
@@ -60,8 +61,8 @@ class H2Delete1Eq1Test extends BaseTest {
     @Test
     @Order(Integer.MAX_VALUE)
     void delete() {
-        logicDeleteMapper.delete(new QueryWrapper<>());
-        defaultMapper.delete(new QueryWrapper<>());
+        logicDeleteMapper.delete(new UpdateWrapper<>());
+        defaultMapper.delete(new UpdateWrapper<>());
         Assertions.assertEquals(0, logicDeleteMapper.selectCount(new QueryWrapper<>()));
         List<H2User> userList = queryByName(null);
         System.out.println(userList.size());

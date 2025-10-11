@@ -1,11 +1,11 @@
 package com.baomidou.mybatisplus.test.h2;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.test.h2.entity.H2Student;
 import com.baomidou.mybatisplus.test.h2.service.IH2StudentService;
 import org.junit.jupiter.api.*;
@@ -56,7 +56,7 @@ class ActiveRecordTest {
         H2Student student = new H2Student(1L, "Tom长大了", 2);
         Assertions.assertTrue(student.updateById());
         student.setName("不听话的学生");
-        Assertions.assertTrue(student.update(new QueryWrapper<H2Student>().gt("id", 10)));
+        Assertions.assertTrue(student.update(new UpdateWrapper<H2Student>().gt("id", 10)));
     }
 
     @Test
@@ -129,7 +129,7 @@ class ActiveRecordTest {
         try {
             h2StudentService.testTransactional();
         } catch (MybatisPlusException e) {
-            List<H2Student> students = new H2Student().selectList(new QueryWrapper<H2Student>().lambda().like(H2Student::getName, "tx"));
+            List<H2Student> students = new H2Student().selectList(new QueryWrapper<H2Student>().like(H2Student::getName, "tx"));
             Assertions.assertTrue(CollectionUtils.isEmpty(students));
         }
     }
@@ -141,7 +141,7 @@ class ActiveRecordTest {
         student.setId(2L);
         Assertions.assertTrue(student.deleteById());
         Assertions.assertTrue(student.deleteById(12L));
-        Assertions.assertTrue(student.delete(new QueryWrapper<H2Student>().gt("id", 10)));
+        Assertions.assertTrue(student.delete(new UpdateWrapper<H2Student>().gt("id", 10)));
     }
 
     @Test
@@ -149,18 +149,18 @@ class ActiveRecordTest {
     void sqlCommentTest() {
         String name = "name1", nameNew = "name1New";
         H2Student student = new H2Student().setName(name).setAge(2);
-        student.delete(new QueryWrapper<H2Student>().comment("deleteAllStu"));
+        student.delete(new UpdateWrapper<H2Student>().comment("deleteAllStu"));
         Assertions.assertTrue(student.insert());
-        boolean updated = new H2Student().setName(nameNew).update(new QueryWrapper<H2Student>().comment("updateStuName1").lambda()
+        boolean updated = new H2Student().setName(nameNew).update(new UpdateWrapper<H2Student>().comment("updateStuName1")
             .eq(H2Student::getName, name)
         );
         Assertions.assertTrue(updated);
         H2Student h2Student = student.selectOne(
-            new QueryWrapper<H2Student>().lambda().comment("getStuByUniqueName")
+            new QueryWrapper<H2Student>().comment("getStuByUniqueName")
                 .eq(H2Student::getName, nameNew)
         );
         Assertions.assertNotNull(h2Student);
-        LambdaQueryWrapper<H2Student> queryWrapper = new QueryWrapper<H2Student>().lambda().ge(H2Student::getAge, 1);
+        QueryWrapper<H2Student> queryWrapper = new QueryWrapper<H2Student>().ge(H2Student::getAge, 1);
         long userCount = student.selectCount(queryWrapper.comment("getStuCount"));
         Assertions.assertEquals(1, userCount);
         List<H2Student> h2StudentList = student.selectList(queryWrapper.comment("getStuList"));
